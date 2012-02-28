@@ -10,7 +10,14 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/rocksolidwebdesign/amoeba"
   s.license     = "BSD"
   s.summary     = %q{Easy copying of rails models and their child associations.}
-  s.description = %q{An extension to ActiveRecord to allow the duplication method to also copy associated children, with recursive support for nested of grandchildren. The behavior is controllable with a simple DSL both on your rails models and on the fly, i.e. per instance. Numerous configuration options and styles and preprocessing directives are included for power and flexibility. Tags: copy child associations, copy nested children, copy associated child records, deep_copy, nested copy, copy associations, copy relations, copy relationships, has_one, has_many, has_and_belongs_to_many, duplicate associations, duplicate associated records, duplicate child records, duplicate children, copy all, duplicate all.}
+
+  s.description = <<-EOF
+    An extension to ActiveRecord to allow the duplication method to also copy associated children, with recursive support for nested of grandchildren. The behavior is controllable with a simple DSL both on your rails models and on the fly, i.e. per instance. Numerous configuration options and styles and preprocessing directives are included for power and flexibility.
+
+    Tags: copy child associations, copy nested children, copy associated child records, deep_copy, nested copy, copy associations, copy relations, copy relationships, has_one, has_many, has_and_belongs_to_many, duplicate associations, duplicate associated records, duplicate child records, duplicate children, copy all, duplicate all.
+  EOF
+
+  s.description = %q{}
 
   s.rubyforge_project = "amoeba"
 

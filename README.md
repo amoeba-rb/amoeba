@@ -1,28 +1,37 @@
 # Amoeba
 
-Many thanks to [Caleb Hanson](http://github.com/calebhanson) for this awesome logo:
+Easy copying of rails associations such as `has_many`.
 
 ![amoebalogo](http://rocksolidwebdesign.com/wp_cms/wp-content/uploads/2012/02/amoeba_logo.jpg)
 
-## Overview
+## Background
 
-Easy copying of rails associations such as `has_many`.
+The goal was to be able to easily and quickly reproduce ActiveRecord objects including their children, for example copying a blog post maintaining its associated tags or categories.
 
-I named this gem Amoeba because amoebas are (small life forms that are) good at reproducing. Their children and grandchildren also reproduce themselves quickly and easily.
+I named this gem "Amoeba" because amoebas are (small life forms that are) good at reproducing. Their children and grandchildren also reproduce themselves quickly and easily.
 
 ## Details
 
 An ActiveRecord extension gem to allow the duplication of associated child record objects when duplicating an active record model. This gem overrides and adds to the built in `ActiveRecord::Base#dup` method.
 
-Rails 3 compatible.
+Rails 3.2 compatible.
 
 ## Features
 
- - Supports automatic recursive duplication of associated `has_one`, `has_many` and `has_and_belongs_to_many` child records.
- - Allows configuration of which fields to copy through a simple DSL applied to your rails models.
- - Supports multiple configuration styles such as inclusive, exclusive and indiscriminate (aka copy everything).
- - Supports preprocessing of fields to help indicate uniqueness and ensure the integrity of your data depending on your business logic needs.
- - Supports per instance configuration to override configuration and behavior on the fly.
+- Supports the following association types
+    - `has_many`
+    - `has_one :through`
+    - `has_many :through`
+    - `has_and_belongs_to_many`
+- A simple DSL for configuration of which fields to copy. The DSL can be applied to your rails models or used on the fly.
+- Multiple configuration styles such as inclusive, exclusive and indiscriminate (aka copy everything).
+- Supports recursive copying of child and grandchild records.
+- Supports preprocessing of fields to help indicate uniqueness and ensure the integrity of your data depending on your business logic needs, e.g. prepending "Copy of " or similar text.
+- Amoeba can perform the following preprocessing operations on fields of copied records
+    - prepend
+    - append
+    - nullify
+    - regex
 
 ## Installation
 
@@ -71,7 +80,7 @@ If you have some models for a blog about like this:
       belongs_to :post
     end
 
-Add the amoeba configuration block to your model and call the enable method to enable the copying of child records, like this:
+simply add the amoeba configuration block to your model and call the enable method to enable the copying of child records, like this:
 
     class Post < ActiveRecord::Base
       has_many :comments
@@ -435,7 +444,7 @@ Globally search and replace the field for a given pattern. Accepts a hash of fie
 
 ## Known Limitations and Issues
 
-Amoeba does not yet recognize advanced versions of `has_and_belongs_to_many` such as `has_and_belongs_to_many :foo, :through => :bar`. Amoeba does not copy the actual HABMT child records but rather simply adds records to the M:M breakout table to associate the new parent copy with the same records that the original parent were associated with. In other words, it doesn't duplicate your tags or categories, but merely reassociates your parent copy with the same tags or categories that the old parent had.
+Amoeba does not copy the actual HABMT child records but rather simply adds records to the M:M breakout table to associate the new parent copy with the same records that the original parent were associated with. In other words, it doesn't duplicate your tags or categories, but merely reassociates your parent copy with the same tags or categories that the old parent had.
 
 The regular expression preprocessor uses case-sensitive `String#gsub`. Given the performance decreases inherrent in using regular expressions already, the fact that character classes can essentially account for case-insensitive searches, the desire to keep the DSL simple and the general use cases for this gem, I don't see a good reason to add yet more decision based conditional syntax to accommodate using case-insensitive searches or singular replacements with `String#sub`. If you find yourself wanting either of these features, by all means fork the code base and if you like your changes, submit a pull request.
 

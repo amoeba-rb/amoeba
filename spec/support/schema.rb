@@ -58,4 +58,28 @@ ActiveRecord::Schema.define do
     t.integer :post_id
     t.integer :tag_id
   end
+
+  create_table :categories, :force => true do |t|
+    t.string :title
+    t.string :description
+  end
+
+  create_table :supercats, :force => true do |t|
+    t.integer :post_id
+    t.integer :category_id
+    t.string :ramblings
+    t.timestamps
+  end
+
+  create_table :accounts, :force => true do |t|
+    t.integer :post_id
+    t.string :title
+    t.timestamps
+  end
+
+  create_table :histories, :force => true do |t|
+    t.integer :account_id
+    t.string :some_stuff
+    t.timestamps
+  end
 end

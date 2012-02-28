@@ -181,13 +181,27 @@ module Amoeba
 
       case settings.macro
       when :has_one
+        if settings.is_a?(ActiveRecord::Reflection::ThroughReflection)
+          return
+        end
+
         old_obj = self.send(relation_name)
 
-        copy_of_obj = old_obj.dup
-        copy_of_obj[:"#{settings.foreign_key}"] = nil
+        if not old_obj.nil?
+          copy_of_obj = old_obj.dup
+          copy_of_obj[:"#{settings.foreign_key}"] = nil
 
-        @result.send(:"#{relation_name}=", copy_of_obj)
+          @result.send(:"#{relation_name}=", copy_of_obj)
+        end
       when :has_many
+        # copying the children of the regular has many will
+        # effectively do what is desired anyway, the through
+        # association is really just for convenience usage
+        # on the model
+        if settings.is_a?(ActiveRecord::Reflection::ThroughReflection)
+          return
+        end
+
         self.send(relation_name).each do |old_obj|
           copy_of_obj = old_obj.dup
           copy_of_obj[:"#{settings.foreign_key}"] = nil
