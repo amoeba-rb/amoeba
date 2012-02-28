@@ -373,6 +373,62 @@ You may cause amoeba to keep copying down the chain as far as you like, simply a
 
 In this example, when a post is copied, amoeba will copy each all of a post's comments and will also copy each comment's ratings.
 
+### Has One Through
+
+Using the `has_one :through` association is simple, just be sure to enable amoeba on the each model with a `has_one` association and amoeba will automatically and recursively drill down, like so:
+
+    class Supplier < ActiveRecord::Base
+      has_one :account
+      has_one :history, :through => :account
+
+      amoeba do
+        enable
+      end
+    end
+
+    class Account < ActiveRecord::Base
+      belongs_to :supplier
+      has_one :history
+
+      amoeba do
+        enable
+      end
+    end
+
+    class History < ActiveRecord::Base
+      belongs_to :account
+    end
+
+### Has Many Through
+
+Copying `has_many :through` associations work automatically. They perform the copy in the same way as the `has_and_belongs_to_many` association, meaning the actual child records are not copied, but rather the associations are simply maintained. You can add some field preprocessors to the middle model if you like but this is not strictly necessary:
+
+    class Assembly < ActiveRecord::Base
+      has_many :manifests
+      has_many :parts, :through => :manifests
+
+      amoeba do
+        enable
+      end
+    end
+
+    class Manifest < ActiveRecord::Base
+      belongs_to :assembly
+      belongs_to :part
+
+      amoeba do
+        prefix :notes => "Copy of "
+      end
+    end
+
+    class Part < ActiveRecord::Base
+      has_many :manifests
+      has_many :assemblies, :through => :manifests
+
+      amoeba do
+        enable
+      end
+    end
 
 ### On The Fly Configuration
 
@@ -416,31 +472,31 @@ Here is a static reference to the available configuration methods, usable within
 
 `enable`
 
-Enables amoeba in the default style of copying all known associated child records.
+Enables amoeba in the default style of copying all known associated child records. Using the enable method is only required if you wish to enable amoeba but you are not using either the `include_field` or `exclude_field` directives. If you use either inclusive or exclusive style, amoeba is automatically enabled for you, so calling `enable` would be redundant, though it won't hurt.
 
 `include_field`
 
-Adds a field to the list of fields which should be copied. All associations not in this list will not be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names.
+Adds a field to the list of fields which should be copied. All associations not in this list will not be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of included fields. Passing an array will empty the list and replace it with the array you pass.
 
 `exclude_field`
 
-Adds a field to the list of fields which should not be copied. Only the associations that are not in this list will be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names.
+Adds a field to the list of fields which should not be copied. Only the associations that are not in this list will be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of excluded fields. Passing an array will empty the list and replace it with the array you pass.
 
 `nullify`
 
-Adds a field to the list of non-association based fields which should be set to nil during copy. All fields in this list will be set to `nil` - note that any nullified field will be given its default value if a default value exists on this model's migration. This method may be called multiple times, once per desired field, or you may pass an array of field names.
+Adds a field to the list of non-association based fields which should be set to nil during copy. All fields in this list will be set to `nil` - note that any nullified field will be given its default value if a default value exists on this model's migration. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of null fields. Passing an array will empty the list and replace it with the array you pass.
 
 `prepend`
 
-Prefix a field with some text. This only works for string fields. Accepts a hash of fields to prepend. The keys are the field names and the values are the prefix strings. An example scenario would be to add a string such as "Copy of " to your title field. Don't forget to include extra space to the right if you want it.
+Prefix a field with some text. This only works for string fields. Accepts a hash of fields to prepend. The keys are the field names and the values are the prefix strings. An example scenario would be to add a string such as "Copy of " to your title field. Don't forget to include extra space to the right if you want it. Passing a hash will add each key value pair to the list of prepend directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:title => "Copy of "}]`.
 
 `append`
 
-Append some text to a field. This only works for string fields. Accepts a hash of fields to prepend. The keys are the field names and the values are the prefix strings. An example would be to add " (copied version)" to your description field. Don't forget to add a leading space if you want it.
+Append some text to a field. This only works for string fields. Accepts a hash of fields to prepend. The keys are the field names and the values are the prefix strings. An example would be to add " (copied version)" to your description field. Don't forget to add a leading space if you want it. Passing a hash will add each key value pair to the list of prepend directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:contents => " (copied version)"}]`.
 
 `regex`
 
-Globally search and replace the field for a given pattern. Accepts a hash of fields to run search and replace upon. The keys are the field names and the values are each a hash with information about what to find and what to replace it with. in the form of . An example would be to replace all occurrences of the word "dog" with the word "cat", the parameter hash would look like this `:contents => {:replace => /dog/, :with => "cat"}`
+Globally search and replace the field for a given pattern. Accepts a hash of fields to run search and replace upon. The keys are the field names and the values are each a hash with information about what to find and what to replace it with. in the form of . An example would be to replace all occurrences of the word "dog" with the word "cat", the parameter hash would look like this `:contents => {:replace => /dog/, :with => "cat"}`. Passing a hash will add each key value pair to the list of prepend directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:contents => {:replace => /dog/, :with => "cat"}]`.
 
 ## Known Limitations and Issues
 
