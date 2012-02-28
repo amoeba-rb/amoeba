@@ -1,5 +1,7 @@
 # Amoeba
 
+![amoebalogo](http://rocksolidwebdesign.com/wp_cms/wp-content/uploads/2012/02/amoeba_logo.jpg)
+
 ## Overview
 
 Easy copying of rails associations such as `has_many`.
@@ -446,3 +448,8 @@ You may run the rspec tests like this:
 ## TODO
 
 Write more tests.... anyone?
+
+## License
+
+The BSD License
+
