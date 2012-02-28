@@ -10,7 +10,7 @@ I named this gem Amoeba because amoebas are (small life forms that are) good at 
 
 An ActiveRecord extension gem to allow the duplication of associated child record objects when duplicating an active record model. This gem overrides and adds to the built in `ActiveRecord::Base#dup` method.
 
-Compatible with ActiveRecord 3.2
+Rails 3 compatible.
 
 ## Features
 
