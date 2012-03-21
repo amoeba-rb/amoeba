@@ -25,9 +25,11 @@ Rails 3.2 compatible.
     - `has_and_belongs_to_many`
 - A simple DSL for configuration of which fields to copy. The DSL can be applied to your rails models or used on the fly.
 - Multiple configuration styles such as inclusive, exclusive and indiscriminate (aka copy everything).
+- Supports cloning of the children of Many-to-Many records as well as not cloning the child records but merely maintaining original associations
 - Supports recursive copying of child and grandchild records.
 - Supports preprocessing of fields to help indicate uniqueness and ensure the integrity of your data depending on your business logic needs, e.g. prepending "Copy of " or similar text.
 - Amoeba can perform the following preprocessing operations on fields of copied records
+    - set
     - prepend
     - append
     - nullify
@@ -133,7 +135,7 @@ Using the inclusive style within the amoeba block actually implies that you wish
       belongs_to :post
     end
 
-You may also specify fields to be copied by passing an array.
+You may also specify fields to be copied by passing an array. If you call the `include_field` with a single value, it will be appended to the list of already included fields. If you pass an array, your array will overwrite the original values.
 
     class Post < ActiveRecord::Base
       has_many :comments
@@ -170,6 +172,38 @@ If you have more fields to include than to exclude, you may wish to shorten the 
     end
 
 This example does the same thing as the inclusive style example, it will copy the post's tags and authors but not its comments. As with inclusive style, there is no need to explicitly enable amoeba when specifying fields to exclude.
+
+### Cloning
+
+If you are using a Many-to-Many relationship, you may tell amoeba to actually make duplicates of the original related records rather than merely maintaining association with the original records. Cloning is easy, merely tell amoeba which fields to clone in the same way you tell it which fields to include or exclude.
+
+    class Post < ActiveRecord::Base
+      has_and_belongs_to_many :warnings
+
+      has_many :post_widgets
+      has_many :widgets, :through => :post_widgets
+
+      amoeba do
+        enable
+        clone [:widgets, :tags]
+      end
+    end
+
+    class Warning < ActiveRecord::Base
+      has_and_belongs_to_many :posts
+    end
+
+    class PostWidget < ActiveRecord::Base
+      belongs_to :widget
+      belongs_to :post
+    end
+
+    class Widget < ActiveRecord::Base
+      has_many :post_widgets
+      has_many :posts, :through => :post_widgets
+    end
+
+This example will actually duplicate the warnings and widgets in the database. If there were originally 3 warnings in the database then, upon duplicating a post, you will end up with 6 warnings in the database. This is in contrast to the default behavior where your new post would merely be re-associated with any previously existing warnings and those warnings themselves would not be duplicated.
 
 ### Limiting Association Types
 
@@ -229,6 +263,18 @@ If you wish to prevent a regular (non `has_*` association based) field from reta
 This example will copy all of a post's comments. It will also nullify the publishing date and dissociate the post from its original topic.
 
 Unlike inclusive and exclusive styles, specifying null fields will not automatically enable amoeba to copy all child records. As with any active record object, the default field value will be used instead of `nil` if a default value exists on the migration.
+
+#### Set
+
+If you wish to just set a field to an aribrary value on all duplicated objects you may use the `set` directive. For example, if you wanted to copy an object that has some kind of approval process associated with it, you likely may wish to set the new object's state to be open or "in progress" again.
+
+    class Post < ActiveRecord::Base
+      amoeba do
+        set :state_tracker => "open_for_editing"
+      end
+    end
+
+In this example, when a post is duplicated, it's `state_tracker` field will always be given a value of `open_for_editing` to start.
 
 #### Prepend
 
