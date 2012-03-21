@@ -546,8 +546,6 @@ Globally search and replace the field for a given pattern. Accepts a hash of fie
 
 ## Known Limitations and Issues
 
-Amoeba does not copy the actual HABMT child records but rather simply adds records to the M:M breakout table to associate the new parent copy with the same records that the original parent were associated with. In other words, it doesn't duplicate your tags or categories, but merely reassociates your parent copy with the same tags or categories that the old parent had.
-
 The regular expression preprocessor uses case-sensitive `String#gsub`. Given the performance decreases inherrent in using regular expressions already, the fact that character classes can essentially account for case-insensitive searches, the desire to keep the DSL simple and the general use cases for this gem, I don't see a good reason to add yet more decision based conditional syntax to accommodate using case-insensitive searches or singular replacements with `String#sub`. If you find yourself wanting either of these features, by all means fork the code base and if you like your changes, submit a pull request.
 
 The behavior when copying nested hierarchical models is undefined. Copying a category model which has a `parent_id` field pointing to the parent category, for example, is currently undefined. The behavior when copying polymorphic `has_many` associations is also undefined. Support for these types of associations is planned for a future release.
