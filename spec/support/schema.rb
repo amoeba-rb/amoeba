@@ -42,7 +42,6 @@ ActiveRecord::Schema.define do
   end
 
   create_table :tags, :force => true do |t|
-    t.integer :post_id
     t.string :value
     t.timestamps
   end
@@ -59,6 +58,25 @@ ActiveRecord::Schema.define do
     t.integer :tag_id
   end
 
+  create_table :notes, :force => true do |t|
+    t.string :value
+    t.timestamps
+  end
+
+  create_table :notes_posts, :force => true do |t|
+    t.integer :post_id
+    t.integer :note_id
+  end
+
+  create_table :widgets, :force => true do |t|
+    t.string :value
+  end
+
+  create_table :post_widgets, :force => true do |t|
+    t.integer :post_id
+    t.integer :widget_id
+  end
+
   create_table :categories, :force => true do |t|
     t.string :title
     t.string :description
@@ -68,6 +86,13 @@ ActiveRecord::Schema.define do
     t.integer :post_id
     t.integer :category_id
     t.string :ramblings
+    t.string :other_ramblings
+    t.timestamps
+  end
+
+  create_table :superkittens, :force => true do |t|
+    t.integer :supercat_id
+    t.string :value
     t.timestamps
   end
 

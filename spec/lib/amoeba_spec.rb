@@ -18,12 +18,18 @@ describe "amoeba" do
       start_cat_count = Category.all.count
       start_supercat_count = Supercat.all.count
       start_tag_count = Tag.all.count
+      start_note_count = Note.all.count
+      start_widget_count = Widget.all.count
       start_post_count = Post.all.count
       start_comment_count = Comment.all.count
       start_rating_count = Rating.all.count
       start_postconfig_count = PostConfig.all.count
+      start_postwidget_count = PostWidget.all.count
+      start_superkitten_count = Superkitten.all.count
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS tag_count FROM posts_tags')
       start_posttag_count = rs["tag_count"]
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS note_count FROM notes_posts')
+      start_postnote_count = rs["note_count"]
 
       new_post.save
 
@@ -32,12 +38,18 @@ describe "amoeba" do
       end_cat_count = Category.all.count
       end_supercat_count = Supercat.all.count
       end_tag_count = Tag.all.count
+      end_note_count = Note.all.count
+      end_widget_count = Widget.all.count
       end_post_count = Post.all.count
       end_comment_count = Comment.all.count
       end_rating_count = Rating.all.count
       end_postconfig_count = PostConfig.all.count
+      end_postwidget_count = PostWidget.all.count
+      end_superkitten_count = Superkitten.all.count
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS tag_count FROM posts_tags')
       end_posttag_count = rs["tag_count"]
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS note_count FROM notes_posts')
+      end_postnote_count = rs["note_count"]
 
       end_tag_count.should         == start_tag_count
       end_cat_count.should         == start_cat_count
@@ -49,10 +61,21 @@ describe "amoeba" do
       end_rating_count.should      == start_rating_count * 2
       end_postconfig_count.should  == start_postconfig_count * 2
       end_posttag_count.should     == start_posttag_count * 2
+      end_widget_count.should      == start_widget_count * 2
+      end_postwidget_count.should  == start_postwidget_count * 2
+      end_note_count.should        == start_note_count * 2
+      end_postnote_count.should    == start_postnote_count * 2
+      end_superkitten_count.should == start_superkitten_count * 2
 
       new_post.supercats.map(&:ramblings).include?("Copy of zomg").should be true
+      new_post.supercats.map(&:other_ramblings).uniq.length.should == 1
+      new_post.supercats.map(&:other_ramblings).uniq.include?("La la la").should be true
       new_post.title.should == "Copy of #{old_post.title}"
       new_post.contents.should == "Here's a copy: #{old_post.contents.gsub(/dog/, 'cat')} (copied version)"
+
+      new_post.widgets.map(&:id).each do |id|
+        old_post.widgets.map(&:id).include?(id).should_not be true
+      end
     end
   end
 end

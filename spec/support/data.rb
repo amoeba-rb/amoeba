@@ -41,11 +41,41 @@ p1.tags << t2
 p1.tags << t3
 p1.save
 
+w1 = Widget.create(:value => "My Sidebar")
+w2 = Widget.create(:value => "Photo Gallery")
+w3 = Widget.create(:value => "Share & Like")
+
+p1.widgets << w1
+p1.widgets << w2
+p1.widgets << w3
+p1.save
+
+n1 = Note.create(:value => "This is important")
+n2 = Note.create(:value => "You've been warned")
+n3 = Note.create(:value => "Don't forget")
+
+p1.notes << n1
+p1.notes << n2
+p1.notes << n3
+p1.save
+
 c1 = Category.create(:title => "Umbrellas", :description => "Clown fart")
 c2 = Category.create(:title => "Widgets", :description => "Humpty dumpty")
 c3 = Category.create(:title => "Wombats", :description => "Slushy mushy")
 
-Supercat.create(:post => p1, :category => c1, :ramblings => "zomg")
-Supercat.create(:post => p1, :category => c2, :ramblings => "why")
-Supercat.create(:post => p1, :category => c3, :ramblings => "ohnoes")
+s1 = Supercat.create(:post => p1, :category => c1, :ramblings => "zomg", :other_ramblings => "nerp")
+s2 = Supercat.create(:post => p1, :category => c2, :ramblings => "why", :other_ramblings => "narp")
+s3 = Supercat.create(:post => p1, :category => c3, :ramblings => "ohnoes", :other_ramblings => "blap")
+
+s1.superkittens.create(:value => "Fluffy")
+s1.superkittens.create(:value => "Buffy")
+s1.superkittens.create(:value => "Fuzzy")
+
+s2.superkittens.create(:value => "Hairball")
+s2.superkittens.create(:value => "Crosseye")
+s2.superkittens.create(:value => "Spot")
+
+s3.superkittens.create(:value => "Dopey")
+s3.superkittens.create(:value => "Sneezy")
+s3.superkittens.create(:value => "Sleepy")
 # }}}

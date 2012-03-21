@@ -20,6 +20,11 @@ module Amoeba
         @do_preproc
       end
 
+      def known_macros
+        @known_macros ||= [:has_one, :has_many, :has_and_belongs_to_many]
+        @known_macros
+      end
+
       def includes
         @includes ||= []
         @includes
@@ -30,14 +35,19 @@ module Amoeba
         @excludes
       end
 
-      def known_macros
-        @known_macros ||= [:has_one, :has_many, :has_and_belongs_to_many]
-        @known_macros
+      def clones
+        @clones ||= []
+        @clones
       end
 
       def null_fields
         @null_fields ||= []
         @null_fields
+      end
+
+      def coercions
+        @coercions ||= {}
+        @coercions
       end
 
       def prefixes
@@ -87,6 +97,17 @@ module Amoeba
         @excludes
       end
 
+      def clone(value=nil)
+        @enabled ||= true
+        @clones ||= []
+        if value.is_a?(Array)
+          @clones = value
+        else
+          @clones << value if value
+        end
+        @clones
+      end
+
       def recognize(value=nil)
         @enabled ||= true
         @known_macros ||= []
@@ -107,6 +128,25 @@ module Amoeba
           @null_fields << value if value
         end
         @null_fields
+      end
+
+      def set(defs=nil)
+        @do_preproc ||= true
+        @coercions ||= {}
+        if defs.is_a?(Array)
+          @coercions = {}
+
+          defs.each do |d|
+            d.each do |k,v|
+              @coercions[k] = v if v
+            end
+          end
+        else
+          defs.each do |k,v|
+            @coercions[k] = v if v
+          end
+        end
+        @coercions
       end
 
       def prepend(defs=nil)
@@ -194,31 +234,72 @@ module Amoeba
           @result.send(:"#{relation_name}=", copy_of_obj)
         end
       when :has_many
-        # copying the children of the regular has many will
-        # effectively do what is desired anyway, the through
-        # association is really just for convenience usage
-        # on the model
-        if settings.is_a?(ActiveRecord::Reflection::ThroughReflection)
-          return
+        clone = amoeba_conf.clones.include?(:"#{relation_name}")
+
+        # this could  be DRYed up for  better readability by
+        # duplicating the loop code, but I'm duplicating the
+        # loops to avoid that extra check on each iteration
+        if clone
+          # This  is  a  M:M  "has many  through"  where  we
+          # actually copy  and reassociate the  new children
+          # rather than only maintaining the associations
+          self.send(relation_name).each do |old_obj|
+            copy_of_obj = old_obj.dup
+
+            # associate this new child to the new parent object
+            @result.send(relation_name) << copy_of_obj
+          end
+        else
+          # This is a regular 1:M "has many"
+          #
+          # copying the children of the regular has many will
+          # effectively do what is desired anyway, the through
+          # association is really just for convenience usage
+          # on the model
+          return if settings.is_a?(ActiveRecord::Reflection::ThroughReflection)
+
+          self.send(relation_name).each do |old_obj|
+            copy_of_obj = old_obj.dup
+            copy_of_obj[:"#{settings.foreign_key}"] = nil
+
+            # associate this new child to the new parent object
+            @result.send(relation_name) << copy_of_obj
+          end
         end
 
-        self.send(relation_name).each do |old_obj|
-          copy_of_obj = old_obj.dup
-          copy_of_obj[:"#{settings.foreign_key}"] = nil
-
-          # associate this new child to the new parent object
-          @result.send(relation_name) << copy_of_obj
-        end
       when :has_and_belongs_to_many
-        self.send(relation_name).each do |old_obj|
-          # associate this new child to the new parent object
-          @result.send(relation_name) << old_obj
+        clone = amoeba_conf.clones.include?(relation_name)
+
+        if clone
+          self.send(relation_name).each do |old_obj|
+            copy_of_obj = old_obj.dup
+
+            # associate this new child to the new parent object
+            @result.send(relation_name) << copy_of_obj
+          end
+        else
+          self.send(relation_name).each do |old_obj|
+            # associate this new child to the new parent object
+            @result.send(relation_name) << old_obj
+          end
         end
       end
     end
 
     def dup(options={})
       @result = super()
+
+      amoeba_conf.clones.each do |clone_field|
+        r = self.class.reflect_on_association clone_field
+
+        # if this is a has many through and we're gonna deep
+        # copy the  child records, exclude the  regular join
+        # table from copying so we don't end up with the new
+        # and old children on the copy
+        if r.macro == :has_many && r.is_a?(ActiveRecord::Reflection::ThroughReflection)
+          amoeba_conf.exclude_field r.options[:through]
+        end
+      end
 
       if amoeba_conf.enabled
         if amoeba_conf.includes.count > 0
@@ -250,6 +331,11 @@ module Amoeba
       # nullify any fields the user has configured
       amoeba_conf.null_fields.each do |n|
         @result[n] = nil
+      end
+
+      # prepend any extra strings to indicate uniqueness of the new record(s)
+      amoeba_conf.coercions.each do |field,coercion|
+        @result[field] = "#{coercion}"
       end
 
       # prepend any extra strings to indicate uniqueness of the new record(s)
