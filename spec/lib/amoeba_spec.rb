@@ -57,7 +57,7 @@ describe "amoeba" do
       end_history_count.should     == start_history_count * 2
       end_supercat_count.should    == start_supercat_count * 2
       end_post_count.should        == start_post_count * 2
-      end_comment_count.should     == start_comment_count * 2
+      end_comment_count.should     == (start_comment_count * 2) + 1
       end_rating_count.should      == start_rating_count * 2
       end_postconfig_count.should  == start_postconfig_count * 2
       end_posttag_count.should     == start_posttag_count * 2
@@ -72,6 +72,9 @@ describe "amoeba" do
       new_post.supercats.map(&:other_ramblings).uniq.include?("La la la").should be true
       new_post.title.should == "Copy of #{old_post.title}"
       new_post.contents.should == "Here's a copy: #{old_post.contents.gsub(/dog/, 'cat')} (copied version)"
+      new_post.comments.length.should == 4
+      new_post.comments.select{ |c| c.nerf == 'ratatat' && c.contents.nil? }.length.should == 1
+      new_post.comments.select{ |c| c.nerf == 'ratatat' }.length.should == 2
 
       new_post.widgets.map(&:id).each do |id|
         old_post.widgets.map(&:id).include?(id).should_not be true

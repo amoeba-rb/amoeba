@@ -41,6 +41,11 @@ module Amoeba
         @clones
       end
 
+      def customizations
+        @customizations ||= []
+        @customizations
+      end
+
       def null_fields
         @null_fields ||= []
         @null_fields
@@ -107,6 +112,17 @@ module Amoeba
           @clones << value if value
         end
         @clones
+      end
+
+      def customize(value=nil)
+        @do_preproc ||= true
+        @customizations ||= []
+        if value.is_a?(Array)
+          @customizations = value
+        else
+          @customizations << value if value
+        end
+        @customizations
       end
 
       def recognize(value=nil)
@@ -245,6 +261,7 @@ module Amoeba
           # actually copy  and reassociate the  new children
           # rather than only maintaining the associations
           self.send(relation_name).each do |old_obj|
+
             copy_of_obj = old_obj.dup
 
             # associate this new child to the new parent object
@@ -332,6 +349,11 @@ module Amoeba
       # nullify any fields the user has configured
       amoeba_conf.null_fields.each do |n|
         @result[n] = nil
+      end
+
+      # prepend any extra strings to indicate uniqueness of the new record(s)
+      amoeba_conf.customizations.each do |block|
+        block.call(self, @result)
       end
 
       # prepend any extra strings to indicate uniqueness of the new record(s)

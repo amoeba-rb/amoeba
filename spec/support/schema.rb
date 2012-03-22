@@ -29,9 +29,15 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
 
+  create_table :custom_things, :force => true do |t|
+    t.string :value
+    t.timestamps
+  end
+
   create_table :comments, :force => true do |t|
     t.integer :post_id
     t.string :contents
+    t.string :nerf
     t.timestamps
   end
 
