@@ -25,14 +25,16 @@ Rails 3.2 compatible.
     - `has_and_belongs_to_many`
 - A simple DSL for configuration of which fields to copy. The DSL can be applied to your rails models or used on the fly.
 - Multiple configuration styles such as inclusive, exclusive and indiscriminate (aka copy everything).
-- Supports cloning of the children of Many-to-Many records as well as not cloning the child records but merely maintaining original associations
+- Supports cloning of the children of Many-to-Many records or merely maintaining original associations
 - Supports recursive copying of child and grandchild records.
 - Supports preprocessing of fields to help indicate uniqueness and ensure the integrity of your data depending on your business logic needs, e.g. prepending "Copy of " or similar text.
+- Supports preprocessing of fields with custom lambda blocks so you can basically whatever you want, for example if you need some custom logic while making copies.
 - Amoeba can perform the following preprocessing operations on fields of copied records
     - set
     - prepend
     - append
     - nullify
+    - customize
     - regex
 
 ## Installation
@@ -309,6 +311,44 @@ You may run a search and replace query on a copied object's field during the cop
       end
     end
 
+#### Custom Methods
+
+You may run a custom method or methods to do basically anything you like, simply pass a lambda block, or an array of lambda blocks to the `customize` directive. Each block must have the same form, meaning that each block must accept two parameters, the original object and the newly copied object. You may then do whatever you wish, like this:
+
+    class Post < ActiveRecord::Base
+      amoeba do
+        prepend :title => "Hello world! "
+
+        customize(lambda { |original_post,new_post|
+          if original_post.foo == "bar"
+            new_post.baz = "qux"
+          end
+        })
+
+        append :comments => "... know what I'm sayin?"
+      end
+    end
+
+or this, using an array:
+
+    class Post < ActiveRecord::Base
+      has_and_belongs_to_many :tags
+
+      amoeba do
+        include_field :tags
+
+        customize([
+          lambda do |orig_obj,copy_of_obj|
+            # good stuff goes here
+          end,
+
+          lambda do |orig_obj,copy_of_obj|
+            # more good stuff goes here
+          end
+        ])
+      end
+    end
+
 #### Chaining
 
 You may apply a preprocessor to multiple fields at once.
@@ -516,6 +556,8 @@ You may control how amoeba copies your object, on the fly, by passing a configur
 
 Here is a static reference to the available configuration methods, usable within the amoeba block on your rails models.
 
+#### Controlling Associations
+
 `enable`
 
 Enables amoeba in the default style of copying all known associated child records. Using the enable method is only required if you wish to enable amoeba but you are not using either the `include_field` or `exclude_field` directives. If you use either inclusive or exclusive style, amoeba is automatically enabled for you, so calling `enable` would be redundant, though it won't hurt.
@@ -527,6 +569,12 @@ Adds a field to the list of fields which should be copied. All associations not 
 `exclude_field`
 
 Adds a field to the list of fields which should not be copied. Only the associations that are not in this list will be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of excluded fields. Passing an array will empty the list and replace it with the array you pass.
+
+`clone`
+
+Adds a field to the list of associations which should have their associated children actually cloned. This means for example, that instead of just maintaining original associations with previously existing tags, a copy will be made of each tag, and the new record will be associated with these new tag copies rather than the old tag copies. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of excluded fields. Passing an array will empty the list and replace it with the array you pass.
+
+#### Pre-Processing Fields
 
 `nullify`
 
@@ -548,21 +596,25 @@ Set a field to a given value. This sould work for almost any type of field. Acce
 
 Globally search and replace the field for a given pattern. Accepts a hash of fields to run search and replace upon. The keys are the field names and the values are each a hash with information about what to find and what to replace it with. in the form of . An example would be to replace all occurrences of the word "dog" with the word "cat", the parameter hash would look like this `:contents => {:replace => /dog/, :with => "cat"}`. Passing a hash will add each key value pair to the list of regex directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:contents => {:replace => /dog/, :with => "cat"}]`.
 
+`customize`
+
+Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy
+
+This method may be called multiple times, once per desired customizer block, or you may pass an array of lambdas. Passing a single lambda will add to the list of processing directives. Passing an array will empty the list and replace it with the array you pass.
+
 ## Known Limitations and Issues
 
 The regular expression preprocessor uses case-sensitive `String#gsub`. Given the performance decreases inherrent in using regular expressions already, the fact that character classes can essentially account for case-insensitive searches, the desire to keep the DSL simple and the general use cases for this gem, I don't see a good reason to add yet more decision based conditional syntax to accommodate using case-insensitive searches or singular replacements with `String#sub`. If you find yourself wanting either of these features, by all means fork the code base and if you like your changes, submit a pull request.
 
-The behavior when copying nested hierarchical models is undefined. Copying a category model which has a `parent_id` field pointing to the parent category, for example, is currently undefined. The behavior when copying polymorphic `has_many` associations is also undefined. Support for these types of associations is planned for a future release.
+The behavior when copying nested hierarchical models is undefined. Copying a category model which has a `parent_id` field pointing to the parent category, for example, is currently undefined.
+
+The behavior when copying polymorphic `has_many` associations is also undefined. Support for these types of associations is planned for a future release.
 
 ### For Developers
 
 You may run the rspec tests like this:
 
     bundle exec rspec spec
-
-## TODO
-
-Write more tests.... anyone?
 
 ## License
 

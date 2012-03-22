@@ -23,20 +23,37 @@ class Post < ActiveRecord::Base
     prepend :title => "Copy of "
     append :contents => " (copied version)"
     regex :contents => {:replace => /dog/, :with => 'cat'}
-    customize(lambda { |orig_obj,copy_of_obj|
-      orig_obj.comments.each do |oc|
-        if oc.nerf == "ratatat"
-          hash = oc.attributes
-          hash[:id]       = nil
-          hash[:post_id]  = nil
-          hash[:contents] = nil
+    customize([
+      lambda do |orig_obj,copy_of_obj|
+        orig_obj.comments.each do |oc|
+          if oc.nerf == "ratatat"
+            hash = oc.attributes
+            hash[:id]       = nil
+            hash[:post_id]  = nil
+            hash[:contents] = nil
 
-          cc = Comment.new(hash)
+            cc = Comment.new(hash)
 
-          copy_of_obj.comments << cc
+            copy_of_obj.comments << cc
+          end
+        end
+      end,
+      lambda do |orig_obj,copy_of_obj|
+        orig_obj.comments.each do |oc|
+          if oc.nerf == "bonk"
+            hash = oc.attributes
+            hash[:id]       = nil
+            hash[:post_id]  = nil
+            hash[:contents] = nil
+            hash[:nerf]     = "bonkers"
+
+            cc = Comment.new(hash)
+
+            copy_of_obj.comments << cc
+          end
         end
       end
-    })
+    ])
   end
 end
 
