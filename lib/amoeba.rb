@@ -94,11 +94,11 @@ module Amoeba
         @enabled = false
       end
 
-      def raised(style=:strict)
+      def raised(style=:submissive)
         @raised = style
       end
 
-      def propagate(style=:strict)
+      def propagate(style=:submissive)
         @parenting ||= style
         @inherit = true
       end
@@ -326,7 +326,7 @@ module Amoeba
           self.class.amoeba(&parent_amoeba_settings)
         when :submissive
           # parent suggests things
-          # child does what it wants anyway
+          # child does what it wants to anyway
           child_settings = amoeba_settings
           self.class.fresh_amoeba(&parent_amoeba_settings)
           self.class.amoeba(&child_settings)

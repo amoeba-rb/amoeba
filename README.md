@@ -4,11 +4,21 @@ Easy copying of rails associations such as `has_many`.
 
 ![amoebalogo](http://rocksolidwebdesign.com/wp_cms/wp-content/uploads/2012/02/amoeba_logo.jpg)
 
-## Background
+## Installation
+
+is hopefully as you would expect:
+
+    gem install amoeba
+
+or just add it to your Gemfile:
+
+    gem 'amoeba'
+
+## What?
 
 The goal was to be able to easily and quickly reproduce ActiveRecord objects including their children, for example copying a blog post maintaining its associated tags or categories.
 
-I named this gem "Amoeba" because amoebas are (small life forms that are) good at reproducing. Their children and grandchildren also reproduce themselves quickly and easily.
+This gem is named "Amoeba" because amoebas are (small life forms that are) good at reproducing. Their children and grandchildren also reproduce themselves quickly and easily.
 
 ## Details
 
@@ -24,11 +34,12 @@ Rails 3.2 compatible.
     - `has_many :through`
     - `has_and_belongs_to_many`
 - A simple DSL for configuration of which fields to copy. The DSL can be applied to your rails models or used on the fly.
+- Supports STI (Single Table Inheritance) children inheriting their parent amoeba settings.
 - Multiple configuration styles such as inclusive, exclusive and indiscriminate (aka copy everything).
 - Supports cloning of the children of Many-to-Many records or merely maintaining original associations
-- Supports recursive copying of child and grandchild records.
+- Supports automatic drill-down i.e. recursive copying of child and grandchild records.
 - Supports preprocessing of fields to help indicate uniqueness and ensure the integrity of your data depending on your business logic needs, e.g. prepending "Copy of " or similar text.
-- Supports preprocessing of fields with custom lambda blocks so you can basically whatever you want, for example if you need some custom logic while making copies.
+- Supports preprocessing of fields with custom lambda blocks so you can do basically whatever you want if, for example, you need some custom logic while making copies.
 - Amoeba can perform the following preprocessing operations on fields of copied records
     - set
     - prepend
@@ -36,16 +47,6 @@ Rails 3.2 compatible.
     - nullify
     - customize
     - regex
-
-## Installation
-
-is hopefully as you would expect:
-
-    gem install amoeba
-
-or just add it to your Gemfile:
-
-    gem 'amoeba'
 
 ## Usage
 
@@ -155,6 +156,8 @@ You may also specify fields to be copied by passing an array. If you call the `i
 
 These examples will copy the post's tags and authors but not its comments.
 
+The inclusive style, when used, will automatically disable any ther style that was previously selected.
+
 ### Exclusive Style
 
 If you have more fields to include than to exclude, you may wish to shorten the amount of typing and reading you need to do by using the exclusive style. All fields that are not explicitly excluded will be copied:
@@ -174,6 +177,8 @@ If you have more fields to include than to exclude, you may wish to shorten the 
     end
 
 This example does the same thing as the inclusive style example, it will copy the post's tags and authors but not its comments. As with inclusive style, there is no need to explicitly enable amoeba when specifying fields to exclude.
+
+The exclusive style, when used, will automatically disable any other style that was previously selected, so if you selected include fields, and then you choose some exclude fields, the `exclude_field` method will disable the previously slected inclusive style and wipe out any corresponding include fields.
 
 ### Cloning
 
@@ -206,6 +211,188 @@ If you are using a Many-to-Many relationship, you may tell amoeba to actually ma
     end
 
 This example will actually duplicate the warnings and widgets in the database. If there were originally 3 warnings in the database then, upon duplicating a post, you will end up with 6 warnings in the database. This is in contrast to the default behavior where your new post would merely be re-associated with any previously existing warnings and those warnings themselves would not be duplicated.
+
+## Inheritance
+
+If you are using the Single Table Inheritance provided by ActiveRecord, you may cause amoeba to automatically process child classes in the same way as their parents. All you need to do is call the `propagate` method within the amoeba block of the parent class and all child classes should copy in a similar manner.
+
+    create_table :products, :force => true do |t|
+      t.string :type # this is the STI column
+
+      # these belong to all products
+      t.string :title
+      t.decimal :price
+
+      # these are for shirts only
+      t.decimal :sleeve_length
+      t.decimal :collar_size
+
+      # these are for computers only
+      t.integer :ram_size
+      t.integer :hard_drive_size
+    end
+
+    class Product < ActiveRecord::Base
+      has_many :images
+      has_and_belongs_to_many :categories
+
+      amoeba do
+        enable
+        propagate
+      end
+    end
+
+    class Shirt < Product
+    end
+
+    class Computer < Product
+    end
+
+    class ProductsController
+      def some_method
+        my_shirt = Shirt.find(1)
+        my_shirt.dup
+        my_shirt.save
+
+        # this shirt should now:
+        # - have its own copy of all parent images
+        # - be in the same categories as the parent
+      end
+    end
+
+This example should duplicate all the images and sections associated with this Shirt, which is a child of Product
+
+### Parenting Style
+
+By default, propagation uses submissive parenting, meaning the config settings on the parent will be applied, but any child settings, if present, will either add to or overwrite the parent settings depending on how you call the DSL methods.
+
+You may change this behavior, the so called "parenting style", to give preference to the parent settings or to ignore any and all child settings.
+
+#### Relaxed Parenting
+
+The `:relaxed` parenting style will prefer parent settings.
+
+    class Product < ActiveRecord::Base
+      has_many :images
+      has_and_belongs_to_many :sections
+
+      amoeba do
+        exclude_field :images
+        propagate :relaxed
+      end
+    end
+
+    class Shirt < Product
+      include_field :images
+      include_field :sections
+      prepend :title => "Copy of "
+    end
+
+In this example, the conflicting `include_field` settings on the child will be ignored and the parent `exclude_field` setting will be used, while the `prepend` setting on the child will be honored because it doesn't conflict with the parent.
+
+#### Strict Parenting
+
+The `:strict` style will ignore child settings altogether and inherit any parent settings.
+
+    class Product < ActiveRecord::Base
+      has_many :images
+      has_and_belongs_to_many :sections
+
+      amoeba do
+        exclude_field :images
+        propagate :strict
+      end
+    end
+
+    class Shirt < Product
+      include_field :images
+      include_field :sections
+      prepend :title => "Copy of "
+    end
+
+In this example, the only processing that will happen when a Shirt is duplicated is whatever processing is allowed by the parent. So in this case the parent's `exclude_field` directive takes precedence over the child's `include_field` settings, and not only that, but none of the other settings for the child are used either. The `prepend` setting of the child is completely ignored.
+
+#### Parenting and Precedence
+
+Because of the two general forms of DSL config parameter usage, you may wish to make yourself mindful of how your coding style will affect the outcome of duplicating an object.
+
+Just remember that:
+
+* If you pass an array you will wipe all previous settings
+* If you pass single values, you will add to currently existing settings
+
+This means that, for example:
+
+* When using the submissive parenting style, you can child take full precedence on a per field basis by passing an array of config values. This will cause the setting from the parent to be overridden instead of added to.
+* When using the relaxed parenting style, you can still let the parent take precedence on a per field basis by passing an array of config values. This will cause the setting for that child to be overridden instead of added to.
+
+#### A Submissive Override Example
+
+This version will use both the parent and child settings, so both the images and sections will be copied.
+
+    class Product < ActiveRecord::Base
+      has_many :images
+      has_and_belongs_to_many :sections
+
+      amoeba do
+        include_field :images
+        propagate
+      end
+    end
+
+    class Shirt < Product
+      include_field :sections
+    end
+
+The next version will use only the child settings because passing an array will override any previous settings rather than adding to them and the child config takes precedence in the `submissive` parenting style. So in this case only the sections will be copied.
+
+    class Product < ActiveRecord::Base
+      has_many :images
+      has_and_belongs_to_many :sections
+
+      amoeba do
+        include_field :images
+        propagate
+      end
+    end
+
+    class Shirt < Product
+      include_field [:sections]
+    end
+
+#### A Relaxed Override Example
+
+This version will use both the parent and child settings, so both the images and sections will be copied.
+
+    class Product < ActiveRecord::Base
+      has_many :images
+      has_and_belongs_to_many :sections
+
+      amoeba do
+        include_field :images
+        propagate :relaxed
+      end
+    end
+
+    class Shirt < Product
+      include_field :sections
+    end
+
+The next version will use only the parent settings because passing an array will override any previous settings rather than adding to them and the parent config takes precedence in the `relaxed` parenting style. So in this case only the images will be copied.
+
+    class Product < ActiveRecord::Base
+      has_many :images
+      has_and_belongs_to_many :sections
+
+      amoeba do
+        include_field [:images]
+        propagate
+      end
+    end
+
+    class Shirt < Product
+      include_field :sections
+    end
 
 ### Limiting Association Types
 
@@ -552,55 +739,83 @@ You may control how amoeba copies your object, on the fly, by passing a configur
       end
     end
 
-### Config-Block Reference
+### Configuration Reference
 
 Here is a static reference to the available configuration methods, usable within the amoeba block on your rails models.
 
 #### Controlling Associations
 
-`enable`
+* `enable`
 
-Enables amoeba in the default style of copying all known associated child records. Using the enable method is only required if you wish to enable amoeba but you are not using either the `include_field` or `exclude_field` directives. If you use either inclusive or exclusive style, amoeba is automatically enabled for you, so calling `enable` would be redundant, though it won't hurt.
+  Enables amoeba in the default style of copying all known associated child records. Using the enable method is only required if you wish to enable amoeba but you are not using either the `include_field` or `exclude_field` directives. If you use either inclusive or exclusive style, amoeba is automatically enabled for you, so calling `enable` would be redundant, though it won't hurt.
 
-`include_field`
+* `include_field`
 
-Adds a field to the list of fields which should be copied. All associations not in this list will not be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of included fields. Passing an array will empty the list and replace it with the array you pass.
+  Adds a field to the list of fields which should be copied. All associations not in this list will not be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of included fields. Passing an array will empty the list and replace it with the array you pass.
 
-`exclude_field`
+* `exclude_field`
 
-Adds a field to the list of fields which should not be copied. Only the associations that are not in this list will be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of excluded fields. Passing an array will empty the list and replace it with the array you pass.
+  Adds a field to the list of fields which should not be copied. Only the associations that are not in this list will be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of excluded fields. Passing an array will empty the list and replace it with the array you pass.
 
-`clone`
+* `clone`
 
-Adds a field to the list of associations which should have their associated children actually cloned. This means for example, that instead of just maintaining original associations with previously existing tags, a copy will be made of each tag, and the new record will be associated with these new tag copies rather than the old tag copies. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of excluded fields. Passing an array will empty the list and replace it with the array you pass.
+  Adds a field to the list of associations which should have their associated children actually cloned. This means for example, that instead of just maintaining original associations with previously existing tags, a copy will be made of each tag, and the new record will be associated with these new tag copies rather than the old tag copies. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of excluded fields. Passing an array will empty the list and replace it with the array you pass.
+
+* `propagate`
+
+  This causes any inherited child models to take the same config settings when copied. This method may take up to one argument to control the so called "parenting style". The argument should be one of `strict`, `relaxed` or `submissive`.
+
+  The default "parenting style" is `submissive`
+
+  for example
+
+        amoeba do
+          propagate :strict
+        end
+
+  will choose the strict parenting style of inherited settings.
+
+* `raised`
+
+  This causes any child to behave with a (potentially) different "parenting style" than its actual parent. This method takes up to a single parameter for which there are three options, `strict`, `relaxed` and `submissive`.
+
+  The default "parenting style" is `submissive`
+
+  for example:
+
+        amoeba do
+          raised :relaxed
+        end
+
+  will choose the relaxed parenting style of inherited settings for this child. A parenting style set via the `raised` method takes precedence over the parenting style set using the `propagate` method.
 
 #### Pre-Processing Fields
 
-`nullify`
+* `nullify`
 
-Adds a field to the list of non-association based fields which should be set to nil during copy. All fields in this list will be set to `nil` - note that any nullified field will be given its default value if a default value exists on this model's migration. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of null fields. Passing an array will empty the list and replace it with the array you pass.
+  Adds a field to the list of non-association based fields which should be set to nil during copy. All fields in this list will be set to `nil` - note that any nullified field will be given its default value if a default value exists on this model's migration. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of null fields. Passing an array will empty the list and replace it with the array you pass.
 
-`prepend`
+* `prepend`
 
-Prefix a field with some text. This only works for string fields. Accepts a hash of fields to prepend. The keys are the field names and the values are the prefix strings. An example scenario would be to add a string such as "Copy of " to your title field. Don't forget to include extra space to the right if you want it. Passing a hash will add each key value pair to the list of prepend directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:title => "Copy of "}]`.
+  Prefix a field with some text. This only works for string fields. Accepts a hash of fields to prepend. The keys are the field names and the values are the prefix strings. An example scenario would be to add a string such as "Copy of " to your title field. Don't forget to include extra space to the right if you want it. Passing a hash will add each key value pair to the list of prepend directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:title => "Copy of "}]`.
 
-`append`
+* `append`
 
-Append some text to a field. This only works for string fields. Accepts a hash of fields to prepend. The keys are the field names and the values are the prefix strings. An example would be to add " (copied version)" to your description field. Don't forget to add a leading space if you want it. Passing a hash will add each key value pair to the list of append directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:contents => " (copied version)"}]`.
+  Append some text to a field. This only works for string fields. Accepts a hash of fields to prepend. The keys are the field names and the values are the prefix strings. An example would be to add " (copied version)" to your description field. Don't forget to add a leading space if you want it. Passing a hash will add each key value pair to the list of append directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:contents => " (copied version)"}]`.
 
-`set`
+* `set`
 
-Set a field to a given value. This sould work for almost any type of field. Accepts a hash of fields and the values you want them set to.. The keys are the field names and the values are the prefix strings. An example would be to add " (copied version)" to your description field. Don't forget to add a leading space if you want it. Passing a hash will add each key value pair to the list of append directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:approval_state => "open_for_editing"}]`.
+  Set a field to a given value. This sould work for almost any type of field. Accepts a hash of fields and the values you want them set to.. The keys are the field names and the values are the prefix strings. An example would be to add " (copied version)" to your description field. Don't forget to add a leading space if you want it. Passing a hash will add each key value pair to the list of append directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:approval_state => "open_for_editing"}]`.
 
-`regex`
+* `regex`
 
-Globally search and replace the field for a given pattern. Accepts a hash of fields to run search and replace upon. The keys are the field names and the values are each a hash with information about what to find and what to replace it with. in the form of . An example would be to replace all occurrences of the word "dog" with the word "cat", the parameter hash would look like this `:contents => {:replace => /dog/, :with => "cat"}`. Passing a hash will add each key value pair to the list of regex directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:contents => {:replace => /dog/, :with => "cat"}]`.
+  Globally search and replace the field for a given pattern. Accepts a hash of fields to run search and replace upon. The keys are the field names and the values are each a hash with information about what to find and what to replace it with. in the form of . An example would be to replace all occurrences of the word "dog" with the word "cat", the parameter hash would look like this `:contents => {:replace => /dog/, :with => "cat"}`. Passing a hash will add each key value pair to the list of regex directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:contents => {:replace => /dog/, :with => "cat"}]`.
 
-`customize`
+* `customize`
 
-Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy
+  Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy
 
-This method may be called multiple times, once per desired customizer block, or you may pass an array of lambdas. Passing a single lambda will add to the list of processing directives. Passing an array will empty the list and replace it with the array you pass.
+  This method may be called multiple times, once per desired customizer block, or you may pass an array of lambdas. Passing a single lambda will add to the list of processing directives. Passing an array will empty the list and replace it with the array you pass.
 
 ## Known Limitations and Issues
 
