@@ -2,23 +2,36 @@ require "active_record"
 require "amoeba/version"
 
 module Amoeba
-  module ClassMethods
-    def amoeba(&block)
-      @config ||= Amoeba::ClassMethods::Config.new
-      @config.instance_eval(&block) if block_given?
-      @config
-    end
-
+  module Dsl # {{{
     class Config
+      def initialize(parent)
+        @parent = parent
+      end
+
       # Getters {{{
+      def upbringing
+        @raised ||= false
+        @raised
+      end
+
       def enabled
         @enabled ||= false
         @enabled
       end
 
+      def inherit
+        @inherit ||= false
+        @inherit
+      end
+
       def do_preproc
         @do_preproc ||= false
         @do_preproc
+      end
+
+      def parenting
+        @parenting ||= false
+        @parenting
       end
 
       def known_macros
@@ -81,8 +94,18 @@ module Amoeba
         @enabled = false
       end
 
+      def raised(style=:strict)
+        @raised = style
+      end
+
+      def propagate(style=:strict)
+        @parenting ||= style
+        @inherit = true
+      end
+
       def include_field(value=nil)
         @enabled ||= true
+        @excludes = []
         @includes ||= []
         if value.is_a?(Array)
           @includes = value
@@ -94,6 +117,7 @@ module Amoeba
 
       def exclude_field(value=nil)
         @enabled ||= true
+        @includes = []
         @excludes ||= []
         if value.is_a?(Array)
           @excludes = value
@@ -224,13 +248,141 @@ module Amoeba
       end
       # }}}
     end
+  end # }}}
+
+  module ClassMethods
+    def amoeba(&block)
+      @config_block ||= block if block_given?
+
+      @config ||= Amoeba::Dsl::Config.new(self)
+      @config.instance_eval(&block) if block_given?
+      @config
+    end
+
+    def fresh_amoeba(&block)
+      @config_block = block if block_given?
+
+      @config = Amoeba::Dsl::Config.new(self)
+      @config.instance_eval(&block) if block_given?
+      @config
+    end
+
+    def amoeba_block
+      @config_block
+    end
   end
 
   module InstanceMethods
+    # Config Getters {{{
     def amoeba_conf
       self.class.amoeba
     end
 
+    def has_parent_amoeba_conf?
+      self.class.superclass.respond_to?(:amoeba)
+    end
+
+    def parent_amoeba_conf
+      if has_parent_amoeba_conf?
+        self.class.superclass.amoeba
+      else
+        false
+      end
+    end
+
+    def amoeba_settings
+      self.class.amoeba_block
+    end
+
+    def has_parent_amoeba_settings?
+      self.class.superclass.respond_to?(:amoeba_block)
+    end
+
+    def parent_amoeba_settings
+      if has_parent_amoeba_conf?
+        self.class.superclass.amoeba_block
+      else
+        false
+      end
+    end
+    # }}}
+
+    def dup(options={})
+      @result = super()
+
+      if !amoeba_conf.enabled && parent_amoeba_conf.inherit
+        if amoeba_conf.upbringing
+          parenting_style = amoeba_conf.upbringing
+        else
+          parenting_style = parent_amoeba_conf.parenting
+        end
+
+        case parenting_style
+        when :strict
+          # parent settings only
+          self.class.fresh_amoeba(&parent_amoeba_settings)
+        when :relaxed
+          # parent takes precedence
+          self.class.amoeba(&parent_amoeba_settings)
+        when :submissive
+          # parent suggests things
+          # child does what it wants anyway
+          child_settings = amoeba_settings
+          self.class.fresh_amoeba(&parent_amoeba_settings)
+          self.class.amoeba(&child_settings)
+        end
+      end
+
+      # Run Amoeba {{{
+      if amoeba_conf.enabled
+        # Deep Clone Settings {{{
+        amoeba_conf.clones.each do |clone_field|
+          r = self.class.reflect_on_association clone_field
+
+          # if this is a has many through and we're gonna deep
+          # copy the  child records, exclude the  regular join
+          # table from copying so we don't end up with the new
+          # and old children on the copy
+          if r.macro == :has_many && r.is_a?(ActiveRecord::Reflection::ThroughReflection)
+            amoeba_conf.exclude_field r.options[:through]
+          end
+        end
+        # }}}
+
+        # Inclusive Style {{{
+        if amoeba_conf.includes.count > 0
+          amoeba_conf.includes.each do |i|
+            r = self.class.reflect_on_association i
+            amo_process_association(i, r)
+          end
+        # }}}
+        # Exclusive Style {{{
+        elsif amoeba_conf.excludes.count > 0
+          reflections.each do |r|
+            if not amoeba_conf.excludes.include?(r[0])
+              amo_process_association(r[0], r[1])
+            end
+          end
+        # }}}
+        # Indiscriminate Style {{{
+        else
+          reflections.each do |r|
+            amo_process_association(r[0], r[1])
+          end
+        end
+        # }}}
+      end
+
+      if amoeba_conf.do_preproc
+        amo_preprocess_parent_copy
+      end
+      # }}}
+
+      @result
+    end
+
+  private
+    # Copy Children {{{
     def amo_process_association(relation_name, settings)
       if not amoeba_conf.known_macros.include?(settings.macro)
         return
@@ -303,49 +455,10 @@ module Amoeba
         end
       end
     end
+    # }}}
 
-    def dup(options={})
-      @result = super()
-
-      amoeba_conf.clones.each do |clone_field|
-        r = self.class.reflect_on_association clone_field
-
-        # if this is a has many through and we're gonna deep
-        # copy the  child records, exclude the  regular join
-        # table from copying so we don't end up with the new
-        # and old children on the copy
-        if r.macro == :has_many && r.is_a?(ActiveRecord::Reflection::ThroughReflection)
-          amoeba_conf.exclude_field r.options[:through]
-        end
-      end
-
-      if amoeba_conf.enabled
-        if amoeba_conf.includes.count > 0
-          amoeba_conf.includes.each do |i|
-            r = self.class.reflect_on_association i
-            amo_process_association(i, r)
-          end
-        elsif amoeba_conf.excludes.count > 0
-          reflections.each do |r|
-            if not amoeba_conf.excludes.include?(r[0])
-              amo_process_association(r[0], r[1])
-            end
-          end
-        else
-          reflections.each do |r|
-            amo_process_association(r[0], r[1])
-          end
-        end
-      end
-
-      if amoeba_conf.do_preproc
-        preprocess_parent_copy
-      end
-
-      @result
-    end
-
-    def preprocess_parent_copy
+    # Field Preprocessor {{{
+    def amo_preprocess_parent_copy
       # nullify any fields the user has configured
       amoeba_conf.null_fields.each do |n|
         @result[n] = nil
@@ -376,6 +489,7 @@ module Amoeba
         @result[field].gsub!(action[:replace], action[:with])
       end
     end
+    # }}}
   end
 end
 

@@ -15,6 +15,57 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
 
+  create_table :products, :force => true do |t|
+    t.string :type
+    t.string :title
+    t.decimal :price
+    t.decimal :weight
+    t.decimal :cost
+    t.decimal :sleeve
+    t.decimal :collar
+    t.decimal :length
+    t.string :metal
+  end
+
+  create_table :products_sections, :force => true do |t|
+    t.integer :section_id
+    t.integer :product_id
+  end
+
+  create_table :sections, :force => true do |t|
+    t.string :name
+    t.integer :num_employees
+    t.decimal :total_sales
+  end
+
+  create_table :images, :force => true do |t|
+    t.string :filename
+    t.integer :product_id
+  end
+
+  create_table :employees, :force => true do |t|
+    t.string :name
+    t.string :ssn
+    t.decimal :salary
+  end
+
+  create_table :customers, :force => true do |t|
+    t.string :email
+    t.string :password
+    t.decimal :balance
+  end
+
+  create_table :addresses, :force => true do |t|
+    t.integer :addressable_id
+    t.string :addressable_type
+
+    t.string :street
+    t.string :unit
+    t.string :city
+    t.string :state
+    t.string :zip
+  end
+
   create_table :post_configs, :force => true do |t|
     t.integer :post_id
     t.integer :is_visible

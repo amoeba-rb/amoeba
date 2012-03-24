@@ -144,3 +144,46 @@ end
 class User < ActiveRecord::Base
   has_many :posts
 end
+
+# Inheritance
+class Product < ActiveRecord::Base
+  has_many :images
+  has_and_belongs_to_many :sections
+
+  amoeba do
+    enable
+    propagate
+  end
+end
+
+class Section < ActiveRecord::Base
+end
+
+class Image < ActiveRecord::Base
+end
+
+class Shirt < Product
+  amoeba do
+    raised :submissive
+  end
+end
+
+class Necklace < Product
+  amoeba do
+    raised :relaxed
+  end
+end
+
+# Polymorphism
+class Address < ActiveRecord::Base
+  belongs_to :addressable, :polymorphic => true
+end
+
+class Employee < ActiveRecord::Base
+  has_many :addresses, :as => :addressable
+end
+
+class Customer < ActiveRecord::Base
+  has_many :addresses, :as => :addressable
+end
+

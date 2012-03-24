@@ -4,6 +4,7 @@ require 'spec_helper'
 describe "amoeba" do
   context "dup" do
     it "duplicates associated child records" do
+      # Posts {{{
       old_post = Post.find(1)
       old_post.comments.map(&:contents).include?("I love it!").should be true
 
@@ -81,6 +82,88 @@ describe "amoeba" do
       new_post.widgets.map(&:id).each do |id|
         old_post.widgets.map(&:id).include?(id).should_not be true
       end
+      # }}}
+      # Products {{{
+      # Base Class {{{
+      old_product = Product.find(1)
+
+      start_image_count = Image.where(:product_id => old_product.id).count
+      start_section_count = Section.all.length
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
+      start_prodsection_count = rs["section_count"]
+
+      new_product = old_product.dup
+      new_product.save
+
+      end_image_count = Image.where(:product_id => old_product.id).count
+      end_newimage_count = Image.where(:product_id => new_product.id).count
+      end_section_count = Section.all.length
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', 1)
+      end_prodsection_count = rs["section_count"]
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', new_product.id)
+      end_newprodsection_count = rs["section_count"]
+
+      end_image_count.should == start_image_count
+      end_newimage_count.should == start_image_count
+      end_section_count.should == start_section_count
+      end_prodsection_count.should == start_prodsection_count
+      end_newprodsection_count.should == start_prodsection_count
+      # }}}
+
+      # Inherited Class {{{
+      # Shirt {{{
+      old_product = Shirt.find(2)
+
+      start_image_count = Image.where(:product_id => old_product.id).count
+      start_section_count = Section.all.length
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
+      start_prodsection_count = rs["section_count"]
+
+      new_product = old_product.dup
+      new_product.save
+
+      end_image_count = Image.where(:product_id => old_product.id).count
+      end_newimage_count = Image.where(:product_id => new_product.id).count
+      end_section_count = Section.all.length
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', 1)
+      end_prodsection_count = rs["section_count"]
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', new_product.id)
+      end_newprodsection_count = rs["section_count"]
+
+      end_image_count.should == start_image_count
+      end_newimage_count.should == start_image_count
+      end_section_count.should == start_section_count
+      end_prodsection_count.should == start_prodsection_count
+      end_newprodsection_count.should == start_prodsection_count
+      # }}}
+
+      # Necklace {{{
+      old_product = Necklace.find(3)
+
+      start_image_count = Image.where(:product_id => old_product.id).count
+      start_section_count = Section.all.length
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
+      start_prodsection_count = rs["section_count"]
+
+      new_product = old_product.dup
+      new_product.save
+
+      end_image_count = Image.where(:product_id => old_product.id).count
+      end_newimage_count = Image.where(:product_id => new_product.id).count
+      end_section_count = Section.all.length
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', 1)
+      end_prodsection_count = rs["section_count"]
+      rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', new_product.id)
+      end_newprodsection_count = rs["section_count"]
+
+      end_image_count.should == start_image_count
+      end_newimage_count.should == start_image_count
+      end_section_count.should == start_section_count
+      end_prodsection_count.should == start_prodsection_count
+      end_newprodsection_count.should == start_prodsection_count
+      # }}}
+      # }}}
+      # }}}
     end
   end
 end

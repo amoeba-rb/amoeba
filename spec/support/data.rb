@@ -79,3 +79,37 @@ s3.superkittens.create(:value => "Dopey")
 s3.superkittens.create(:value => "Sneezy")
 s3.superkittens.create(:value => "Sleepy")
 # }}}
+
+# Product {{{
+product1 = Product.create(:title => "Sticky Notes 5-Pak", :price => 5.99, :weight => 0.56)
+shirt1 = Shirt.create(:title => "Fancy Shirt", :price => 48.95, :sleeve => 32, :collar => 15.5)
+necklace1 = Necklace.create(:title => "Pearl Necklace", :price => 2995.99, :length => 18, :metal => "14k")
+
+img1 = product1.images.create(:filename => "sticky.jpg")
+img2 = product1.images.create(:filename => "notes.jpg")
+
+img1 = shirt1.images.create(:filename => "02948u31.jpg")
+img2 = shirt1.images.create(:filename => "zsif8327.jpg")
+
+img1 = necklace1.images.create(:filename => "ae02x9f1.jpg")
+img2 = necklace1.images.create(:filename => "cba9f912.jpg")
+
+office = Section.create(:name => "Office", :num_employees => 2, :total_sales => "1234.56")
+supplies = Section.create(:name => "Supplies", :num_employees => 1, :total_sales => "543.21")
+mens = Section.create(:name => "Mens", :num_employees => 3, :total_sales => "11982.63")
+apparel = Section.create(:name => "Apparel", :num_employees => 5, :total_sales => "1315.20")
+accessories = Section.create(:name => "Accessories", :num_employees => 1, :total_sales => "8992.34")
+jewelry = Section.create(:name => "Jewelry", :num_employees => 3, :total_sales => "25481.77")
+
+product1.sections << office
+product1.sections << supplies
+product1.save
+
+shirt1.sections << mens
+shirt1.sections << apparel
+shirt1.save
+
+necklace1.sections << jewelry
+necklace1.sections << accessories
+necklace1.save
+# }}}
