@@ -33,6 +33,7 @@ describe "amoeba" do
       start_postnote_count = rs["note_count"]
 
       new_post.save
+      new_post.errors.messages.length.should == 0
 
       end_account_count = Account.all.count
       end_history_count = History.all.count
@@ -83,6 +84,12 @@ describe "amoeba" do
         old_post.widgets.map(&:id).include?(id).should_not be true
       end
       # }}}
+      # Author {{{
+      old_author = Author.find(1)
+      new_author = old_author.dup
+      new_author.save
+      new_author.errors.messages.length.should == 0
+      # }}}
       # Products {{{
       # Base Class {{{
       old_product = Product.find(1)
@@ -94,6 +101,7 @@ describe "amoeba" do
 
       new_product = old_product.dup
       new_product.save
+      new_product.errors.messages.length.should == 0
 
       end_image_count = Image.where(:product_id => old_product.id).count
       end_newimage_count = Image.where(:product_id => new_product.id).count
@@ -121,6 +129,7 @@ describe "amoeba" do
 
       new_product = old_product.dup
       new_product.save
+      new_product.errors.messages.length.should == 0
 
       end_image_count = Image.where(:product_id => old_product.id).count
       end_newimage_count = Image.where(:product_id => new_product.id).count
@@ -147,6 +156,7 @@ describe "amoeba" do
 
       new_product = old_product.dup
       new_product.save
+      new_product.errors.messages.length.should == 0
 
       end_image_count = Image.where(:product_id => old_product.id).count
       end_newimage_count = Image.where(:product_id => new_product.id).count

@@ -424,6 +424,90 @@ You may control which association types amoeba applies itself to by using the `r
 
 This example will copy the post's configuration data and keep tags associated with the new post, but will not copy the post's comments because amoeba will only recognize and copy children of `has_one` and `has_and_belongs_to_many` associations and in this example, comments are not an `has_and_belongs_to_many` association.
 
+### Nested Association Validation
+
+If you end up with some validation issues when trying to validate the presence of a child's `belongs_to` association, just be sure to include the `:inverse_of` declaration on your relationships and all should be well.
+
+For example this will throw a validation error saying that your posts are invalid:
+
+    class Author < ActiveRecord::Base
+      has_many :posts
+
+      amoeba do
+        enable
+      end
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :author
+      validates_presence_of :author
+
+      amoeba do
+        enable
+      end
+    end
+
+    author = Author.find(1)
+    author.dup
+
+    author.save # this will fail validation
+
+Wheras this will work fine:
+
+    class Author < ActiveRecord::Base
+      has_many :posts, :inverse_of => :author
+
+      amoeba do
+        enable
+      end
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :author, :inverse_of => :posts
+      validates_presence_of :author
+
+      amoeba do
+        enable
+      end
+    end
+
+    author = Author.find(1)
+    author.dup
+
+    author.save # this will pass validation
+
+This issue is not amoeba specific and also occurs when creating new objects using `accepts_nested_attributes_for`, like this:
+
+    class Author < ActiveRecord::Base
+      has_many :posts
+      accepts_nested_attributes_for :posts
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :author
+      validates_presence_of :author
+    end
+
+    # this will fail validation
+    author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
+
+This issue with `accepts_nested_attributes_for` can also be solved by using `:inverse_of`, like this:
+
+    class Author < ActiveRecord::Base
+      has_many :posts, :inverse_of => :author
+      accepts_nested_attributes_for :posts
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :author, :inverse_of => :posts
+      validates_presence_of :author
+    end
+
+    # this will pass validation
+    author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
+
+The crux of the issue is that upon duplication, the new `Author` instance does not yet have an ID because it has not yet been persisted, so the `:posts` do not yet have an `:author_id` either, and thus no `:author` and thus they will fail validation. This issue may likely affect amoeba usage so if you get some validation failures, be sure to add `:inverse_of` to your models.
+
 ### Field Preprocessors
 
 #### Nullify

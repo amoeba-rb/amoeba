@@ -1,10 +1,13 @@
 u1 = User.create(:name => "Robert Johnson", :email => "bob@crossroads.com")
 u2 = User.create(:name => "Miles Davis", :email => "miles@kindofblue.com")
 
+a1 = Author.create(:full_name => "Kermit The Vonnegut", :nickname => "kvsoitgoes")
+a2 = Author.create(:full_name => "Arthur Sees Clarck", :nickname => "strangewater")
+
 t = Topic.create(:title => "Ponies", :description => "Lets talk about my ponies.")
 
 # First Post {{{
-p1 = t.posts.create(:author => u1, :title => "My little pony", :contents => "Lorum ipsum dolor rainbow bright. I like dogs, dogs are awesome.")
+p1 = t.posts.create(:owner => u1, :author => a1, :title => "My little pony", :contents => "Lorum ipsum dolor rainbow bright. I like dogs, dogs are awesome.")
 f1 = p1.create_post_config(:is_visible => true, :is_open => false, :password => 'abcdefg123')
 a1 = p1.create_account(:title => "Foo")
 h1 = p1.account.create_history(:some_stuff => "Bar")

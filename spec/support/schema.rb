@@ -9,6 +9,7 @@ ActiveRecord::Schema.define do
 
   create_table :posts, :force => true do |t|
     t.integer :topic_id
+    t.integer :owner_id
     t.integer :author_id
     t.string :title
     t.string :contents
@@ -107,6 +108,12 @@ ActiveRecord::Schema.define do
     t.integer :post_id
     t.string :name
     t.string :email
+    t.timestamps
+  end
+
+  create_table :authors, :force => true do |t|
+    t.string :full_name
+    t.string :nickname
     t.timestamps
   end
 

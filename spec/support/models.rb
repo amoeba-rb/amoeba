@@ -2,9 +2,21 @@ class Topic < ActiveRecord::Base
   has_many :posts
 end
 
+class User < ActiveRecord::Base
+  has_many :posts
+end
+
+class Author < ActiveRecord::Base
+  has_many :posts, :inverse_of => :author
+  amoeba do
+    enable
+  end
+end
+
 class Post < ActiveRecord::Base
   belongs_to :topic
-  belongs_to :author, :class_name => 'User'
+  belongs_to :owner, :class_name => 'User'
+  belongs_to :author, :inverse_of => :posts
   has_one :post_config
   has_one :account
   has_one :history, :through => :account
@@ -15,7 +27,9 @@ class Post < ActiveRecord::Base
   has_many :widgets, :through => :post_widgets
   has_and_belongs_to_many :tags
   has_and_belongs_to_many :notes
-  #has_and_belongs_to_many :tags
+
+  validates_presence_of :topic
+  validates_presence_of :author
 
   amoeba do
     enable
@@ -139,10 +153,6 @@ end
 
 class Note < ActiveRecord::Base
   has_and_belongs_to_many :posts
-end
-
-class User < ActiveRecord::Base
-  has_many :posts
 end
 
 # Inheritance
