@@ -59,6 +59,11 @@ module Amoeba
         @customizations
       end
 
+      def overrides
+        @overrides ||= []
+        @overrides
+      end
+
       def null_fields
         @null_fields ||= []
         @null_fields
@@ -136,6 +141,17 @@ module Amoeba
           @clones << value if value
         end
         @clones
+      end
+
+      def override(value=nil)
+        @do_preproc ||= true
+        @overrides ||= []
+        if value.is_a?(Array)
+          @overrides = value
+        else
+          @overrides << value if value
+        end
+        @overrides
       end
 
       def customize(value=nil)
@@ -310,6 +326,7 @@ module Amoeba
     def dup(options={})
       @result = super()
 
+      # Inherit Parent Settings {{{
       if !amoeba_conf.enabled && parent_amoeba_conf.inherit
         if amoeba_conf.upbringing
           parenting_style = amoeba_conf.upbringing
@@ -332,8 +349,16 @@ module Amoeba
           self.class.amoeba(&child_settings)
         end
       end
+      # }}}
 
       # Run Amoeba {{{
+      # pramoeba_conf.overridesepend any extra strings to indicate uniqueness of the new record(s)
+      if amoeba_conf.overrides.length > 0
+        amoeba_conf.overrides.each do |block|
+          block.call(self, @result)
+        end
+      end
+
       if amoeba_conf.enabled
         # Deep Clone Settings {{{
         amoeba_conf.clones.each do |clone_field|
@@ -465,11 +490,6 @@ module Amoeba
       end
 
       # prepend any extra strings to indicate uniqueness of the new record(s)
-      amoeba_conf.customizations.each do |block|
-        block.call(self, @result)
-      end
-
-      # prepend any extra strings to indicate uniqueness of the new record(s)
       amoeba_conf.coercions.each do |field,coercion|
         @result[field] = "#{coercion}"
       end
@@ -487,6 +507,11 @@ module Amoeba
       # regex andy fields that need changing
       amoeba_conf.regexes.each do |field,action|
         @result[field].gsub!(action[:replace], action[:with])
+      end
+
+      # prepend any extra strings to indicate uniqueness of the new record(s)
+      amoeba_conf.customizations.each do |block|
+        block.call(self, @result)
       end
     end
     # }}}

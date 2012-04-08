@@ -28,7 +28,7 @@ EOF
   s.add_development_dependency "bundler", ">= 1.0.0"
   s.add_development_dependency "rspec", "~> 2.3"
 
-  s.add_development_dependency "sqlite3-ruby"
+  s.add_development_dependency "sqlite3"
 
   s.add_dependency "activerecord", ">= 3.0"
 end
