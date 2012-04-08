@@ -460,7 +460,7 @@ Lambda blocks passed to customize run, by default, after all copying and field p
 
 #### Chaining
 
-You may apply a preprocessor to multiple fields at once.
+You may apply a single preprocessor to multiple fields at once.
 
     class Post < ActiveRecord::Base
       amoeba do
@@ -934,6 +934,11 @@ The behavior when copying polymorphic `has_many` associations is also undefined.
 You may run the rspec tests like this:
 
     bundle exec rspec spec
+
+### TODO
+
+* add ability to cancel further processing from within an override block
+* write some spec for the override method
 
 ## License
 
