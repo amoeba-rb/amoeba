@@ -212,7 +212,7 @@ If you are using a Many-to-Many relationship, you may tell amoeba to actually ma
 
 This example will actually duplicate the warnings and widgets in the database. If there were originally 3 warnings in the database then, upon duplicating a post, you will end up with 6 warnings in the database. This is in contrast to the default behavior where your new post would merely be re-associated with any previously existing warnings and those warnings themselves would not be duplicated.
 
-### Limiting Association Types
+#### Limiting Association Types
 
 By default, amoeba recognizes and attemps to copy any children of the following association types:
 
@@ -241,90 +241,6 @@ You may control which association types amoeba applies itself to by using the `r
     end
 
 This example will copy the post's configuration data and keep tags associated with the new post, but will not copy the post's comments because amoeba will only recognize and copy children of `has_one` and `has_and_belongs_to_many` associations and in this example, comments are not an `has_and_belongs_to_many` association.
-
-### Nested Association Validation
-
-If you end up with some validation issues when trying to validate the presence of a child's `belongs_to` association, just be sure to include the `:inverse_of` declaration on your relationships and all should be well.
-
-For example this will throw a validation error saying that your posts are invalid:
-
-    class Author < ActiveRecord::Base
-      has_many :posts
-
-      amoeba do
-        enable
-      end
-    end
-
-    class Post < ActiveRecord::Base
-      belongs_to :author
-      validates_presence_of :author
-
-      amoeba do
-        enable
-      end
-    end
-
-    author = Author.find(1)
-    author.dup
-
-    author.save # this will fail validation
-
-Wheras this will work fine:
-
-    class Author < ActiveRecord::Base
-      has_many :posts, :inverse_of => :author
-
-      amoeba do
-        enable
-      end
-    end
-
-    class Post < ActiveRecord::Base
-      belongs_to :author, :inverse_of => :posts
-      validates_presence_of :author
-
-      amoeba do
-        enable
-      end
-    end
-
-    author = Author.find(1)
-    author.dup
-
-    author.save # this will pass validation
-
-This issue is not amoeba specific and also occurs when creating new objects using `accepts_nested_attributes_for`, like this:
-
-    class Author < ActiveRecord::Base
-      has_many :posts
-      accepts_nested_attributes_for :posts
-    end
-
-    class Post < ActiveRecord::Base
-      belongs_to :author
-      validates_presence_of :author
-    end
-
-    # this will fail validation
-    author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
-
-This issue with `accepts_nested_attributes_for` can also be solved by using `:inverse_of`, like this:
-
-    class Author < ActiveRecord::Base
-      has_many :posts, :inverse_of => :author
-      accepts_nested_attributes_for :posts
-    end
-
-    class Post < ActiveRecord::Base
-      belongs_to :author, :inverse_of => :posts
-      validates_presence_of :author
-    end
-
-    # this will pass validation
-    author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
-
-The crux of the issue is that upon duplication, the new `Author` instance does not yet have an ID because it has not yet been persisted, so the `:posts` do not yet have an `:author_id` either, and thus no `:author` and thus they will fail validation. This issue may likely affect amoeba usage so if you get some validation failures, be sure to add `:inverse_of` to your models.
 
 ### Field Preprocessors
 
@@ -843,6 +759,90 @@ The next version will use only the parent settings because passing an array will
       include_field :sections
     end
 
+### Validating Nested Attributes
+
+If you end up with some validation issues when trying to validate the presence of a child's `belongs_to` association, just be sure to include the `:inverse_of` declaration on your relationships and all should be well.
+
+For example this will throw a validation error saying that your posts are invalid:
+
+    class Author < ActiveRecord::Base
+      has_many :posts
+
+      amoeba do
+        enable
+      end
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :author
+      validates_presence_of :author
+
+      amoeba do
+        enable
+      end
+    end
+
+    author = Author.find(1)
+    author.dup
+
+    author.save # this will fail validation
+
+Wheras this will work fine:
+
+    class Author < ActiveRecord::Base
+      has_many :posts, :inverse_of => :author
+
+      amoeba do
+        enable
+      end
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :author, :inverse_of => :posts
+      validates_presence_of :author
+
+      amoeba do
+        enable
+      end
+    end
+
+    author = Author.find(1)
+    author.dup
+
+    author.save # this will pass validation
+
+This issue is not amoeba specific and also occurs when creating new objects using `accepts_nested_attributes_for`, like this:
+
+    class Author < ActiveRecord::Base
+      has_many :posts
+      accepts_nested_attributes_for :posts
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :author
+      validates_presence_of :author
+    end
+
+    # this will fail validation
+    author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
+
+This issue with `accepts_nested_attributes_for` can also be solved by using `:inverse_of`, like this:
+
+    class Author < ActiveRecord::Base
+      has_many :posts, :inverse_of => :author
+      accepts_nested_attributes_for :posts
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :author, :inverse_of => :posts
+      validates_presence_of :author
+    end
+
+    # this will pass validation
+    author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
+
+The crux of the issue is that upon duplication, the new `Author` instance does not yet have an ID because it has not yet been persisted, so the `:posts` do not yet have an `:author_id` either, and thus no `:author` and thus they will fail validation. This issue may likely affect amoeba usage so if you get some validation failures, be sure to add `:inverse_of` to your models.
+
 ## Configuration Reference
 
 Here is a static reference to the available configuration methods, usable within the amoeba block on your rails models.
@@ -915,9 +915,15 @@ Here is a static reference to the available configuration methods, usable within
 
   Globally search and replace the field for a given pattern. Accepts a hash of fields to run search and replace upon. The keys are the field names and the values are each a hash with information about what to find and what to replace it with. in the form of . An example would be to replace all occurrences of the word "dog" with the word "cat", the parameter hash would look like this `:contents => {:replace => /dog/, :with => "cat"}`. Passing a hash will add each key value pair to the list of regex directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:contents => {:replace => /dog/, :with => "cat"}]`.
 
+#### override
+
+  Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy. These blocks will run before any other duplication or field processing.
+
+  This method may be called multiple times, once per desired customizer block, or you may pass an array of lambdas. Passing a single lambda will add to the list of processing directives. Passing an array will empty the list and replace it with the array you pass.
+
 #### customize
 
-  Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy
+  Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy. These blocks will run after all copying and field processing.
 
   This method may be called multiple times, once per desired customizer block, or you may pass an array of lambdas. Passing a single lambda will add to the list of processing directives. Passing an array will empty the list and replace it with the array you pass.
 
