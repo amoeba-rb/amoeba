@@ -83,6 +83,10 @@ describe "amoeba" do
       new_post.widgets.map(&:id).each do |id|
         old_post.widgets.map(&:id).include?(id).should_not be true
       end
+      old_post.custom_things.length.should == 3
+      old_post.custom_things.select{ |ct| ct.value == [] }.length.should == 1
+      old_post.custom_things.select{ |ct| ct.value == [1,2]}.length.should == 1
+      old_post.custom_things.select{ |ct| ct.value == [78]}.length.should == 1
       # }}}
       # Author {{{
       old_author = Author.find(1)
