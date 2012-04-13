@@ -81,6 +81,8 @@ s2.superkittens.create(:value => "Spot")
 s3.superkittens.create(:value => "Dopey")
 s3.superkittens.create(:value => "Sneezy")
 s3.superkittens.create(:value => "Sleepy")
+
+p1.custom_things.create([{:value => [1,2]}, {:value => []}, {:value => [78]}])
 # }}}
 
 # Product {{{
@@ -115,6 +117,4 @@ shirt1.save
 necklace1.sections << jewelry
 necklace1.sections << accessories
 necklace1.save
-
-p1.custom_things.create [{:value => [1,2]}, {:value => []},{ :value => [78]}]
 # }}}
