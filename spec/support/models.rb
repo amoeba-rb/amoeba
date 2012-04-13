@@ -25,6 +25,7 @@ class Post < ActiveRecord::Base
   has_many :categories, :through => :supercats
   has_many :post_widgets
   has_many :widgets, :through => :post_widgets
+  has_many :custom_things
   has_and_belongs_to_many :tags
   has_and_belongs_to_many :notes
 
@@ -73,6 +74,17 @@ end
 
 class CustomThing < ActiveRecord::Base
   belongs_to :post
+  class ArrayPack
+    def load(str)
+      str.split(',')
+    end
+
+    def dump(int_array)
+      int_array.join(',')
+    end
+  end
+
+  serialize :value, ArrayPack.new  
 end
 
 class Account < ActiveRecord::Base
