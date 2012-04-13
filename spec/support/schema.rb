@@ -82,6 +82,7 @@ ActiveRecord::Schema.define do
   end
 
   create_table :custom_things, :force => true do |t|
+    t.integer :post_id
     t.string :value
     t.timestamps
   end
