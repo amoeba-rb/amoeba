@@ -115,4 +115,6 @@ shirt1.save
 necklace1.sections << jewelry
 necklace1.sections << accessories
 necklace1.save
+
+p1.custom_things.create [{:value => [1,2]}, {:value => []},{ :value => [78]}]
 # }}}
