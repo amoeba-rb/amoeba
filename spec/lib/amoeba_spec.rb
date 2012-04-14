@@ -94,6 +94,10 @@ describe "amoeba" do
       new_author = old_author.dup
       new_author.save
       new_author.errors.messages.length.should == 0
+      new_author.posts.first.custom_things.length.should == 3
+      new_author.posts.first.custom_things.select{ |ct| ct.value == [] }.length.should == 1
+      new_author.posts.first.custom_things.select{ |ct| ct.value == [1,2]}.length.should == 1
+      new_author.posts.first.custom_things.select{ |ct| ct.value == [78]}.length.should == 1
       # }}}
       # Products {{{
       # Base Class {{{

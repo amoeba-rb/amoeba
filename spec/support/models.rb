@@ -76,14 +76,28 @@ class CustomThing < ActiveRecord::Base
   belongs_to :post
   class ArrayPack
     def self.load(str)
+      unless str.present? && str.length > 0
+        return []
+      end
+      if str.is_a?(Array)
+        return str
+      end
       str.split(',').collect(&:to_i)
     end
     def self.dump(int_array)
+      unless int_array.present? && int_array.length > 0
+        return ""
+      end
       int_array.join(',')
     end
   end
-  
+
   serialize :value, ArrayPack
+
+  before_create :hydrate_me
+  def hydrate_me
+    self.value = self.value
+  end
 end
 
 class Account < ActiveRecord::Base
