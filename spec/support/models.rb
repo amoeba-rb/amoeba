@@ -74,8 +74,16 @@ end
 
 class CustomThing < ActiveRecord::Base
   belongs_to :post
-
-  serialize :value
+  class ArrayPack
+    def self.load(str)
+      str.split(',').collect(&:to_i)
+    end
+    def self.dump(int_array)
+      int_array.join(',')
+    end
+  end
+  
+  serialize :value, ArrayPack
 end
 
 class Account < ActiveRecord::Base
