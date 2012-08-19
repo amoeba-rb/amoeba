@@ -528,7 +528,7 @@ Copying of `has_many :through` associations works automatically. They perform th
       belongs_to :part
 
       amoeba do
-        prefix :notes => "Copy of "
+        prepend :notes => "Copy of "
       end
     end
 
