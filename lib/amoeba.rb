@@ -323,8 +323,8 @@ module Amoeba
     end
     # }}}
 
-    def dup(options={})
-      @result = super()
+    def amoeba_dup(options={})
+      @result = self.dup()
 
       # Inherit Parent Settings {{{
       if !amoeba_conf.enabled && parent_amoeba_conf.inherit
@@ -422,7 +422,7 @@ module Amoeba
         old_obj = self.send(relation_name)
 
         if not old_obj.nil?
-          copy_of_obj = old_obj.dup
+          copy_of_obj = old_obj.amoeba_dup
           copy_of_obj[:"#{settings.foreign_key}"] = nil
 
           @result.send(:"#{relation_name}=", copy_of_obj)
@@ -439,7 +439,7 @@ module Amoeba
           # rather than only maintaining the associations
           self.send(relation_name).each do |old_obj|
 
-            copy_of_obj = old_obj.dup
+            copy_of_obj = old_obj.amoeba_dup
 
             # associate this new child to the new parent object
             @result.send(relation_name) << copy_of_obj
@@ -454,7 +454,7 @@ module Amoeba
           return if settings.is_a?(ActiveRecord::Reflection::ThroughReflection)
 
           self.send(relation_name).each do |old_obj|
-            copy_of_obj = old_obj.dup
+            copy_of_obj = old_obj.amoeba_dup
             copy_of_obj[:"#{settings.foreign_key}"] = nil
 
             # associate this new child to the new parent object
@@ -467,7 +467,7 @@ module Amoeba
 
         if clone
           self.send(relation_name).each do |old_obj|
-            copy_of_obj = old_obj.dup
+            copy_of_obj = old_obj.amoeba_dup
 
             # associate this new child to the new parent object
             @result.send(relation_name) << copy_of_obj
