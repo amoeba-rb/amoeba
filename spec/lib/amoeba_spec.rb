@@ -12,7 +12,7 @@ describe "amoeba" do
         prepend :contents => "Here's a copy: "
       end
 
-      new_post = old_post.dup
+      new_post = old_post.amoeba_dup
 
       start_account_count = Account.all.count
       start_history_count = History.all.count
@@ -91,7 +91,7 @@ describe "amoeba" do
       # }}}
       # Author {{{
       old_author = Author.find(1)
-      new_author = old_author.dup
+      new_author = old_author.amoeba_dup
       new_author.save
       new_author.errors.messages.length.should == 0
       new_author.posts.first.custom_things.length.should == 3
@@ -108,7 +108,7 @@ describe "amoeba" do
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
       start_prodsection_count = rs["section_count"]
 
-      new_product = old_product.dup
+      new_product = old_product.amoeba_dup
       new_product.save
       new_product.errors.messages.length.should == 0
 
@@ -136,7 +136,7 @@ describe "amoeba" do
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
       start_prodsection_count = rs["section_count"]
 
-      new_product = old_product.dup
+      new_product = old_product.amoeba_dup
       new_product.save
       new_product.errors.messages.length.should == 0
 
@@ -163,7 +163,7 @@ describe "amoeba" do
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
       start_prodsection_count = rs["section_count"]
 
-      new_product = old_product.dup
+      new_product = old_product.amoeba_dup
       new_product.save
       new_product.errors.messages.length.should == 0
 
