@@ -12,7 +12,7 @@ This gem is named "Amoeba" because amoebas are (small life forms that are) good 
 
 ### Technical Details
 
-An ActiveRecord extension gem to allow the duplication of associated child record objects when duplicating an active record model. This gem adds to the `ActiveRecord::Base#amoeba_dup` method.
+An ActiveRecord extension gem to allow the duplication of associated child record objects when duplicating an active record model.
 
 Rails 3.2 compatible.
 
@@ -50,7 +50,7 @@ or just add it to your Gemfile:
 
     gem 'amoeba'
 
-Configure your models with one of the styles below and then just run the `amoeba_dup` method on your model as you normally would:
+Configure your models with one of the styles below and then just run the `amoeba_dup` method on your model where you would run the `dup` method normally:
 
     p = Post.create(:title => "Hello World!", :content => "Lorum ipsum dolor")
     p.comments.create(:content => "I love it!")
@@ -99,7 +99,7 @@ simply add the amoeba configuration block to your model and call the enable meth
       belongs_to :post
     end
 
-Child records will be automatically copied when you run the dup method.
+Child records will be automatically copied when you run the `amoeba_dup` method.
 
 #### Inclusive Style
 
