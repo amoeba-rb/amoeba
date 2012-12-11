@@ -1,6 +1,6 @@
 # IMPORTANT NEWS
 
-* As of December 11th, 2012 Amoeba no longer overrides the built in `ActiveRecord::Base#dup` method and instead implements its own method called `amoeba_dup`. Make sure to update your code if you do a bundle install.
+* As of December 11th, 2012 Amoeba no longer overrides the built in `ActiveRecord::Base#dup` method and instead implements its own method called `amoeba_dup`. Make sure to update your code if you do a bundle update and or double check that your gemfile has a version restriction bound to v1.x e.g. '~> 1.2' listed for amoeba.
 
 ## Amoeba
 
