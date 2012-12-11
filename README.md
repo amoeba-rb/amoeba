@@ -12,7 +12,7 @@ This gem is named "Amoeba" because amoebas are (small life forms that are) good 
 
 ### Technical Details
 
-An ActiveRecord extension gem to allow the duplication of associated child record objects when duplicating an active record model. This gem overrides and adds to the built in `ActiveRecord::Base#dup` method.
+An ActiveRecord extension gem to allow the duplication of associated child record objects when duplicating an active record model. This gem adds to the `ActiveRecord::Base#amoeba_dup` method.
 
 Rails 3.2 compatible.
 
@@ -50,7 +50,7 @@ or just add it to your Gemfile:
 
     gem 'amoeba'
 
-Configure your models with one of the styles below and then just run the `dup` method on your model as you normally would:
+Configure your models with one of the styles below and then just run the `amoeba_dup` method on your model as you normally would:
 
     p = Post.create(:title => "Hello World!", :content => "Lorum ipsum dolor")
     p.comments.create(:content => "I love it!")
@@ -58,7 +58,7 @@ Configure your models with one of the styles below and then just run the `dup` m
 
     puts Comment.all.count # should be 2
 
-    my_copy = p.dup
+    my_copy = p.amoeba_dup
     my_copy.save
 
     puts Comment.all.count # should be 4
@@ -404,7 +404,7 @@ This example should result in something like this:
       :contents =>  "I like dogs, dogs are awesome."
     )
 
-    new_post = post.dup
+    new_post = post.amoeba_dup
 
     new_post.title # "Copy of Hello world"
     new_post.contents # "Original contents: I like cats, cats are awesome. (copied version)"
@@ -569,7 +569,7 @@ You may control how amoeba copies your object, on the fly, by passing a configur
           prepend :contents => "Here's a copy: "
         end
 
-        new_post = old_post.dup
+        new_post = old_post.amoeba_dup
 
         new_post.title # should be "Copy of Hello world"
         new_post.contents # should be "Here's a copy: Lorum ipsum"
@@ -616,7 +616,7 @@ If you are using the Single Table Inheritance provided by ActiveRecord, you may 
     class ProductsController
       def some_method
         my_shirt = Shirt.find(1)
-        my_shirt.dup
+        my_shirt.amoeba_dup
         my_shirt.save
 
         # this shirt should now:
@@ -783,7 +783,7 @@ For example this will throw a validation error saying that your posts are invali
     end
 
     author = Author.find(1)
-    author.dup
+    author.amoeba_dup
 
     author.save # this will fail validation
 
@@ -807,7 +807,7 @@ Wheras this will work fine:
     end
 
     author = Author.find(1)
-    author.dup
+    author.amoeba_dup
 
     author.save # this will pass validation
 
