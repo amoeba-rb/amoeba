@@ -1,4 +1,8 @@
-# Amoeba
+# IMPORTANT NEWS
+
+* As of December 11th, 2012 Amoeba no longer overrides the built in `ActiveRecord::Base#dup` method and instead implements its own method called `amoeba_dup`. Make sure to update your code if you do a bundle install.
+
+## Amoeba
 
 Easy copying of rails associations such as `has_many`.
 
