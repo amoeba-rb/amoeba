@@ -512,7 +512,7 @@ module Amoeba
 
       # prepend any extra strings to indicate uniqueness of the new record(s)
       amoeba_conf.customizations.each do |block|
-        block.call(self, @result@options)
+        block.call(self, @result,@options)
       end
     end
     # }}}
