@@ -325,6 +325,7 @@ module Amoeba
 
     def amoeba_dup(options={})
       @result = self.dup()
+      @options = options
 
       # Inherit Parent Settings {{{
       if !amoeba_conf.enabled && parent_amoeba_conf.inherit
@@ -355,7 +356,7 @@ module Amoeba
       # pramoeba_conf.overridesepend any extra strings to indicate uniqueness of the new record(s)
       if amoeba_conf.overrides.length > 0
         amoeba_conf.overrides.each do |block|
-          block.call(self, @result)
+          block.call(self, @result,@options)
         end
       end
 
@@ -511,7 +512,7 @@ module Amoeba
 
       # prepend any extra strings to indicate uniqueness of the new record(s)
       amoeba_conf.customizations.each do |block|
-        block.call(self, @result)
+        block.call(self, @result@options)
       end
     end
     # }}}
