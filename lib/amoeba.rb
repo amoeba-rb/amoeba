@@ -294,6 +294,10 @@ module Amoeba
       self.class.amoeba
     end
 
+    def amoeba_dup_options
+      @amoeba_dup_options
+    end
+
     def has_parent_amoeba_conf?
       self.class.superclass.respond_to?(:amoeba)
     end
@@ -325,7 +329,7 @@ module Amoeba
 
     def amoeba_dup(options={})
       @result = self.dup()
-      @options = options
+      @amoeba_dup_options = options
 
       # Inherit Parent Settings {{{
       if !amoeba_conf.enabled && parent_amoeba_conf.inherit
@@ -356,7 +360,7 @@ module Amoeba
       # pramoeba_conf.overridesepend any extra strings to indicate uniqueness of the new record(s)
       if amoeba_conf.overrides.length > 0
         amoeba_conf.overrides.each do |block|
-          block.call(self, @result,@options)
+          block.call(self, @result)
         end
       end
 
@@ -423,7 +427,7 @@ module Amoeba
         old_obj = self.send(relation_name)
 
         if not old_obj.nil?
-          copy_of_obj = old_obj.amoeba_dup
+          copy_of_obj = old_obj.amoeba_dup(amoeba_dup_options)
           copy_of_obj[:"#{settings.foreign_key}"] = nil
 
           @result.send(:"#{relation_name}=", copy_of_obj)
@@ -455,7 +459,7 @@ module Amoeba
           return if settings.is_a?(ActiveRecord::Reflection::ThroughReflection)
 
           self.send(relation_name).each do |old_obj|
-            copy_of_obj = old_obj.amoeba_dup
+            copy_of_obj = old_obj.amoeba_dup(amoeba_dup_options)
             copy_of_obj[:"#{settings.foreign_key}"] = nil
 
             # associate this new child to the new parent object
@@ -512,7 +516,7 @@ module Amoeba
 
       # prepend any extra strings to indicate uniqueness of the new record(s)
       amoeba_conf.customizations.each do |block|
-        block.call(self, @result,@options)
+        block.call(self, @result)
       end
     end
     # }}}
