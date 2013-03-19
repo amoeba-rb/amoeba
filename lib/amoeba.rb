@@ -14,6 +14,16 @@ module Amoeba
         @raised
       end
 
+      def dup_method
+        @dup_method ||= :dup
+        @dup_method
+      end
+
+      def remap_method
+        @remap_method ||= false
+        @remap_method
+      end
+
       def enabled
         @enabled ||= false
         @enabled
@@ -93,6 +103,16 @@ module Amoeba
       # Setters (Config DSL) {{{
       def enable
         @enabled = true
+      end
+
+      def method(value=nil)
+        @dup_method = value
+        @dup_method
+      end
+
+      def remapper(value=nil)
+        @remap_method = value
+        @remap_method
       end
 
       def disable
@@ -328,8 +348,9 @@ module Amoeba
     # }}}
 
     def amoeba_dup(options={})
-      @result = self.dup()
       @amoeba_dup_options = options
+
+      @result = self.send( amoeba_conf.dup_method )
 
       # Inherit Parent Settings {{{
       if !amoeba_conf.enabled && parent_amoeba_conf.inherit
@@ -430,7 +451,7 @@ module Amoeba
           copy_of_obj = old_obj.amoeba_dup(amoeba_dup_options)
           copy_of_obj[:"#{settings.foreign_key}"] = nil
 
-          @result.send(:"#{relation_name}=", copy_of_obj)
+          @result.send(:"#{ amo_map_relation(relation_name) }=", copy_of_obj)
         end
       when :has_many
         clone = amoeba_conf.clones.include?(:"#{relation_name}")
@@ -447,7 +468,7 @@ module Amoeba
             copy_of_obj = old_obj.amoeba_dup
 
             # associate this new child to the new parent object
-            @result.send(relation_name) << copy_of_obj
+            @result.send( amo_map_relation(relation_name) ) << copy_of_obj
           end
         else
           # This is a regular 1:M "has many"
@@ -463,7 +484,7 @@ module Amoeba
             copy_of_obj[:"#{settings.foreign_key}"] = nil
 
             # associate this new child to the new parent object
-            @result.send(relation_name) << copy_of_obj
+            @result.send( amo_map_relation(relation_name) ) << copy_of_obj
           end
         end
 
@@ -475,17 +496,24 @@ module Amoeba
             copy_of_obj = old_obj.amoeba_dup
 
             # associate this new child to the new parent object
-            @result.send(relation_name) << copy_of_obj
+            @result.send( amo_map_relation(relation_name) ) << copy_of_obj
           end
         else
           self.send(relation_name).each do |old_obj|
             # associate this new child to the new parent object
-            @result.send(relation_name) << old_obj
+            @result.send( amo_map_relation(relation_name) ) << old_obj
           end
         end
       end
     end
     # }}}
+
+    def amo_map_relation( relation_name )
+      if amoeba_conf.remap_method
+        relation_name = self.send( amoeba_conf.remap_method, relation_name.to_s) || relation_name
+      end
+      relation_name.to_sym
+    end
 
     # Field Preprocessor {{{
     def amo_preprocess_parent_copy
