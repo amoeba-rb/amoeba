@@ -196,7 +196,7 @@ If you are using a Many-to-Many relationship, you may tell amoeba to actually ma
 
       amoeba do
         enable
-        clone [:widgets, :tags]
+        clone [:widgets, :warnings]
       end
     end
 
