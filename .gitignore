@@ -1,5 +1,6 @@
 *.gem
 .bundle
-Gemfile.lock
+Gemfile*.lock
 pkg/*
 spec/test.sqlite3
+coverage
