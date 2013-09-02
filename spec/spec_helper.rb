@@ -1,3 +1,5 @@
+require 'coveralls'
+Coveralls.wear!
 require 'amoeba'
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
