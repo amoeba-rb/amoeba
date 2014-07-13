@@ -388,7 +388,7 @@ module Amoeba
         # }}}
         # Exclusive Style {{{
         elsif amoeba_conf.excludes.count > 0
-          reflections.each do |r|
+          self.class.reflections.each do |r|
             if not amoeba_conf.excludes.include?(r[0])
               amo_process_association(r[0], r[1])
             end
@@ -396,7 +396,7 @@ module Amoeba
         # }}}
         # Indiscriminate Style {{{
         else
-          reflections.each do |r|
+          self.class.reflections.each do |r|
             amo_process_association(r[0], r[1])
           end
         end
