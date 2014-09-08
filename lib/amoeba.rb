@@ -412,6 +412,7 @@ module Amoeba
     end
 
   private
+
     # Copy Children {{{
     def amo_process_association(relation_name, settings)
       if not amoeba_conf.known_macros.include?(settings.macro)
@@ -428,7 +429,7 @@ module Amoeba
 
         if not old_obj.nil?
           copy_of_obj = old_obj.amoeba_dup(amoeba_dup_options)
-          copy_of_obj[:"#{settings.foreign_key}"] = nil
+          copy_of_obj[:"#{foreign_key_for(settings)}"] = nil
 
           @result.send(:"#{relation_name}=", copy_of_obj)
         end
@@ -460,7 +461,7 @@ module Amoeba
 
           self.send(relation_name).each do |old_obj|
             copy_of_obj = old_obj.amoeba_dup(amoeba_dup_options)
-            copy_of_obj[:"#{settings.foreign_key}"] = nil
+            copy_of_obj[:"#{foreign_key_for(settings)}"] = nil
 
             # associate this new child to the new parent object
             @result.send(relation_name) << copy_of_obj
@@ -520,6 +521,18 @@ module Amoeba
       end
     end
     # }}}
+
+    def foreign_key_for(association)
+      if ActiveRecord::VERSION::MAJOR == 3 && ActiveRecord::VERSION::MINOR == 0
+        # See: https://github.com/rails/rails/blob/3-0-stable/activerecord/lib/active_record/reflection.rb#L201
+        association.primary_key_name
+      elsif ActiveRecord::VERSION::MAJOR >= 3
+        association.foreign_key
+      else
+        raise "ActiveRecord version #{ActiveRecord.version} is not supported."
+      end
+    end
+
   end
 end
 
