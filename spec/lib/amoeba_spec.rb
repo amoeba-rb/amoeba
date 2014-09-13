@@ -2,6 +2,24 @@ require 'active_record'
 require 'spec_helper'
 
 describe "amoeba" do
+
+  describe 'method' do
+    it do
+      prototype = ObjectPrototype.new
+      real_object = prototype.amoeba_dup
+      real_object.class.should eql RealObject
+    end
+  end
+
+  describe 'remapper' do
+    it do
+      prototype = ObjectPrototype.new
+      prototype.subobject_prototypes << SubobjectPrototype.new
+      real_object = prototype.amoeba_dup
+      real_object.subobjects.length.should eql 1
+    end
+  end
+
   context "dup" do
     it "duplicates associated child records" do
       # Posts {{{
