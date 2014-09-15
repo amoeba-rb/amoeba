@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
 end
 
 class Author < ActiveRecord::Base
-  has_many :posts, :inverse_of => :author
+  has_many :posts, inverse_of: :author
   amoeba do
     enable
   end
@@ -15,16 +15,16 @@ end
 
 class Post < ActiveRecord::Base
   belongs_to :topic
-  belongs_to :owner, :class_name => 'User'
-  belongs_to :author, :inverse_of => :posts
+  belongs_to :owner, class_name: 'User'
+  belongs_to :author, inverse_of: :posts
   has_one :post_config
   has_one :account
-  has_one :history, :through => :account
+  has_one :history, through: :account
   has_many :comments
   has_many :supercats
-  has_many :categories, :through => :supercats
+  has_many :categories, through: :supercats
   has_many :post_widgets
-  has_many :widgets, :through => :post_widgets
+  has_many :widgets, through: :post_widgets
   has_many :custom_things
   has_and_belongs_to_many :tags
   has_and_belongs_to_many :notes
@@ -35,13 +35,13 @@ class Post < ActiveRecord::Base
   amoeba do
     enable
     clone [:widgets, :notes]
-    prepend :title => "Copy of "
-    append :contents => " (copied version)"
-    regex :contents => {:replace => /dog/, :with => 'cat'}
+    prepend title: 'Copy of '
+    append contents: ' (copied version)'
+    regex contents: { replace: /dog/, with: 'cat' }
     customize([
-      lambda do |orig_obj,copy_of_obj|
+      lambda do |orig_obj, copy_of_obj|
         orig_obj.comments.each do |oc|
-          if oc.nerf == "ratatat"
+          if oc.nerf == 'ratatat'
             hash = oc.attributes
             hash[:id]       = nil
             hash[:post_id]  = nil
@@ -53,14 +53,14 @@ class Post < ActiveRecord::Base
           end
         end
       end,
-      lambda do |orig_obj,copy_of_obj|
+      lambda do |orig_obj, copy_of_obj|
         orig_obj.comments.each do |oc|
-          if oc.nerf == "bonk"
+          if oc.nerf == 'bonk'
             hash = oc.attributes
             hash[:id]       = nil
             hash[:post_id]  = nil
             hash[:contents] = nil
-            hash[:nerf]     = "bonkers"
+            hash[:nerf]     = 'bonkers'
 
             cc = Comment.new(hash)
 
@@ -82,11 +82,11 @@ class CustomThing < ActiveRecord::Base
       if str.is_a?(Array)
         return str
       end
-      str.split(',').collect(&:to_i)
+      str.split(',').map(&:to_i)
     end
     def self.dump(int_array)
       unless int_array.present? && int_array.length > 0
-        return ""
+        return ''
       end
       int_array.join(',')
     end
@@ -96,7 +96,7 @@ class CustomThing < ActiveRecord::Base
 
   before_create :hydrate_me
   def hydrate_me
-    self.value = self.value
+    self.value = value
   end
 end
 
@@ -115,12 +115,12 @@ end
 
 class Category < ActiveRecord::Base
   has_many :supercats
-  has_many :posts, :through => :supercats
+  has_many :posts, through: :supercats
 
   amoeba do
     enable
-    prepend :ramblings => "Copy of "
-    set :other_ramblings => "La la la"
+    prepend ramblings: 'Copy of '
+    set other_ramblings: 'La la la'
   end
 end
 
@@ -131,8 +131,8 @@ class Supercat < ActiveRecord::Base
 
   amoeba do
     include_field :superkittens
-    prepend :ramblings => "Copy of "
-    set :other_ramblings => "La la la"
+    prepend ramblings: 'Copy of '
+    set other_ramblings: 'La la la'
   end
 end
 
@@ -164,7 +164,7 @@ end
 
 class Widget < ActiveRecord::Base
   has_many :post_widgets
-  has_many :posts, :through => :post_widgets
+  has_many :posts, through: :post_widgets
 end
 
 class PostWidget < ActiveRecord::Base
@@ -209,16 +209,24 @@ class Necklace < Product
   end
 end
 
+class BlackBox < Product
+  amoeba do
+    propagate :strict
+  end
+end
+
+class SuperBlackBox < BlackBox
+end
+
 # Polymorphism
 class Address < ActiveRecord::Base
-  belongs_to :addressable, :polymorphic => true
+  belongs_to :addressable, polymorphic: true
 end
 
 class Employee < ActiveRecord::Base
-  has_many :addresses, :as => :addressable
+  has_many :addresses, as: :addressable
 end
 
 class Customer < ActiveRecord::Base
-  has_many :addresses, :as => :addressable
+  has_many :addresses, as: :addressable
 end
-
