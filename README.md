@@ -6,7 +6,7 @@
 
 Easy copying of rails associations such as `has_many`.
 
-![amoebalogo](http://rocksolidwebdesign.com/wp_cms/wp-content/uploads/2012/02/amoeba_logo.jpg)
+[![Code Climate](https://codeclimate.com/github/rocksolidwebdesign/amoeba/badges/gpa.svg)](https://codeclimate.com/github/rocksolidwebdesign/amoeba)
 
 ## What?
 

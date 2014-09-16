@@ -1,15 +1,17 @@
-require 'active_record'
 require 'spec_helper'
 
-describe "amoeba" do
-  context "dup" do
-    it "duplicates associated child records" do
+describe 'amoeba' do
+  context 'dup' do
+    before :each do
+      require ::File.dirname(__FILE__) + '/../support/data.rb'
+    end
+    it 'duplicates associated child records' do
       # Posts {{{
-      old_post = Post.find(1)
-      old_post.comments.map(&:contents).include?("I love it!").should be true
+      old_post = ::Post.find(1)
+      expect(old_post.comments.map(&:contents).include?('I love it!')).to be_truthy
 
       old_post.class.amoeba do
-        prepend :contents => "Here's a copy: "
+        prepend contents: "Here's a copy: "
       end
 
       new_post = old_post.amoeba_dup
@@ -28,12 +30,12 @@ describe "amoeba" do
       start_postwidget_count = PostWidget.all.count
       start_superkitten_count = Superkitten.all.count
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS tag_count FROM posts_tags')
-      start_posttag_count = rs["tag_count"]
+      start_posttag_count = rs['tag_count']
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS note_count FROM notes_posts')
-      start_postnote_count = rs["note_count"]
+      start_postnote_count = rs['note_count']
 
-      new_post.save
-      new_post.errors.messages.length.should == 0
+      expect(new_post.save!).to be_truthy
+      expect(new_post.title).to eq("Copy of #{old_post.title}")
 
       end_account_count = Account.all.count
       end_history_count = History.all.count
@@ -49,140 +51,187 @@ describe "amoeba" do
       end_postwidget_count = PostWidget.all.count
       end_superkitten_count = Superkitten.all.count
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS tag_count FROM posts_tags')
-      end_posttag_count = rs["tag_count"]
+      end_posttag_count = rs['tag_count']
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS note_count FROM notes_posts')
-      end_postnote_count = rs["note_count"]
+      end_postnote_count = rs['note_count']
 
-      end_tag_count.should         == start_tag_count
-      end_cat_count.should         == start_cat_count
-      end_account_count.should     == start_account_count * 2
-      end_history_count.should     == start_history_count * 2
-      end_supercat_count.should    == start_supercat_count * 2
-      end_post_count.should        == start_post_count * 2
-      end_comment_count.should     == (start_comment_count * 2) + 2
-      end_rating_count.should      == start_rating_count * 2
-      end_postconfig_count.should  == start_postconfig_count * 2
-      end_posttag_count.should     == start_posttag_count * 2
-      end_widget_count.should      == start_widget_count * 2
-      end_postwidget_count.should  == start_postwidget_count * 2
-      end_note_count.should        == start_note_count * 2
-      end_postnote_count.should    == start_postnote_count * 2
-      end_superkitten_count.should == start_superkitten_count * 2
+      expect(end_tag_count).to         eq(start_tag_count)
+      expect(end_cat_count).to         eq(start_cat_count)
+      expect(end_account_count).to     eq(start_account_count * 2)
+      expect(end_history_count).to     eq(start_history_count * 2)
+      expect(end_supercat_count).to    eq(start_supercat_count * 2)
+      expect(end_post_count).to        eq(start_post_count * 2)
+      expect(end_comment_count).to     eq((start_comment_count * 2) + 2)
+      expect(end_rating_count).to      eq(start_rating_count * 2)
+      expect(end_postconfig_count).to  eq(start_postconfig_count * 2)
+      expect(end_posttag_count).to     eq(start_posttag_count * 2)
+      expect(end_widget_count).to      eq(start_widget_count * 2)
+      expect(end_postwidget_count).to  eq(start_postwidget_count * 2)
+      expect(end_note_count).to        eq(start_note_count * 2)
+      expect(end_postnote_count).to    eq(start_postnote_count * 2)
+      expect(end_superkitten_count).to eq(start_superkitten_count * 2)
 
-      new_post.supercats.map(&:ramblings).include?("Copy of zomg").should be true
-      new_post.supercats.map(&:other_ramblings).uniq.length.should == 1
-      new_post.supercats.map(&:other_ramblings).uniq.include?("La la la").should be true
-      new_post.title.should == "Copy of #{old_post.title}"
-      new_post.contents.should == "Here's a copy: #{old_post.contents.gsub(/dog/, 'cat')} (copied version)"
-      new_post.comments.length.should == 5
-      new_post.comments.select{ |c| c.nerf == 'ratatat' && c.contents.nil? }.length.should == 1
-      new_post.comments.select{ |c| c.nerf == 'ratatat' }.length.should == 2
-      new_post.comments.select{ |c| c.nerf == 'bonk' }.length.should == 1
-      new_post.comments.select{ |c| c.nerf == 'bonkers' && c.contents.nil? }.length.should == 1
+      expect(new_post.supercats.map(&:ramblings).include?('Copy of zomg')).to be true
+      expect(new_post.supercats.map(&:other_ramblings).uniq.length).to eq(1)
+      expect(new_post.supercats.map(&:other_ramblings).uniq.include?('La la la')).to be true
+      expect(new_post.contents).to eq("Here's a copy: #{old_post.contents.gsub(/dog/, 'cat')} (copied version)")
+      expect(new_post.comments.length).to eq(5)
+      expect(new_post.comments.select { |c| c.nerf == 'ratatat' && c.contents.nil? }.length).to eq(1)
+      expect(new_post.comments.select { |c| c.nerf == 'ratatat' }.length).to eq(2)
+      expect(new_post.comments.select { |c| c.nerf == 'bonk' }.length).to eq(1)
+      expect(new_post.comments.select { |c| c.nerf == 'bonkers' && c.contents.nil? }.length).to eq(1)
 
       new_post.widgets.map(&:id).each do |id|
-        old_post.widgets.map(&:id).include?(id).should_not be true
+        expect(old_post.widgets.map(&:id).include?(id)).not_to be true
       end
 
-      new_post.custom_things.length.should == 3
-      new_post.custom_things.select{ |ct| ct.value == [] }.length.should == 1
-      new_post.custom_things.select{ |ct| ct.value == [1,2]}.length.should == 1
-      new_post.custom_things.select{ |ct| ct.value == [78]}.length.should == 1
+      expect(new_post.custom_things.length).to eq(3)
+      expect(new_post.custom_things.select { |ct| ct.value == [] }.length).to eq(1)
+      expect(new_post.custom_things.select { |ct| ct.value == [1, 2] }.length).to eq(1)
+      expect(new_post.custom_things.select { |ct| ct.value == [78] }.length).to eq(1)
       # }}}
       # Author {{{
       old_author = Author.find(1)
       new_author = old_author.amoeba_dup
-      new_author.save
-      new_author.errors.messages.length.should == 0
-      new_author.posts.first.custom_things.length.should == 3
-      new_author.posts.first.custom_things.select{ |ct| ct.value == [] }.length.should == 1
-      new_author.posts.first.custom_things.select{ |ct| ct.value == [1,2]}.length.should == 1
-      new_author.posts.first.custom_things.select{ |ct| ct.value == [78]}.length.should == 1
+      new_author.save!
+      expect(new_author.errors.messages.length).to eq(0)
+      expect(new_author.posts.first.custom_things.length).to eq(3)
+      expect(new_author.posts.first.custom_things.select { |ct| ct.value == [] }.length).to eq(1)
+      expect(new_author.posts.first.custom_things.select { |ct| ct.value == [1, 2] }.length).to eq(1)
+      expect(new_author.posts.first.custom_things.select { |ct| ct.value == [78] }.length).to eq(1)
       # }}}
       # Products {{{
       # Base Class {{{
       old_product = Product.find(1)
 
-      start_image_count = Image.where(:product_id => old_product.id).count
+      start_image_count = Image.where(product_id: old_product.id).count
       start_section_count = Section.all.length
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
-      start_prodsection_count = rs["section_count"]
+      start_prodsection_count = rs['section_count']
 
       new_product = old_product.amoeba_dup
       new_product.save
-      new_product.errors.messages.length.should == 0
+      expect(new_product.errors.messages.length).to eq(0)
 
-      end_image_count = Image.where(:product_id => old_product.id).count
-      end_newimage_count = Image.where(:product_id => new_product.id).count
+      end_image_count = Image.where(product_id: old_product.id).count
+      end_newimage_count = Image.where(product_id: new_product.id).count
       end_section_count = Section.all.length
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', 1)
-      end_prodsection_count = rs["section_count"]
+      end_prodsection_count = rs['section_count']
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', new_product.id)
-      end_newprodsection_count = rs["section_count"]
+      end_newprodsection_count = rs['section_count']
 
-      end_image_count.should == start_image_count
-      end_newimage_count.should == start_image_count
-      end_section_count.should == start_section_count
-      end_prodsection_count.should == start_prodsection_count
-      end_newprodsection_count.should == start_prodsection_count
+      expect(end_image_count).to eq(start_image_count)
+      expect(end_newimage_count).to eq(start_image_count)
+      expect(end_section_count).to eq(start_section_count)
+      expect(end_prodsection_count).to eq(start_prodsection_count)
+      expect(end_newprodsection_count).to eq(start_prodsection_count)
       # }}}
 
       # Inherited Class {{{
       # Shirt {{{
       old_product = Shirt.find(2)
 
-      start_image_count = Image.where(:product_id => old_product.id).count
+      start_image_count = Image.where(product_id: old_product.id).count
       start_section_count = Section.all.length
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
-      start_prodsection_count = rs["section_count"]
+      start_prodsection_count = rs['section_count']
 
       new_product = old_product.amoeba_dup
       new_product.save
-      new_product.errors.messages.length.should == 0
+      expect(new_product.errors.messages.length).to eq(0)
 
-      end_image_count = Image.where(:product_id => old_product.id).count
-      end_newimage_count = Image.where(:product_id => new_product.id).count
+      end_image_count = Image.where(product_id: old_product.id).count
+      end_newimage_count = Image.where(product_id: new_product.id).count
       end_section_count = Section.all.length
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', 1)
-      end_prodsection_count = rs["section_count"]
+      end_prodsection_count = rs['section_count']
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', new_product.id)
-      end_newprodsection_count = rs["section_count"]
+      end_newprodsection_count = rs['section_count']
 
-      end_image_count.should == start_image_count
-      end_newimage_count.should == start_image_count
-      end_section_count.should == start_section_count
-      end_prodsection_count.should == start_prodsection_count
-      end_newprodsection_count.should == start_prodsection_count
+      expect(end_image_count).to eq(start_image_count)
+      expect(end_newimage_count).to eq(start_image_count)
+      expect(end_section_count).to eq(start_section_count)
+      expect(end_prodsection_count).to eq(start_prodsection_count)
+      expect(end_newprodsection_count).to eq(start_prodsection_count)
       # }}}
 
       # Necklace {{{
       old_product = Necklace.find(3)
 
-      start_image_count = Image.where(:product_id => old_product.id).count
+      start_image_count = Image.where(product_id: old_product.id).count
       start_section_count = Section.all.length
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', old_product.id)
-      start_prodsection_count = rs["section_count"]
+      start_prodsection_count = rs['section_count']
 
       new_product = old_product.amoeba_dup
       new_product.save
-      new_product.errors.messages.length.should == 0
+      expect(new_product.errors.messages.length).to eq(0)
 
-      end_image_count = Image.where(:product_id => old_product.id).count
-      end_newimage_count = Image.where(:product_id => new_product.id).count
+      end_image_count = Image.where(product_id: old_product.id).count
+      end_newimage_count = Image.where(product_id: new_product.id).count
       end_section_count = Section.all.length
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', 1)
-      end_prodsection_count = rs["section_count"]
+      end_prodsection_count = rs['section_count']
       rs = ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?', new_product.id)
-      end_newprodsection_count = rs["section_count"]
+      end_newprodsection_count = rs['section_count']
 
-      end_image_count.should == start_image_count
-      end_newimage_count.should == start_image_count
-      end_section_count.should == start_section_count
-      end_prodsection_count.should == start_prodsection_count
-      end_newprodsection_count.should == start_prodsection_count
+      expect(end_image_count).to eq(start_image_count)
+      expect(end_newimage_count).to eq(start_image_count)
+      expect(end_section_count).to eq(start_section_count)
+      expect(end_prodsection_count).to eq(start_prodsection_count)
+      expect(end_newprodsection_count).to eq(start_prodsection_count)
       # }}}
       # }}}
       # }}}
+    end
+  end
+  context 'override' do
+    before :each do
+      ::Image.fresh_amoeba
+      ::Image.amoeba do
+        override ->(old, new) {
+          if old.filename == 'test.jpg'
+            new.product_id = 13
+          end
+        }
+      end
+    end
+    it 'should override fields' do
+      image = ::Image.create(filename: 'test.jpg', product_id: 12)
+      image_dup = image.amoeba_dup
+      expect(image_dup.save).to be_truthy
+      expect(image_dup.product_id).to eq(13)
+    end
+    it 'should not override fields' do
+      image = ::Image.create(filename: 'test2.jpg', product_id: 12)
+      image_dup = image.amoeba_dup
+      expect(image_dup.save).to be_truthy
+      expect(image_dup.product_id).to eq(12)
+    end
+  end
+
+  context 'nullify' do
+    before :each do
+      ::Image.fresh_amoeba
+      ::Image.amoeba do
+        nullify :product_id
+      end
+    end
+    it 'should nullify fields' do
+      image = ::Image.create(filename: 'test.jpg', product_id: 12)
+      image_dup = image.amoeba_dup
+      expect(image_dup.save).to be_truthy
+      expect(image_dup.product_id).to be_nil
+    end
+  end
+
+  context 'strict propagate' do
+    it 'should call #fresh_amoeba' do
+      expect(::SuperBlackBox).to receive(:fresh_amoeba).and_call_original
+      box = ::SuperBlackBox.create(title: 'Super Black Box', price: 9.99, length: 1, metal: '1')
+      new_box = box.amoeba_dup
+      expect(new_box.save).to be_truthy
     end
   end
 end

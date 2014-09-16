@@ -1,10 +1,12 @@
-source "http://rubygems.org"
-
-# Specify your gem's dependencies in power_dup.gemspec
+source 'https://rubygems.org'
 gemspec
-gem 'activerecord', '~> 4.1.2'
 
 group :development, :test do
   gem 'rake'
   gem 'coveralls', require: false
+end
+
+group :local_development do
+  gem 'pry'
+  gem 'appraisal'
 end
