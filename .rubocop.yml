@@ -3,7 +3,7 @@ AllCops:
     - '**/Rakefile'
   Exclude:
     - 'spec/**/*'
-Style/LineLength:
+Metrics/LineLength:
   Max: 99
 Style/FileName:
   Enabled: false
@@ -13,5 +13,5 @@ Style/Encoding:
   Enabled: false
 Documentation:
   Enabled: false
-Style/MethodLength:
+Metrics/MethodLength:
   Max: 15

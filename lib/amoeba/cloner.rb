@@ -31,35 +31,41 @@ module Amoeba
       amoeba.upbringing ? amoeba.upbringing : _parent_amoeba.parenting
     end
 
+    def inherit_strict_parent_settings
+      fresh_amoeba(&_parent_amoeba_settings)
+    end
+
+    def inherit_relaxed_parent_settings
+      amoeba(&_parent_amoeba_settings)
+    end
+
+    def inherit_submissive_parent_settings
+      fresh_amoeba(&_parent_amoeba_settings)
+      amoeba(&_amoeba_settings)
+    end
+
     def inherit_parent_settings
       return if amoeba.enabled || !_parent_amoeba.inherit
-      case parenting_style
-      when :strict
-        # parent settings only
-        fresh_amoeba(&_parent_amoeba_settings)
-      when :relaxed
-        # parent takes precedence
-        amoeba(&_parent_amoeba_settings)
-      when :submissive
-        # parent suggests things
-        # child does what it wants to anyway
-        fresh_amoeba(&_parent_amoeba_settings)
-        amoeba(&_amoeba_settings)
-      end
+      return unless %w(strict relaxed submissive).include?(parenting_style.to_s)
+      __send__("inherit_#{parenting_style}_parent_settings".to_sym)
     end
 
     def apply_clones
       amoeba.clones.each do |clone_field|
-        association = @object_klass.reflect_on_association(clone_field)
-
-        # if this is a has many through and we're gonna deep
-        # copy the child records, exclude the regular join
-        # table from copying so we don't end up with the new
-        # and old children on the copy
-        if association.macro == :has_many && association.is_a?(::ActiveRecord::Reflection::ThroughReflection)
-          amoeba.exclude_field(association.options[:through])
-        end
+        exclude_clone_if_has_many_through(clone_field)
       end
+    end
+
+    def exclude_clone_if_has_many_through(clone_field)
+      association = @object_klass.reflect_on_association(clone_field)
+
+      # if this is a has many through and we're gonna deep
+      # copy the child records, exclude the regular join
+      # table from copying so we don't end up with the new
+      # and old children on the copy
+      return unless association.macro == :has_many ||
+        association.is_a?(::ActiveRecord::Reflection::ThroughReflection)
+      amoeba.exclude_field(association.options[:through])
     end
 
     def follow_only_includes
@@ -75,15 +81,19 @@ module Amoeba
       end
     end
 
+    def follow_all
+      @object_klass.reflections.each do |name, association|
+        follow_association(name, association)
+      end
+    end
+
     def apply_associations
       if amoeba.includes.size > 0
         follow_only_includes
       elsif amoeba.excludes.size > 0
         follow_all_except_excludes
       else
-        @object_klass.reflections.each do |name, association|
-          follow_association(name, association)
-        end
+        follow_all
       end
     end
 
@@ -94,7 +104,7 @@ module Amoeba
 
     def follow_association(relation_name, association)
       return unless amoeba.known_macros.include?(association.macro.to_sym)
-      follow_klass = "::Amoeba::Macros::#{association.macro.to_s.classify}".safe_constantize
+      follow_klass = ::Amoeba::Macros.list[association.macro.to_sym]
       follow_klass.new(self).follow(relation_name, association) if follow_klass
     end
 

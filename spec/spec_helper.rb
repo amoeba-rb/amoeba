@@ -11,7 +11,15 @@ end
 require 'active_record'
 require 'amoeba'
 
-ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+adapter = if defined?(JRuby)
+            require 'activerecord-jdbcsqlite3-adapter'
+            'jdbcsqlite3'
+          else
+            require 'sqlite3'
+            'sqlite3'
+          end
+
+ActiveRecord::Base.establish_connection(adapter: adapter, database: ':memory:')
 
 ::RSpec.configure do |config|
   config.order = :default

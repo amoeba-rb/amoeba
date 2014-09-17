@@ -204,6 +204,15 @@ class Shirt < Product
 end
 
 class Necklace < Product
+  # Strange bug on rbx
+  if defined?(::Rubinius)
+    after_initialize :set_type
+
+    def set_type
+      self.type = 'Necklace'
+    end
+  end
+
   amoeba do
     raised :relaxed
   end

@@ -218,7 +218,7 @@ This example will actually duplicate the warnings and widgets in the database. I
 
 #### Limiting Association Types
 
-By default, amoeba recognizes and attemps to copy any children of the following association types:
+By default, amoeba recognizes and attempts to copy any children of the following association types:
 
  - has one
  - has many
