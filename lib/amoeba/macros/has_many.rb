@@ -14,6 +14,7 @@ module Amoeba
         # actually copy  and reassociate the  new children
         # rather than only maintaining the associations
         @old_object.__send__(relation_name).each do |old_obj|
+          relation_name = remapped_relation_name(relation_name)
           # associate this new child to the new parent object
           @new_object.__send__(relation_name) << old_obj.amoeba_dup
         end
@@ -31,7 +32,7 @@ module Amoeba
         @old_object.__send__(relation_name).each do |old_obj|
           copy_of_obj = old_obj.amoeba_dup(@options)
           copy_of_obj[:"#{association.foreign_key}"] = nil
-
+          relation_name = remapped_relation_name(relation_name)
           # associate this new child to the new parent object
           @new_object.__send__(relation_name) << copy_of_obj
         end

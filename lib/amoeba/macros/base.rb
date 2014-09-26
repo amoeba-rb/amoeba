@@ -16,6 +16,11 @@ module Amoeba
           ::Amoeba::Macros.add(klass)
         end
       end
+
+      def remapped_relation_name(name)
+        return name unless @cloner.amoeba.remap_method
+        @old_object.__send__(@cloner.amoeba.remap_method, name.to_sym) || name
+      end
     end
   end
 end

@@ -239,3 +239,45 @@ end
 class Customer < ActiveRecord::Base
   has_many :addresses, as: :addressable
 end
+
+# Remapping and Method
+
+class MetalObject < ActiveRecord::Base
+end
+
+class ObjectPrototype < MetalObject
+  has_many :subobject_prototypes, foreign_key: :parent_id
+
+  amoeba do
+    enable
+    through :become_real
+    remapper :remap_subobjects
+  end
+
+  def become_real
+    self.dup.becomes RealObject
+  end
+
+  def remap_subobjects( relation_name )
+    :subobjects if relation_name == :subobject_prototypes
+  end
+end
+
+class RealObject < MetalObject
+  has_many :subobjects, foreign_key: :parent_id
+end
+
+class SubobjectPrototype < MetalObject
+
+  amoeba do
+    enable
+    through :become_subobject
+  end
+
+  def become_subobject
+    self.dup.becomes Subobject
+  end
+end
+
+class Subobject < MetalObject
+end

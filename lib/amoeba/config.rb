@@ -6,6 +6,8 @@ module Amoeba
       do_preproc:     false,
       parenting:      false,
       raised:         false,
+      dup_method:     :dup,
+      remap_method:   nil,
       includes:       [],
       excludes:       [],
       clones:         [],
@@ -123,39 +125,32 @@ module Amoeba
       push_value_to_array(value, :known_macros)
     end
 
-    def override(value = nil)
-      @config[:do_preproc] = true
-      push_value_to_array(value, :overrides)
+    { override: 'overrides', customize: 'customizations',
+      nullify: 'null_fields' }.each do |method, key|
+      class_eval <<-EOS, __FILE__, __LINE__ + 1
+        def #{method}(value = nil)             # def override(value = nil)
+          @config[:do_preproc] = true          #   @config[:do_preproc] = true
+          push_value_to_array(value, :#{key})  #   push_value_to_array(value, :overrides)
+        end                                    # end
+      EOS
     end
 
-    def customize(value = nil)
-      @config[:do_preproc] = true
-      push_value_to_array(value, :customizations)
+    { set: 'coercions', prepend: 'prefixes',
+      append: 'suffixes', regex:   'regexes' }.each do |method, key|
+      class_eval <<-EOS, __FILE__, __LINE__ + 1
+        def #{method}(value = nil)            # def set(value = nil)
+          @config[:do_preproc] = true         #   @config[:do_preproc] = true
+          push_value_to_hash(value, :#{key})  #   push_value_to_hash(value, :coercions)
+        end                                   # end
+      EOS
     end
 
-    def nullify(value = nil)
-      @config[:do_preproc] = true
-      push_value_to_array(value, :null_fields)
+    def through(value)
+      @config[:dup_method] = value.to_sym
     end
 
-    def set(value = nil)
-      @config[:do_preproc] = true
-      push_value_to_hash(value, :coercions)
-    end
-
-    def prepend(value = nil)
-      @config[:do_preproc] = true
-      push_value_to_hash(value, :prefixes)
-    end
-
-    def append(value = nil)
-      @config[:do_preproc] = true
-      push_value_to_hash(value, :suffixes)
-    end
-
-    def regex(value = nil)
-      @config[:do_preproc] = true
-      push_value_to_hash(value, :regexes)
+    def remapper(value)
+      @config[:remap_method] = value.to_sym
     end
   end
 end

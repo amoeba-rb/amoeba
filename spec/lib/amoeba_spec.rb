@@ -234,4 +234,22 @@ describe 'amoeba' do
       expect(new_box.save).to be_truthy
     end
   end
+
+  context 'remapping and custom dup method' do
+    let(:prototype) { ObjectPrototype.new }
+    context 'through' do
+      it do
+        real_object = prototype.amoeba_dup
+        expect(real_object).to be_a(::RealObject)
+      end
+    end
+    context 'remapper' do
+      it do
+        prototype.subobject_prototypes << SubobjectPrototype.new
+        real_object = prototype.amoeba_dup
+        expect(real_object.subobjects.length).to eq(1)
+      end
+    end
+  end
+
 end

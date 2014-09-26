@@ -7,7 +7,7 @@ module Amoeba
         return unless old_obj
         copy_of_obj = old_obj.amoeba_dup(@options)
         copy_of_obj[:"#{association.foreign_key}"] = nil
-
+        relation_name = remapped_relation_name(relation_name)
         @new_object.__send__(:"#{relation_name}=", copy_of_obj)
       end
     end

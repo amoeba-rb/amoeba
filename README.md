@@ -791,7 +791,7 @@ For example this will throw a validation error saying that your posts are invali
 
     author.save # this will fail validation
 
-Wheras this will work fine:
+Where this will work fine:
 
     class Author < ActiveRecord::Base
       has_many :posts, :inverse_of => :author
@@ -846,6 +846,15 @@ This issue with `accepts_nested_attributes_for` can also be solved by using `:in
     author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
 
 The crux of the issue is that upon duplication, the new `Author` instance does not yet have an ID because it has not yet been persisted, so the `:posts` do not yet have an `:author_id` either, and thus no `:author` and thus they will fail validation. This issue may likely affect amoeba usage so if you get some validation failures, be sure to add `:inverse_of` to your models.
+
+
+## Custom duplication method
+
+Need to update. Please look #22
+
+## Associations remapping
+
+Need to update. Please look #22
 
 ## Configuration Reference
 

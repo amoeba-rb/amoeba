@@ -172,4 +172,10 @@ ActiveRecord::Schema.define do
     t.string :some_stuff
     t.timestamps null: true
   end
+
+  create_table :metal_objects, force: true do |t|
+    t.string :type
+    t.integer :parent_id
+    t.timestamps
+  end
 end
