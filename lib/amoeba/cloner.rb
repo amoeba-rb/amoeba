@@ -13,9 +13,9 @@ module Amoeba
 
     def initialize(object, options = {})
       @old_object, @options = object, options
-      @object_klass         = @old_object.class
+      @object_klass = @old_object.class
       inherit_parent_settings
-      @new_object           = object.__send__(amoeba.dup_method)
+      @new_object = object.__send__(amoeba.dup_method)
     end
 
     def run

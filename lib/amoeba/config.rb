@@ -69,7 +69,7 @@ module Amoeba
 
     def propagate(style = :submissive)
       @config[:parenting] ||= style
-      @config[:inherit]   = true
+      @config[:inherit]  = true
     end
 
     def push_value_to_array(value, key)

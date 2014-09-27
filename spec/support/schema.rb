@@ -176,13 +176,27 @@ ActiveRecord::Schema.define do
   create_table :metal_objects, force: true do |t|
     t.string :type
     t.integer :parent_id
-    t.timestamps
+    t.timestamps null: true
   end
 
   create_table :super_admins, force: true do |t|
     t.string :email
     t.string :password
     t.boolean :active, null: false, default: true
-    t.timestamps
+    t.timestamps null: true
   end
+
+  create_table :boxes, force: true do |t|
+    t.string   :title
+    t.timestamps null: true
+  end
+
+  create_table :box_products, force: true do |t|
+    t.string   :type
+    t.integer  :box_id
+    t.integer  :box_sub_product_id
+    t.string   :title
+    t.timestamps null: true
+  end
+
 end

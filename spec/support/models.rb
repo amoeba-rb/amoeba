@@ -291,3 +291,38 @@ class SuperAdmin < ::ActiveRecord::Base
     prepend password: false
   end
 end
+
+# Proper inheritance
+
+class Box < ActiveRecord::Base
+
+  has_many        :products, class_name: 'BoxProduct'
+  has_many        :sub_products, class_name: 'BoxSubProduct'
+
+  amoeba do
+    enable
+  end
+
+end
+
+class BoxProduct < ActiveRecord::Base
+
+  belongs_to      :box, class_name: 'Box'
+
+  amoeba do
+    enable
+    propagate
+  end
+
+end
+
+class BoxSubProduct < BoxProduct
+  has_one :another_product, class_name: 'BoxAnotherProduct'
+end
+
+class BoxSubSubProduct < BoxSubProduct
+end
+
+class BoxAnotherProduct < BoxProduct
+  belongs_to :sub_product, class_name: 'BoxSubProduct'
+end
