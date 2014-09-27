@@ -1,10 +1,6 @@
-# IMPORTANT NEWS
+# Amoeba
 
-* As of December 11th, 2012 Amoeba no longer overrides the built in `ActiveRecord::Base#dup` method and instead implements its own method called `amoeba_dup`. Make sure to update your code if you do a bundle update and or double check that your gemfile has a version restriction bound to v1.x e.g. '~> 1.2' listed for amoeba.
-
-## Amoeba
-
-Easy copying of rails associations such as `has_many`.
+Easy cloning of active_record objects including associations and several operations under associations and attributes.
 
 [![Code Climate](https://codeclimate.com/github/rocksolidwebdesign/amoeba/badges/gpa.svg)](https://codeclimate.com/github/rocksolidwebdesign/amoeba)
 
@@ -116,8 +112,8 @@ If you only want some of the associations copied but not others, you may use the
 
       amoeba do
         enable
-        include_field :tags
-        include_field :authors
+        include_association :tags
+        include_association :authors
       end
     end
 
@@ -133,8 +129,8 @@ Using the inclusive style within the amoeba block actually implies that you wish
       has_many :authors
 
       amoeba do
-        include_field :tags
-        include_field :authors
+        include_association :tags
+        include_association :authors
       end
     end
 
@@ -142,7 +138,7 @@ Using the inclusive style within the amoeba block actually implies that you wish
       belongs_to :post
     end
 
-You may also specify fields to be copied by passing an array. If you call the `include_field` with a single value, it will be appended to the list of already included fields. If you pass an array, your array will overwrite the original values.
+You may also specify fields to be copied by passing an array. If you call the `include_association` with a single value, it will be appended to the list of already included fields. If you pass an array, your array will overwrite the original values.
 
     class Post < ActiveRecord::Base
       has_many :comments
@@ -150,7 +146,7 @@ You may also specify fields to be copied by passing an array. If you call the `i
       has_many :authors
 
       amoeba do
-        include_field [:tags, :authors]
+        include_association [:tags, :authors]
       end
     end
 
@@ -172,7 +168,7 @@ If you have more fields to include than to exclude, you may wish to shorten the 
       has_many :authors
 
       amoeba do
-        exclude_field :comments
+        exclude_association :comments
       end
     end
 
@@ -182,7 +178,7 @@ If you have more fields to include than to exclude, you may wish to shorten the 
 
 This example does the same thing as the inclusive style example, it will copy the post's tags and authors but not its comments. As with inclusive style, there is no need to explicitly enable amoeba when specifying fields to exclude.
 
-The exclusive style, when used, will automatically disable any other style that was previously selected, so if you selected include fields, and then you choose some exclude fields, the `exclude_field` method will disable the previously slected inclusive style and wipe out any corresponding include fields.
+The exclusive style, when used, will automatically disable any other style that was previously selected, so if you selected include fields, and then you choose some exclude fields, the `exclude_association` method will disable the previously slected inclusive style and wipe out any corresponding include fields.
 
 #### Cloning
 
@@ -346,7 +342,7 @@ or this, using an array:
       has_and_belongs_to_many :tags
 
       amoeba do
-        include_field :tags
+        include_association :tags
 
         customize([
           lambda do |orig_obj,copy_of_obj|
@@ -413,11 +409,11 @@ This example should result in something like this:
     new_post.title # "Copy of Hello world"
     new_post.contents # "Original contents: I like cats, cats are awesome. (copied version)"
 
-Like `nullify`, the preprocessing directives do not automatically enable the copying of associated child records. If only preprocessing directives are used and you do want to copy child records and no `include_field` or `exclude_field` list is provided, you must still explicitly enable the copying of child records by calling the enable method from within the amoeba block on your model.
+Like `nullify`, the preprocessing directives do not automatically enable the copying of associated child records. If only preprocessing directives are used and you do want to copy child records and no `include_association` or `exclude_association` list is provided, you must still explicitly enable the copying of child records by calling the enable method from within the amoeba block on your model.
 
 ### Precedence
 
-You may use a combination of configuration methods within each model's amoeba block. Recognized association types take precedence over inclusion or exclusion lists. Inclusive style takes precedence over exclusive style, and these two explicit styles take precedence over the indiscriminate style. In other words, if you list fields to copy, amoeba will only copy the fields you list, or only copy the fields you don't exclude as the case may be. Additionally, if a field type is not recognized it will not be copied, regardless of whether it appears in an inclusion list. If you want amoeba to automatically copy all of your child records, do not list any fields using either `include_field` or `exclude_field`.
+You may use a combination of configuration methods within each model's amoeba block. Recognized association types take precedence over inclusion or exclusion lists. Inclusive style takes precedence over exclusive style, and these two explicit styles take precedence over the indiscriminate style. In other words, if you list fields to copy, amoeba will only copy the fields you list, or only copy the fields you don't exclude as the case may be. Additionally, if a field type is not recognized it will not be copied, regardless of whether it appears in an inclusion list. If you want amoeba to automatically copy all of your child records, do not list any fields using either `include_association` or `exclude_association`.
 
 The following example syntax is perfectly valid, and will result in the usage of inclusive style. The order in which you call the configuration methods within the amoeba block does not matter:
 
@@ -432,13 +428,13 @@ The following example syntax is perfectly valid, and will result in the usage of
       has_many :authors
 
       amoeba do
-        exclude_field :authors
-        include_field :tags
+        exclude_association :authors
+        include_association :tags
         nullify :date_published
         prepend :title => "Copy of "
         append :contents => " (copied version)"
         regex :contents => {:replace => /dog/, :with => 'cat'}
-        include_field :authors
+        include_association :authors
         enable
         nullify :topic_id
       end
@@ -450,7 +446,7 @@ The following example syntax is perfectly valid, and will result in the usage of
 
 This example will copy all of a post's tags and authors, but not its comments. It will also nullify the publishing date and dissociate the post from its original topic. It will also preprocess the post's fields as in the previous preprocessing example.
 
-Note that, because of precedence, inclusive style is used and the list of exclude fields is never consulted. Additionally, the `enable` method is redundant because amoeba is automatically enabled when using `include_field`.
+Note that, because of precedence, inclusive style is used and the list of exclude fields is never consulted. Additionally, the `enable` method is redundant because amoeba is automatically enabled when using `include_association`.
 
 The preprocessing directives are run after child records are copied andare run in this order.
 
@@ -646,18 +642,18 @@ The `:relaxed` parenting style will prefer parent settings.
       has_and_belongs_to_many :sections
 
       amoeba do
-        exclude_field :images
+        exclude_association :images
         propagate :relaxed
       end
     end
 
     class Shirt < Product
-      include_field :images
-      include_field :sections
+      include_association :images
+      include_association :sections
       prepend :title => "Copy of "
     end
 
-In this example, the conflicting `include_field` settings on the child will be ignored and the parent `exclude_field` setting will be used, while the `prepend` setting on the child will be honored because it doesn't conflict with the parent.
+In this example, the conflicting `include_association` settings on the child will be ignored and the parent `exclude_association` setting will be used, while the `prepend` setting on the child will be honored because it doesn't conflict with the parent.
 
 ##### Strict Parenting
 
@@ -668,18 +664,18 @@ The `:strict` style will ignore child settings altogether and inherit any parent
       has_and_belongs_to_many :sections
 
       amoeba do
-        exclude_field :images
+        exclude_association :images
         propagate :strict
       end
     end
 
     class Shirt < Product
-      include_field :images
-      include_field :sections
+      include_association :images
+      include_association :sections
       prepend :title => "Copy of "
     end
 
-In this example, the only processing that will happen when a Shirt is duplicated is whatever processing is allowed by the parent. So in this case the parent's `exclude_field` directive takes precedence over the child's `include_field` settings, and not only that, but none of the other settings for the child are used either. The `prepend` setting of the child is completely ignored.
+In this example, the only processing that will happen when a Shirt is duplicated is whatever processing is allowed by the parent. So in this case the parent's `exclude_association` directive takes precedence over the child's `include_association` settings, and not only that, but none of the other settings for the child are used either. The `prepend` setting of the child is completely ignored.
 
 ##### Parenting and Precedence
 
@@ -704,13 +700,13 @@ This version will use both the parent and child settings, so both the images and
       has_and_belongs_to_many :sections
 
       amoeba do
-        include_field :images
+        include_association :images
         propagate
       end
     end
 
     class Shirt < Product
-      include_field :sections
+      include_association :sections
     end
 
 The next version will use only the child settings because passing an array will override any previous settings rather than adding to them and the child config takes precedence in the `submissive` parenting style. So in this case only the sections will be copied.
@@ -720,13 +716,13 @@ The next version will use only the child settings because passing an array will 
       has_and_belongs_to_many :sections
 
       amoeba do
-        include_field :images
+        include_association :images
         propagate
       end
     end
 
     class Shirt < Product
-      include_field [:sections]
+      include_association [:sections]
     end
 
 ##### A Relaxed Override Example
@@ -738,13 +734,13 @@ This version will use both the parent and child settings, so both the images and
       has_and_belongs_to_many :sections
 
       amoeba do
-        include_field :images
+        include_association :images
         propagate :relaxed
       end
     end
 
     class Shirt < Product
-      include_field :sections
+      include_association :sections
     end
 
 The next version will use only the parent settings because passing an array will override any previous settings rather than adding to them and the parent config takes precedence in the `relaxed` parenting style. So in this case only the images will be copied.
@@ -754,13 +750,13 @@ The next version will use only the parent settings because passing an array will
       has_and_belongs_to_many :sections
 
       amoeba do
-        include_field [:images]
+        include_association [:images]
         propagate
       end
     end
 
     class Shirt < Product
-      include_field :sections
+      include_association :sections
     end
 
 ### Validating Nested Attributes
@@ -848,29 +844,101 @@ This issue with `accepts_nested_attributes_for` can also be solved by using `:in
 The crux of the issue is that upon duplication, the new `Author` instance does not yet have an ID because it has not yet been persisted, so the `:posts` do not yet have an `:author_id` either, and thus no `:author` and thus they will fail validation. This issue may likely affect amoeba usage so if you get some validation failures, be sure to add `:inverse_of` to your models.
 
 
-## Custom duplication method
+## Cloning using custom method
 
-Need to update. Please look #22
+If you need to clone model with custom method you can use `through`:
 
-## Associations remapping
+    class ChildPrototype < ActiveRecord::Base
+      amoeba do
+        through :become_child
+      end
 
-Need to update. Please look #22
+      def become_child
+        self.dup.becomes(Child)
+      end
+    end
+
+    class Child < ChildPrototype
+    end
+
+After cloning we will get instance of `Child` instead of `ChildPrototype`
+
+## Remapping associations
+
+If you will need to do complex cloning with remapping associations name you can user `remapper`:
+
+    class ObjectPrototype < ActiveRecord::Base
+      has_many :child_prototypes
+
+      amoeba do
+        method :become_real
+        remapper :remap_associations
+      end
+
+      def become_real
+        self.dup().becomes( RealObject )
+      end
+
+      def remap_associations( name )
+        :childs if name == :child_prototypes
+      end
+    end
+
+    class RealObject < ObjectPrototype
+      has_many :childs
+    end
+
+    class ChildPrototype < ActiveRecord::Base
+      amoeba do
+        method :become_child
+      end
+
+      def become_child
+        self.dup().becomes( Child )
+      end
+    end
+
+    class Child < ChildPrototype
+    end
+
+In result we will get next:
+
+    prototype = ObjectPrototype.new
+    prototype.child_prototypes << ChildPrototype.new
+    object = prototype.amoeba_dup
+    object.class # => RealObject
+    object.childs.first.class #=> Child
 
 ## Configuration Reference
 
 Here is a static reference to the available configuration methods, usable within the amoeba block on your rails models.
 
+### through
+
+ Set method what we will use for cloning model instead of `dup`.
+
+ for example:
+
+    amoeba do
+      through :supper_pupper_dup
+    end
+
+    def supper_pupper_dup
+      puts "multiplied by budding"
+      self.dup
+    end
+
 ### Controlling Associations
 
 #### enable
 
-  Enables amoeba in the default style of copying all known associated child records. Using the enable method is only required if you wish to enable amoeba but you are not using either the `include_field` or `exclude_field` directives. If you use either inclusive or exclusive style, amoeba is automatically enabled for you, so calling `enable` would be redundant, though it won't hurt.
+  Enables amoeba in the default style of copying all known associated child records. Using the enable method is only required if you wish to enable amoeba but you are not using either the `include_association` or `exclude_association` directives. If you use either inclusive or exclusive style, amoeba is automatically enabled for you, so calling `enable` would be redundant, though it won't hurt.
 
-#### include_field
+#### include_association
 
   Adds a field to the list of fields which should be copied. All associations not in this list will not be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of included fields. Passing an array will empty the list and replace it with the array you pass.
 
-#### exclude_field
+#### exclude_association
 
   Adds a field to the list of fields which should not be copied. Only the associations that are not in this list will be copied. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of excluded fields. Passing an array will empty the list and replace it with the array you pass.
 
@@ -905,6 +973,19 @@ Here is a static reference to the available configuration methods, usable within
         end
 
   will choose the relaxed parenting style of inherited settings for this child. A parenting style set via the `raised` method takes precedence over the parenting style set using the `propagate` method.
+
+#### remapper
+
+  Set the method what will be used for remapping of association name. Method will have one argument - association name as Symbol. If method will return nil then association will not be remapped.
+
+  for example:
+      amoeba do
+        remapper :childs_to_parents
+      end
+
+      def childs_to_parents(association_name)
+        :parents if association_name == :childs
+      end
 
 ### Pre-Processing Fields
 

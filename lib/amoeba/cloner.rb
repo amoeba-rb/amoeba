@@ -65,7 +65,7 @@ module Amoeba
       # and old children on the copy
       return unless association.macro == :has_many ||
         association.is_a?(::ActiveRecord::Reflection::ThroughReflection)
-      amoeba.exclude_field(association.options[:through])
+      amoeba.exclude_association(association.options[:through])
     end
 
     def follow_only_includes

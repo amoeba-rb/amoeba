@@ -103,16 +103,28 @@ module Amoeba
       @config[config_key]
     end
 
-    def include_field(value = nil)
+    def include_association(value = nil)
       @config[:enabled]  = true
       @config[:excludes] = []
       push_value_to_array(value, :includes)
     end
 
-    def exclude_field(value = nil)
+    # TODO remove this method in v3.0.0
+    def include_field(value = nil)
+      warn "include_field is deprecated and will be removed in version 3.0.0; please use include_association instead"
+      include_association(value)
+    end
+
+    def exclude_association(value = nil)
       @config[:enabled]  = true
       @config[:includes] = []
       push_value_to_array(value, :excludes)
+    end
+
+    # TODO remove this method in v3.0.0
+    def exclude_field(value = nil)
+      warn "exclude_field is deprecated and will be removed in version 3.0.0; please use exclude_association instead"
+      exclude_association(value)
     end
 
     def clone(value = nil)

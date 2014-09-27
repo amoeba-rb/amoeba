@@ -130,7 +130,7 @@ class Supercat < ActiveRecord::Base
   has_many :superkittens
 
   amoeba do
-    include_field :superkittens
+    include_association :superkittens
     prepend ramblings: 'Copy of '
     set other_ramblings: 'La la la'
   end
@@ -150,7 +150,7 @@ class Comment < ActiveRecord::Base
   has_many :reviews
 
   amoeba do
-    exclude_field :reviews
+    exclude_association :reviews
   end
 end
 
