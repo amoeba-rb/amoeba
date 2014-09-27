@@ -178,4 +178,11 @@ ActiveRecord::Schema.define do
     t.integer :parent_id
     t.timestamps
   end
+
+  create_table :super_admins, force: true do |t|
+    t.string :email
+    t.string :password
+    t.boolean :active, null: false, default: true
+    t.timestamps
+  end
 end

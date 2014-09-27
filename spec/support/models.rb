@@ -281,3 +281,13 @@ end
 
 class Subobject < MetalObject
 end
+
+# Check of changing boolean attributes
+
+class SuperAdmin < ::ActiveRecord::Base
+
+  amoeba do
+    set active: false
+    prepend password: false
+  end
+end

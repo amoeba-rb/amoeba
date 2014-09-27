@@ -252,4 +252,17 @@ describe 'amoeba' do
     end
   end
 
+  context 'preprocessing fields' do
+    it 'should accept "set" to set false to attribute' do
+      super_admin = ::SuperAdmin.create!(email: 'user@example.com', active: true, password: 'password')
+      clone = super_admin.amoeba_dup
+      expect(clone.active).to eq(false)
+    end
+    it 'should skip "prepend" if it equal to false' do
+      super_admin = ::SuperAdmin.create!(email: 'user2@example.com', active: true, password: 'password')
+      clone = super_admin.amoeba_dup
+      expect(clone.password).to eq('password')
+    end
+  end
+
 end

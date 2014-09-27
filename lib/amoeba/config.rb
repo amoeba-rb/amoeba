@@ -87,7 +87,7 @@ module Amoeba
 
       value.each do |definition|
         definition.each do |key, val|
-          @config[config_key][key] = val if val
+          @config[config_key][key] = val if val || (!val.nil? && config_key == :coercions)
         end
       end
     end
@@ -97,7 +97,7 @@ module Amoeba
         push_array_value_to_hash(value, config_key)
       else
         value.each do |key, val|
-          @config[config_key][key] = val if val
+          @config[config_key][key] = val if val || (!val.nil? && config_key == :coercions)
         end
       end
       @config[config_key]
