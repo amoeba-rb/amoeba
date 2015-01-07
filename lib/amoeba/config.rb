@@ -87,7 +87,7 @@ module Amoeba
 
       value.each do |definition|
         definition.each do |key, val|
-          @config[config_key][key] = val if val || (!val.nil? && config_key == :coercions)
+          fill_hash_value_for(config_key, key, val)
         end
       end
     end
@@ -97,10 +97,14 @@ module Amoeba
         push_array_value_to_hash(value, config_key)
       else
         value.each do |key, val|
-          @config[config_key][key] = val if val || (!val.nil? && config_key == :coercions)
+          fill_hash_value_for(config_key, key, val)
         end
       end
       @config[config_key]
+    end
+
+    def fill_hash_value_for(config_key, key, val)
+      @config[config_key][key] = val if val || (!val.nil? && config_key == :coercions)
     end
 
     def include_association(value = nil)
