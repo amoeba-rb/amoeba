@@ -11,5 +11,14 @@ appraise 'activerecord-4.1' do
 end
 
 appraise 'activerecord-4.2' do
-  gem 'activerecord', '~> 4.2.0beta1'
+  gem 'activerecord', '~> 4.2.0'
+end
+
+appraise 'activerecord-head' do
+  git 'git://github.com/rails/arel.git' do
+    gem 'arel'
+  end
+  git 'git://github.com/rails/rails.git' do
+    gem 'activerecord'
+  end
 end

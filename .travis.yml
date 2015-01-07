@@ -1,8 +1,8 @@
 language: ruby
 rvm:
-  - 1.9.3
   - 2.0.0
   - 2.1
+  - 2.2
   - ruby-head
   - jruby-19mode # JRuby in 1.9 mode
   - rbx-2
@@ -11,6 +11,7 @@ gemfile:
   - gemfiles/activerecord_4.0.gemfile
   - gemfiles/activerecord_4.1.gemfile
   - gemfiles/activerecord_4.2.gemfile
+  - gemfiles/activerecord_head.gemfile
 matrix:
   allow_failures:
     - rvm: ruby-head
