@@ -110,7 +110,7 @@ module Amoeba
 
     def process_overrides
       amoeba.overrides.each do |block|
-        block.call(@new_object, @new_object)
+        block.call(@old_object, @new_object)
       end
     end
 
