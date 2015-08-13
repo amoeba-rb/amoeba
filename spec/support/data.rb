@@ -117,4 +117,16 @@ shirt1.save
 necklace1.sections << jewelry
 necklace1.sections << accessories
 necklace1.save
+
+
+company = Company.create(name:'ABC Industries')
+employee = company.employees.create(name:'Joe',ssn:'1111111111',salary:10000.0)
+employee_address = employee.addresses.create(street: '123 My Street',unit:'103',city:'Hollywood',state:'CA',zip:'90210')
+employee_address_2 = employee.addresses.create(street: '124 My Street',unit:'103',city:'Follywood',state:'CA',zip:'90210')
+employee_photo = employee.photos.create(name: 'Portrait', size: 12345)
+customer = company.customers.create(email:'my@email.address',password:'password')
+customer_address = customer.addresses.create(street: '321 My Street',unit:'301',city:'Bollywood',state:'IN',zip:'11111')
+customer_address_2 = customer.addresses.create(street: '321 My Drive',unit:'311',city:'Mollywood',state:'IN',zip:'21111')
+customer_photo = customer.photos.create(name: 'Mug Shot', size: 54321)
+
 # }}}

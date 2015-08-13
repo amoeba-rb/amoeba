@@ -44,13 +44,19 @@ ActiveRecord::Schema.define do
     t.integer :product_id
   end
 
+  create_table :companies, force: true do |t|
+    t.string :name
+  end
+
   create_table :employees, force: true do |t|
+    t.integer :company_id
     t.string :name
     t.string :ssn
     t.decimal :salary
   end
 
   create_table :customers, force: true do |t|
+    t.integer :company_id
     t.string :email
     t.string :password
     t.decimal :balance
@@ -65,6 +71,14 @@ ActiveRecord::Schema.define do
     t.string :city
     t.string :state
     t.string :zip
+  end
+
+  create_table :photos, force: true do |t|
+    t.integer :imageable_id
+    t.string :imageable_type
+
+    t.string :name
+    t.integer :size
   end
 
   create_table :post_configs, force: true do |t|

@@ -278,4 +278,42 @@ describe 'amoeba' do
     end
   end
 
+  context 'polymorphic' do
+    it 'does not fail with a deep inheritance' do
+      company = Company.where(name:'ABC Industries').first
+      # employee = company.employees.where(name:'Joe').first
+      start_company_count = Company.count
+      start_customer_count = Customer.count
+      start_employee_count = Employee.count
+      start_address_count = Address.count
+      start_photo_count = Photo.count
+      new_company = company.amoeba_dup
+      new_company.name = "Copy of #{new_company.name.to_s}"
+      new_company.save
+      expect(Company.count).to eq(start_company_count + 1)
+      expect(Customer.count).to eq(start_customer_count + 1)
+      expect(Employee.count).to eq(start_employee_count + 1)
+      expect(Address.count).to eq(start_address_count + 4)
+      expect(Photo.count).to eq(start_photo_count + 2)
+      new_company = Company.find(new_company.id) # fully reload from database
+      new_company_employees = new_company.employees
+      expect(new_company_employees.count).to eq(1)
+      new_company_employee_joe = new_company_employees.where(name:'Joe').first
+      expect(new_company_employee_joe.photos.count).to eq(1)
+      expect(new_company_employee_joe.photos.first.size).to eq(12345)
+      expect(new_company_employee_joe.addresses.count).to eq(2)
+      expect(new_company_employee_joe.addresses.where(street:'123 My Street').count).to eq(1)
+      expect(new_company_employee_joe.addresses.where(street:'124 My Street').count).to eq(1)
+      new_company_customers = new_company.customers
+      expect(new_company_customers.count).to eq(1)
+      new_company_customer_my = new_company_customers.where(email:'my@email.address').first
+      expect(new_company_customer_my.photos.count).to eq(1)
+      expect(new_company_customer_my.photos.first.size).to eq(54321)
+      expect(new_company_customer_my.addresses.count).to eq(2)
+      expect(new_company_customer_my.addresses.where(street:'321 My Street').count).to eq(1)
+      expect(new_company_customer_my.addresses.where(street:'321 My Drive').count).to eq(1)
+    end
+
+  end
+
 end
