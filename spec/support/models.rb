@@ -230,14 +230,49 @@ end
 # Polymorphism
 class Address < ActiveRecord::Base
   belongs_to :addressable, polymorphic: true
+
+  amoeba do
+    enable
+  end
+end
+
+class Photo < ActiveRecord::Base
+  belongs_to :imageable, polymorphic: true
+
+  amoeba do
+    customize(lambda { |original_photo,new_photo|
+      new_photo.name = original_photo.name.to_s + ' Copy'
+    })
+  end
+end
+
+class Company < ActiveRecord::Base
+  has_many :employees
+  has_many :customers
+  amoeba do
+    include_association :employees
+    include_association :customers
+  end
 end
 
 class Employee < ActiveRecord::Base
   has_many :addresses, as: :addressable
+  has_many :photos, as: :imageable
+  belongs_to :company
+  amoeba do
+    include_association :addresses
+    include_association :photos
+  end
+
 end
 
 class Customer < ActiveRecord::Base
   has_many :addresses, as: :addressable
+  has_many :photos, as: :imageable
+  belongs_to :company
+  amoeba do
+    enable
+  end
 end
 
 # Remapping and Method
