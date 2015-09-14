@@ -158,7 +158,7 @@ You may also specify fields to be copied by passing an array. If you call the `i
 
 These examples will copy the post's tags and authors but not its comments.
 
-The inclusive style, when used, will automatically disable any ther style that was previously selected.
+The inclusive style, when used, will automatically disable any other style that was previously selected.
 
 #### Exclusive Style
 
