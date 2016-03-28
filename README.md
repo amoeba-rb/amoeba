@@ -46,24 +46,30 @@ Rails 3.2, 4.x compatible.
 
 is hopefully as you would expect:
 
-    gem install amoeba
+```sh
+gem install amoeba
+```
 
 or just add it to your Gemfile:
 
-    gem 'amoeba'
+```sh
+gem 'amoeba'
+```
 
 Configure your models with one of the styles below and then just run the `amoeba_dup` method on your model where you would run the `dup` method normally:
 
-    p = Post.create(:title => "Hello World!", :content => "Lorum ipsum dolor")
-    p.comments.create(:content => "I love it!")
-    p.comments.create(:content => "This sucks!")
+```ruby
+p = Post.create(:title => "Hello World!", :content => "Lorum ipsum dolor")
+p.comments.create(:content => "I love it!")
+p.comments.create(:content => "This sucks!")
 
-    puts Comment.all.count # should be 2
+puts Comment.all.count # should be 2
 
-    my_copy = p.amoeba_dup
-    my_copy.save
+my_copy = p.amoeba_dup
+my_copy.save
 
-    puts Comment.all.count # should be 4
+puts Comment.all.count # should be 4
+```
 
 By default, when enabled, amoeba will copy any and all associated child records automatically and associated them with the new parent record.
 
@@ -79,27 +85,31 @@ This is the most basic usage case and will simply enable the copying of any know
 
 If you have some models for a blog about like this:
 
-    class Post < ActiveRecord::Base
-      has_many :comments
-    end
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+```
 
 simply add the amoeba configuration block to your model and call the enable method to enable the copying of child records, like this:
 
-    class Post < ActiveRecord::Base
-      has_many :comments
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+```
 
 Child records will be automatically copied when you run the `amoeba_dup` method.
 
@@ -107,54 +117,60 @@ Child records will be automatically copied when you run the `amoeba_dup` method.
 
 If you only want some of the associations copied but not others, you may use the inclusive style:
 
-    class Post < ActiveRecord::Base
-      has_many :comments
-      has_many :tags
-      has_many :authors
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
+  has_many :tags
+  has_many :authors
 
-      amoeba do
-        enable
-        include_association :tags
-        include_association :authors
-      end
-    end
+  amoeba do
+    enable
+    include_association :tags
+    include_association :authors
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+```
 
 Using the inclusive style within the amoeba block actually implies that you wish to enable amoeba, so there is no need to run the enable method, though it won't hurt either:
 
-    class Post < ActiveRecord::Base
-      has_many :comments
-      has_many :tags
-      has_many :authors
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
+  has_many :tags
+  has_many :authors
 
-      amoeba do
-        include_association :tags
-        include_association :authors
-      end
-    end
+  amoeba do
+    include_association :tags
+    include_association :authors
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+```
 
 You may also specify fields to be copied by passing an array. If you call the `include_association` with a single value, it will be appended to the list of already included fields. If you pass an array, your array will overwrite the original values.
 
-    class Post < ActiveRecord::Base
-      has_many :comments
-      has_many :tags
-      has_many :authors
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
+  has_many :tags
+  has_many :authors
 
-      amoeba do
-        include_association [:tags, :authors]
-      end
-    end
+  amoeba do
+    include_association [:tags, :authors]
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+```
 
 These examples will copy the post's tags and authors but not its comments.
 
@@ -164,19 +180,21 @@ The inclusive style, when used, will automatically disable any other style that 
 
 If you have more fields to include than to exclude, you may wish to shorten the amount of typing and reading you need to do by using the exclusive style. All fields that are not explicitly excluded will be copied:
 
-    class Post < ActiveRecord::Base
-      has_many :comments
-      has_many :tags
-      has_many :authors
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
+  has_many :tags
+  has_many :authors
 
-      amoeba do
-        exclude_association :comments
-      end
-    end
+  amoeba do
+    exclude_association :comments
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+```
 
 This example does the same thing as the inclusive style example, it will copy the post's tags and authors but not its comments. As with inclusive style, there is no need to explicitly enable amoeba when specifying fields to exclude.
 
@@ -186,31 +204,33 @@ The exclusive style, when used, will automatically disable any other style that 
 
 If you are using a Many-to-Many relationship, you may tell amoeba to actually make duplicates of the original related records rather than merely maintaining association with the original records. Cloning is easy, merely tell amoeba which fields to clone in the same way you tell it which fields to include or exclude.
 
-    class Post < ActiveRecord::Base
-      has_and_belongs_to_many :warnings
+```ruby
+class Post < ActiveRecord::Base
+  has_and_belongs_to_many :warnings
 
-      has_many :post_widgets
-      has_many :widgets, :through => :post_widgets
+  has_many :post_widgets
+  has_many :widgets, :through => :post_widgets
 
-      amoeba do
-        enable
-        clone [:widgets, :warnings]
-      end
-    end
+  amoeba do
+    enable
+    clone [:widgets, :warnings]
+  end
+end
 
-    class Warning < ActiveRecord::Base
-      has_and_belongs_to_many :posts
-    end
+class Warning < ActiveRecord::Base
+  has_and_belongs_to_many :posts
+end
 
-    class PostWidget < ActiveRecord::Base
-      belongs_to :widget
-      belongs_to :post
-    end
+class PostWidget < ActiveRecord::Base
+  belongs_to :widget
+  belongs_to :post
+end
 
-    class Widget < ActiveRecord::Base
-      has_many :post_widgets
-      has_many :posts, :through => :post_widgets
-    end
+class Widget < ActiveRecord::Base
+  has_many :post_widgets
+  has_many :posts, :through => :post_widgets
+end
+```
 
 This example will actually duplicate the warnings and widgets in the database. If there were originally 3 warnings in the database then, upon duplicating a post, you will end up with 6 warnings in the database. This is in contrast to the default behavior where your new post would merely be re-associated with any previously existing warnings and those warnings themselves would not be duplicated.
 
@@ -224,23 +244,25 @@ By default, amoeba recognizes and attempts to copy any children of the following
 
 You may control which association types amoeba applies itself to by using the `recognize` method within the amoeba configuration block.
 
-    class Post < ActiveRecord::Base
-      has_one :config
-      has_many :comments
-      has_and_belongs_to_many :tags
+```ruby
+class Post < ActiveRecord::Base
+  has_one :config
+  has_many :comments
+  has_and_belongs_to_many :tags
 
-      amoeba do
-        recognize [:has_one, :has_and_belongs_to_many]
-      end
-    end
+  amoeba do
+    recognize [:has_one, :has_and_belongs_to_many]
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
 
-    class Tag < ActiveRecord::Base
-      has_and_belongs_to_many :posts
-    end
+class Tag < ActiveRecord::Base
+  has_and_belongs_to_many :posts
+end
+```
 
 This example will copy the post's configuration data and keep tags associated with the new post, but will not copy the post's comments because amoeba will only recognize and copy children of `has_one` and `has_and_belongs_to_many` associations and in this example, comments are not an `has_and_belongs_to_many` association.
 
@@ -250,24 +272,26 @@ This example will copy the post's configuration data and keep tags associated wi
 
 If you wish to prevent a regular (non `has_*` association based) field from retaining it's value when copied, you may "zero out" or "nullify" the field, like this:
 
-    class Topic < ActiveRecord::Base
-      has_many :posts
-    end
+```ruby
+class Topic < ActiveRecord::Base
+  has_many :posts
+end
 
-    class Post < ActiveRecord::Base
-      belongs_to :topic
-      has_many :comments
+class Post < ActiveRecord::Base
+  belongs_to :topic
+  has_many :comments
 
-      amoeba do
-        enable
-        nullify :date_published
-        nullify :topic_id
-      end
-    end
+  amoeba do
+    enable
+    nullify :date_published
+    nullify :topic_id
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+```
 
 This example will copy all of a post's comments. It will also nullify the publishing date and dissociate the post from its original topic.
 
@@ -277,11 +301,13 @@ Unlike inclusive and exclusive styles, specifying null fields will not automatic
 
 If you wish to just set a field to an aribrary value on all duplicated objects you may use the `set` directive. For example, if you wanted to copy an object that has some kind of approval process associated with it, you likely may wish to set the new object's state to be open or "in progress" again.
 
-    class Post < ActiveRecord::Base
-      amoeba do
-        set :state_tracker => "open_for_editing"
-      end
-    end
+```ruby
+class Post < ActiveRecord::Base
+  amoeba do
+    set :state_tracker => "open_for_editing"
+  end
+end
+```
 
 In this example, when a post is duplicated, it's `state_tracker` field will always be given a value of `open_for_editing` to start.
 
@@ -289,34 +315,40 @@ In this example, when a post is duplicated, it's `state_tracker` field will alwa
 
 You may add a string to the beginning of a copied object's field during the copy phase:
 
-    class Post < ActiveRecord::Base
-      amoeba do
-        enable
-        prepend :title => "Copy of "
-      end
-    end
+```ruby
+class Post < ActiveRecord::Base
+  amoeba do
+    enable
+    prepend :title => "Copy of "
+  end
+end
+```
 
 #### Append
 
 You may add a string to the end of a copied object's field during the copy phase:
 
-    class Post < ActiveRecord::Base
-      amoeba do
-        enable
-        append :title => "Copy of "
-      end
-    end
+```ruby
+class Post < ActiveRecord::Base
+  amoeba do
+    enable
+    append :title => "Copy of "
+  end
+end
+```
 
 #### Regex
 
 You may run a search and replace query on a copied object's field during the copy phase:
 
-    class Post < ActiveRecord::Base
-      amoeba do
-        enable
-        regex :contents => {:replace => /dog/, :with => 'cat'}
-      end
-    end
+```ruby
+class Post < ActiveRecord::Base
+  amoeba do
+    enable
+    regex :contents => {:replace => /dog/, :with => 'cat'}
+  end
+end
+```
 
 #### Custom Methods
 
@@ -324,92 +356,104 @@ You may run a search and replace query on a copied object's field during the cop
 
 You may run a custom method or methods to do basically anything you like, simply pass a lambda block, or an array of lambda blocks to the `customize` directive. Each block must have the same form, meaning that each block must accept two parameters, the original object and the newly copied object. You may then do whatever you wish, like this:
 
-    class Post < ActiveRecord::Base
-      amoeba do
-        prepend :title => "Hello world! "
+```ruby
+class Post < ActiveRecord::Base
+  amoeba do
+    prepend :title => "Hello world! "
 
-        customize(lambda { |original_post,new_post|
-          if original_post.foo == "bar"
-            new_post.baz = "qux"
-          end
-        })
-
-        append :comments => "... know what I'm sayin?"
+    customize(lambda { |original_post,new_post|
+      if original_post.foo == "bar"
+        new_post.baz = "qux"
       end
-    end
+    })
+
+    append :comments => "... know what I'm sayin?"
+  end
+end
+```
 
 or this, using an array:
 
-    class Post < ActiveRecord::Base
-      has_and_belongs_to_many :tags
+```ruby
+class Post < ActiveRecord::Base
+  has_and_belongs_to_many :tags
 
-      amoeba do
-        include_association :tags
+  amoeba do
+    include_association :tags
 
-        customize([
-          lambda do |orig_obj,copy_of_obj|
-            # good stuff goes here
-          end,
+    customize([
+      lambda do |orig_obj,copy_of_obj|
+        # good stuff goes here
+      end,
 
-          lambda do |orig_obj,copy_of_obj|
-            # more good stuff goes here
-          end
-        ])
+      lambda do |orig_obj,copy_of_obj|
+        # more good stuff goes here
       end
-    end
+    ])
+  end
+end
+```
 
 ##### Override
 
 Lambda blocks passed to customize run, by default, after all copying and field pre-processing. If you wish to run a method before any customization or field pre-processing, you may use `override` the cousin of `customize`. Usage is the same as above.
 
-    class Post < ActiveRecord::Base
-      amoeba do
-        prepend :title => "Hello world! "
+```ruby
+class Post < ActiveRecord::Base
+  amoeba do
+    prepend :title => "Hello world! "
 
-        override(lambda { |original_post,new_post|
-          if original_post.foo == "bar"
-            new_post.baz = "qux"
-          end
-        })
-
-        append :comments => "... know what I'm sayin?"
+    override(lambda { |original_post,new_post|
+      if original_post.foo == "bar"
+        new_post.baz = "qux"
       end
-    end
+    })
+
+    append :comments => "... know what I'm sayin?"
+  end
+end
+```
 
 #### Chaining
 
 You may apply a single preprocessor to multiple fields at once.
 
-    class Post < ActiveRecord::Base
-      amoeba do
-        enable
-        prepend :title => "Copy of ", :contents => "Copied contents: "
-      end
-    end
+```ruby
+class Post < ActiveRecord::Base
+  amoeba do
+    enable
+    prepend :title => "Copy of ", :contents => "Copied contents: "
+  end
+end
+```
 
 #### Stacking
 
 You may apply multiple preproccessing directives to a single model at once.
 
-    class Post < ActiveRecord::Base
-      amoeba do
-        prepend :title => "Copy of ", :contents => "Original contents: "
-        append :contents => " (copied version)"
-        regex :contents => {:replace => /dog/, :with => 'cat'}
-      end
-    end
+```ruby
+class Post < ActiveRecord::Base
+  amoeba do
+    prepend :title => "Copy of ", :contents => "Original contents: "
+    append :contents => " (copied version)"
+    regex :contents => {:replace => /dog/, :with => 'cat'}
+  end
+end
+```
 
 This example should result in something like this:
 
-    post = Post.create(
-      :title => "Hello world",
-      :contents =>  "I like dogs, dogs are awesome."
-    )
+```ruby
+post = Post.create(
+  :title => "Hello world",
+  :contents =>  "I like dogs, dogs are awesome."
+)
 
-    new_post = post.amoeba_dup
+new_post = post.amoeba_dup
 
-    new_post.title # "Copy of Hello world"
-    new_post.contents # "Original contents: I like cats, cats are awesome. (copied version)"
+new_post.title # "Copy of Hello world"
+new_post.contents # "Original contents: I like cats, cats are awesome. (copied version)"
+```
 
 Like `nullify`, the preprocessing directives do not automatically enable the copying of associated child records. If only preprocessing directives are used and you do want to copy child records and no `include_association` or `exclude_association` list is provided, you must still explicitly enable the copying of child records by calling the enable method from within the amoeba block on your model.
 
@@ -419,32 +463,34 @@ You may use a combination of configuration methods within each model's amoeba bl
 
 The following example syntax is perfectly valid, and will result in the usage of inclusive style. The order in which you call the configuration methods within the amoeba block does not matter:
 
-    class Topic < ActiveRecord::Base
-      has_many :posts
-    end
+```ruby
+class Topic < ActiveRecord::Base
+  has_many :posts
+end
 
-    class Post < ActiveRecord::Base
-      belongs_to :topic
-      has_many :comments
-      has_many :tags
-      has_many :authors
+class Post < ActiveRecord::Base
+  belongs_to :topic
+  has_many :comments
+  has_many :tags
+  has_many :authors
 
-      amoeba do
-        exclude_association :authors
-        include_association :tags
-        nullify :date_published
-        prepend :title => "Copy of "
-        append :contents => " (copied version)"
-        regex :contents => {:replace => /dog/, :with => 'cat'}
-        include_association :authors
-        enable
-        nullify :topic_id
-      end
-    end
+  amoeba do
+    exclude_association :authors
+    include_association :tags
+    nullify :date_published
+    prepend :title => "Copy of "
+    append :contents => " (copied version)"
+    regex :contents => {:replace => /dog/, :with => 'cat'}
+    include_association :authors
+    enable
+    nullify :topic_id
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+```
 
 This example will copy all of a post's tags and authors, but not its comments. It will also nullify the publishing date and dissociate the post from its original topic. It will also preprocess the post's fields as in the previous preprocessing example.
 
@@ -463,26 +509,28 @@ Preprocessing directives do not affect inclusion and exclusion lists.
 
 You may cause amoeba to keep copying down the chain as far as you like, simply add amoeba blocks to each model you wish to have copy its children. Amoeba will automatically recurse into any enabled grandchildren and copy them as well.
 
-    class Post < ActiveRecord::Base
-      has_many :comments
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-      has_many :ratings
+class Comment < ActiveRecord::Base
+  belongs_to :post
+  has_many :ratings
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    class Rating < ActiveRecord::Base
-      belongs_to :comment
-    end
+class Rating < ActiveRecord::Base
+  belongs_to :comment
+end
+```
 
 In this example, when a post is copied, amoeba will copy each all of a post's comments and will also copy each comment's ratings.
 
@@ -490,142 +538,150 @@ In this example, when a post is copied, amoeba will copy each all of a post's co
 
 Using the `has_one :through` association is simple, just be sure to enable amoeba on the each model with a `has_one` association and amoeba will automatically and recursively drill down, like so:
 
-    class Supplier < ActiveRecord::Base
-      has_one :account
-      has_one :history, :through => :account
+```ruby
+class Supplier < ActiveRecord::Base
+  has_one :account
+  has_one :history, :through => :account
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    class Account < ActiveRecord::Base
-      belongs_to :supplier
-      has_one :history
+class Account < ActiveRecord::Base
+  belongs_to :supplier
+  has_one :history
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    class History < ActiveRecord::Base
-      belongs_to :account
-    end
+class History < ActiveRecord::Base
+  belongs_to :account
+end
+```
 
 ### Has Many Through
 
 Copying of `has_many :through` associations works automatically. They perform the copy in the same way as the `has_and_belongs_to_many` association, meaning the actual child records are not copied, but rather the associations are simply maintained. You can add some field preprocessors to the middle model if you like but this is not strictly necessary:
 
-    class Assembly < ActiveRecord::Base
-      has_many :manifests
-      has_many :parts, :through => :manifests
+```ruby
+class Assembly < ActiveRecord::Base
+  has_many :manifests
+  has_many :parts, :through => :manifests
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    class Manifest < ActiveRecord::Base
-      belongs_to :assembly
-      belongs_to :part
+class Manifest < ActiveRecord::Base
+  belongs_to :assembly
+  belongs_to :part
 
-      amoeba do
-        prepend :notes => "Copy of "
-      end
-    end
+  amoeba do
+    prepend :notes => "Copy of "
+  end
+end
 
-    class Part < ActiveRecord::Base
-      has_many :manifests
-      has_many :assemblies, :through => :manifests
+class Part < ActiveRecord::Base
+  has_many :manifests
+  has_many :assemblies, :through => :manifests
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
+```
 
 ### On The Fly Configuration
 
 You may control how amoeba copies your object, on the fly, by passing a configuration block to the model's amoeba method. The configuration method is static but the configuration is applied on a per instance basis.
 
-    class Post < ActiveRecord::Base
-      has_many :comments
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
 
-      amoeba do
-        enable
-        prepend :title => "Copy of "
-      end
+  amoeba do
+    enable
+    prepend :title => "Copy of "
+  end
+end
+
+class Comment < ActiveRecord::Base
+  belongs_to :post
+end
+
+class PostsController < ActionController
+  def duplicate_a_post
+    old_post = Post.create(
+      :title => "Hello world",
+      :contents => "Lorum ipsum"
+    )
+
+    old_post.class.amoeba do
+      prepend :contents => "Here's a copy: "
     end
 
-    class Comment < ActiveRecord::Base
-      belongs_to :post
-    end
+    new_post = old_post.amoeba_dup
 
-    class PostsController < ActionController
-      def duplicate_a_post
-        old_post = Post.create(
-          :title => "Hello world",
-          :contents => "Lorum ipsum"
-        )
-
-        old_post.class.amoeba do
-          prepend :contents => "Here's a copy: "
-        end
-
-        new_post = old_post.amoeba_dup
-
-        new_post.title # should be "Copy of Hello world"
-        new_post.contents # should be "Here's a copy: Lorum ipsum"
-        new_post.save
-      end
-    end
+    new_post.title # should be "Copy of Hello world"
+    new_post.contents # should be "Here's a copy: Lorum ipsum"
+    new_post.save
+  end
+end
+```
 
 ### Inheritance
 
 If you are using the Single Table Inheritance provided by ActiveRecord, you may cause amoeba to automatically process child classes in the same way as their parents. All you need to do is call the `propagate` method within the amoeba block of the parent class and all child classes should copy in a similar manner.
 
-    create_table :products, :force => true do |t|
-      t.string :type # this is the STI column
+```ruby
+create_table :products, :force => true do |t|
+  t.string :type # this is the STI column
 
-      # these belong to all products
-      t.string :title
-      t.decimal :price
+  # these belong to all products
+  t.string :title
+  t.decimal :price
 
-      # these are for shirts only
-      t.decimal :sleeve_length
-      t.decimal :collar_size
+  # these are for shirts only
+  t.decimal :sleeve_length
+  t.decimal :collar_size
 
-      # these are for computers only
-      t.integer :ram_size
-      t.integer :hard_drive_size
-    end
+  # these are for computers only
+  t.integer :ram_size
+  t.integer :hard_drive_size
+end
 
-    class Product < ActiveRecord::Base
-      has_many :images
-      has_and_belongs_to_many :categories
+class Product < ActiveRecord::Base
+  has_many :images
+  has_and_belongs_to_many :categories
 
-      amoeba do
-        enable
-        propagate
-      end
-    end
+  amoeba do
+    enable
+    propagate
+  end
+end
 
-    class Shirt < Product
-    end
+class Shirt < Product
+end
 
-    class Computer < Product
-    end
+class Computer < Product
+end
 
-    class ProductsController
-      def some_method
-        my_shirt = Shirt.find(1)
-        my_shirt.amoeba_dup
-        my_shirt.save
+class ProductsController
+  def some_method
+    my_shirt = Shirt.find(1)
+    my_shirt.amoeba_dup
+    my_shirt.save
 
-        # this shirt should now:
-        # - have its own copy of all parent images
-        # - be in the same categories as the parent
-      end
-    end
+    # this shirt should now:
+    # - have its own copy of all parent images
+    # - be in the same categories as the parent
+  end
+end
+```
 
 This example should duplicate all the images and sections associated with this Shirt, which is a child of Product
 
@@ -639,21 +695,23 @@ You may change this behavior, the so called "parenting style", to give preferenc
 
 The `:relaxed` parenting style will prefer parent settings.
 
-    class Product < ActiveRecord::Base
-      has_many :images
-      has_and_belongs_to_many :sections
+```ruby
+class Product < ActiveRecord::Base
+  has_many :images
+  has_and_belongs_to_many :sections
 
-      amoeba do
-        exclude_association :images
-        propagate :relaxed
-      end
-    end
+  amoeba do
+    exclude_association :images
+    propagate :relaxed
+  end
+end
 
-    class Shirt < Product
-      include_association :images
-      include_association :sections
-      prepend :title => "Copy of "
-    end
+class Shirt < Product
+  include_association :images
+  include_association :sections
+  prepend :title => "Copy of "
+end
+```
 
 In this example, the conflicting `include_association` settings on the child will be ignored and the parent `exclude_association` setting will be used, while the `prepend` setting on the child will be honored because it doesn't conflict with the parent.
 
@@ -661,21 +719,23 @@ In this example, the conflicting `include_association` settings on the child wil
 
 The `:strict` style will ignore child settings altogether and inherit any parent settings.
 
-    class Product < ActiveRecord::Base
-      has_many :images
-      has_and_belongs_to_many :sections
+```ruby
+class Product < ActiveRecord::Base
+  has_many :images
+  has_and_belongs_to_many :sections
 
-      amoeba do
-        exclude_association :images
-        propagate :strict
-      end
-    end
+  amoeba do
+    exclude_association :images
+    propagate :strict
+  end
+end
 
-    class Shirt < Product
-      include_association :images
-      include_association :sections
-      prepend :title => "Copy of "
-    end
+class Shirt < Product
+  include_association :images
+  include_association :sections
+  prepend :title => "Copy of "
+end
+```
 
 In this example, the only processing that will happen when a Shirt is duplicated is whatever processing is allowed by the parent. So in this case the parent's `exclude_association` directive takes precedence over the child's `include_association` settings, and not only that, but none of the other settings for the child are used either. The `prepend` setting of the child is completely ignored.
 
@@ -697,69 +757,77 @@ This means that, for example:
 
 This version will use both the parent and child settings, so both the images and sections will be copied.
 
-    class Product < ActiveRecord::Base
-      has_many :images
-      has_and_belongs_to_many :sections
+```ruby
+class Product < ActiveRecord::Base
+  has_many :images
+  has_and_belongs_to_many :sections
 
-      amoeba do
-        include_association :images
-        propagate
-      end
-    end
+  amoeba do
+    include_association :images
+    propagate
+  end
+end
 
-    class Shirt < Product
-      include_association :sections
-    end
+class Shirt < Product
+  include_association :sections
+end
+```
 
 The next version will use only the child settings because passing an array will override any previous settings rather than adding to them and the child config takes precedence in the `submissive` parenting style. So in this case only the sections will be copied.
 
-    class Product < ActiveRecord::Base
-      has_many :images
-      has_and_belongs_to_many :sections
+```ruby
+class Product < ActiveRecord::Base
+  has_many :images
+  has_and_belongs_to_many :sections
 
-      amoeba do
-        include_association :images
-        propagate
-      end
-    end
+  amoeba do
+    include_association :images
+    propagate
+  end
+end
 
-    class Shirt < Product
-      include_association [:sections]
-    end
+class Shirt < Product
+  include_association [:sections]
+end
+```
 
 ##### A Relaxed Override Example
 
 This version will use both the parent and child settings, so both the images and sections will be copied.
 
-    class Product < ActiveRecord::Base
-      has_many :images
-      has_and_belongs_to_many :sections
+```ruby
+class Product < ActiveRecord::Base
+  has_many :images
+  has_and_belongs_to_many :sections
 
-      amoeba do
-        include_association :images
-        propagate :relaxed
-      end
-    end
+  amoeba do
+    include_association :images
+    propagate :relaxed
+  end
+end
 
-    class Shirt < Product
-      include_association :sections
-    end
+class Shirt < Product
+  include_association :sections
+end
+```
 
 The next version will use only the parent settings because passing an array will override any previous settings rather than adding to them and the parent config takes precedence in the `relaxed` parenting style. So in this case only the images will be copied.
 
-    class Product < ActiveRecord::Base
-      has_many :images
-      has_and_belongs_to_many :sections
+```ruby
+class Product < ActiveRecord::Base
+  has_many :images
+  has_and_belongs_to_many :sections
 
-      amoeba do
-        include_association [:images]
-        propagate
-      end
-    end
+  amoeba do
+    include_association [:images]
+    propagate
+  end
+end
 
-    class Shirt < Product
-      include_association :sections
-    end
+class Shirt < Product
+  include_association :sections
+end
+```
 
 ### Validating Nested Attributes
 
@@ -767,81 +835,89 @@ If you end up with some validation issues when trying to validate the presence o
 
 For example this will throw a validation error saying that your posts are invalid:
 
-    class Author < ActiveRecord::Base
-      has_many :posts
+```ruby
+class Author < ActiveRecord::Base
+  has_many :posts
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    class Post < ActiveRecord::Base
-      belongs_to :author
-      validates_presence_of :author
+class Post < ActiveRecord::Base
+  belongs_to :author
+  validates_presence_of :author
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    author = Author.find(1)
-    author.amoeba_dup
+author = Author.find(1)
+author.amoeba_dup
 
-    author.save # this will fail validation
+author.save # this will fail validation
+```
 
 Where this will work fine:
 
-    class Author < ActiveRecord::Base
-      has_many :posts, :inverse_of => :author
+```ruby
+class Author < ActiveRecord::Base
+  has_many :posts, :inverse_of => :author
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    class Post < ActiveRecord::Base
-      belongs_to :author, :inverse_of => :posts
-      validates_presence_of :author
+class Post < ActiveRecord::Base
+  belongs_to :author, :inverse_of => :posts
+  validates_presence_of :author
 
-      amoeba do
-        enable
-      end
-    end
+  amoeba do
+    enable
+  end
+end
 
-    author = Author.find(1)
-    author.amoeba_dup
+author = Author.find(1)
+author.amoeba_dup
 
-    author.save # this will pass validation
+author.save # this will pass validation
+```
 
 This issue is not amoeba specific and also occurs when creating new objects using `accepts_nested_attributes_for`, like this:
 
-    class Author < ActiveRecord::Base
-      has_many :posts
-      accepts_nested_attributes_for :posts
-    end
+```ruby
+class Author < ActiveRecord::Base
+  has_many :posts
+  accepts_nested_attributes_for :posts
+end
 
-    class Post < ActiveRecord::Base
-      belongs_to :author
-      validates_presence_of :author
-    end
+class Post < ActiveRecord::Base
+  belongs_to :author
+  validates_presence_of :author
+end
 
-    # this will fail validation
-    author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
+# this will fail validation
+author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
+```
 
 This issue with `accepts_nested_attributes_for` can also be solved by using `:inverse_of`, like this:
 
-    class Author < ActiveRecord::Base
-      has_many :posts, :inverse_of => :author
-      accepts_nested_attributes_for :posts
-    end
+```ruby
+class Author < ActiveRecord::Base
+  has_many :posts, :inverse_of => :author
+  accepts_nested_attributes_for :posts
+end
 
-    class Post < ActiveRecord::Base
-      belongs_to :author, :inverse_of => :posts
-      validates_presence_of :author
-    end
+class Post < ActiveRecord::Base
+  belongs_to :author, :inverse_of => :posts
+  validates_presence_of :author
+end
 
-    # this will pass validation
-    author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
+# this will pass validation
+author = Author.create({:name => "Jim Smith", :posts => [{:title => "Hello World", :contents => "Lorum ipsum dolor}]})
+```
 
 The crux of the issue is that upon duplication, the new `Author` instance does not yet have an ID because it has not yet been persisted, so the `:posts` do not yet have an `:author_id` either, and thus no `:author` and thus they will fail validation. This issue may likely affect amoeba usage so if you get some validation failures, be sure to add `:inverse_of` to your models.
 
@@ -850,18 +926,20 @@ The crux of the issue is that upon duplication, the new `Author` instance does n
 
 If you need to clone model with custom method you can use `through`:
 
-    class ChildPrototype < ActiveRecord::Base
-      amoeba do
-        through :become_child
-      end
+```ruby
+class ChildPrototype < ActiveRecord::Base
+  amoeba do
+    through :become_child
+  end
 
-      def become_child
-        self.dup.becomes(Child)
-      end
-    end
+  def become_child
+    self.dup.becomes(Child)
+  end
+end
 
-    class Child < ChildPrototype
-    end
+class Child < ChildPrototype
+end
+```
 
 After cloning we will get instance of `Child` instead of `ChildPrototype`
 
@@ -869,47 +947,51 @@ After cloning we will get instance of `Child` instead of `ChildPrototype`
 
 If you will need to do complex cloning with remapping associations name you can user `remapper`:
 
-    class ObjectPrototype < ActiveRecord::Base
-      has_many :child_prototypes
+```ruby
+class ObjectPrototype < ActiveRecord::Base
+  has_many :child_prototypes
 
-      amoeba do
-        method :become_real
-        remapper :remap_associations
-      end
+  amoeba do
+    method :become_real
+    remapper :remap_associations
+  end
 
-      def become_real
-        self.dup().becomes( RealObject )
-      end
+  def become_real
+    self.dup().becomes( RealObject )
+  end
 
-      def remap_associations( name )
-        :childs if name == :child_prototypes
-      end
-    end
+  def remap_associations( name )
+    :childs if name == :child_prototypes
+  end
+end
 
-    class RealObject < ObjectPrototype
-      has_many :childs
-    end
+class RealObject < ObjectPrototype
+  has_many :childs
+end
 
-    class ChildPrototype < ActiveRecord::Base
-      amoeba do
-        method :become_child
-      end
+class ChildPrototype < ActiveRecord::Base
+  amoeba do
+    method :become_child
+  end
 
-      def become_child
-        self.dup().becomes( Child )
-      end
-    end
+  def become_child
+    self.dup().becomes( Child )
+  end
+end
 
-    class Child < ChildPrototype
-    end
+class Child < ChildPrototype
+end
+```
 
 In result we will get next:
 
-    prototype = ObjectPrototype.new
-    prototype.child_prototypes << ChildPrototype.new
-    object = prototype.amoeba_dup
-    object.class # => RealObject
-    object.childs.first.class #=> Child
+```ruby
+prototype = ObjectPrototype.new
+prototype.child_prototypes << ChildPrototype.new
+object = prototype.amoeba_dup
+object.class # => RealObject
+object.childs.first.class #=> Child
+```
 
 ## Configuration Reference
 
@@ -921,14 +1003,16 @@ Here is a static reference to the available configuration methods, usable within
 
  for example:
 
-    amoeba do
-      through :supper_pupper_dup
-    end
+```ruby
+amoeba do
+  through :supper_pupper_dup
+end
 
-    def supper_pupper_dup
-      puts "multiplied by budding"
-      self.dup
-    end
+def supper_pupper_dup
+  puts "multiplied by budding"
+  self.dup
+end
+```
 
 ### Controlling Associations
 
@@ -956,9 +1040,11 @@ Here is a static reference to the available configuration methods, usable within
 
   for example
 
-        amoeba do
-          propagate :strict
-        end
+  ```ruby
+  amoeba do
+    propagate :strict
+  end
+  ```
 
   will choose the strict parenting style of inherited settings.
 
@@ -970,9 +1056,11 @@ Here is a static reference to the available configuration methods, usable within
 
   for example:
 
-        amoeba do
-          raised :relaxed
-        end
+  ```ruby
+  amoeba do
+    raised :relaxed
+  end
+  ```
 
   will choose the relaxed parenting style of inherited settings for this child. A parenting style set via the `raised` method takes precedence over the parenting style set using the `propagate` method.
 
@@ -981,13 +1069,16 @@ Here is a static reference to the available configuration methods, usable within
   Set the method what will be used for remapping of association name. Method will have one argument - association name as Symbol. If method will return nil then association will not be remapped.
 
   for example:
-      amoeba do
-        remapper :childs_to_parents
-      end
 
-      def childs_to_parents(association_name)
-        :parents if association_name == :childs
-      end
+  ```ruby
+  amoeba do
+    remapper :childs_to_parents
+  end
+
+  def childs_to_parents(association_name)
+    :parents if association_name == :childs
+  end
+  ```
 
 ### Pre-Processing Fields
 
@@ -1035,7 +1126,9 @@ The behavior when copying polymorphic `has_many` associations is also undefined.
 
 You may run the rspec tests like this:
 
-    bundle exec rspec spec
+```sh
+bundle exec rspec spec
+```
 
 ### TODO
 
