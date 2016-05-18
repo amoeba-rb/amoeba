@@ -12,7 +12,8 @@ module Amoeba
     def_delegators :object_klass, :amoeba, :fresh_amoeba
 
     def initialize(object, options = {})
-      @old_object, @options = object, options
+      @old_object = object
+      @options    = options
       @object_klass = @old_object.class
       inherit_parent_settings
       @new_object = object.__send__(amoeba.dup_method)
@@ -64,19 +65,21 @@ module Amoeba
       # table from copying so we don't end up with the new
       # and old children on the copy
       return unless association.macro == :has_many ||
-        association.is_a?(::ActiveRecord::Reflection::ThroughReflection)
+                    association.is_a?(::ActiveRecord::Reflection::ThroughReflection)
       amoeba.exclude_association(association.options[:through])
     end
 
     def follow_only_includes
-      amoeba.includes.each do |include|
+      amoeba.includes.each do |include, options|
+        next if options[:if] && !@old_object.send(options[:if])
         follow_association(include, @object_klass.reflect_on_association(include))
       end
     end
 
     def follow_all_except_excludes
       @object_klass.reflections.each do |name, association|
-        next if amoeba.excludes.include?(name.to_sym)
+        exclude = amoeba.excludes[name.to_sym]
+        next if exclude && (exclude.blank? || @old_object.send(exclude[:if]))
         follow_association(name, association)
       end
     end
@@ -88,9 +91,9 @@ module Amoeba
     end
 
     def apply_associations
-      if amoeba.includes.size > 0
+      if amoeba.includes.present?
         follow_only_includes
-      elsif amoeba.excludes.size > 0
+      elsif amoeba.excludes.present?
         follow_all_except_excludes
       else
         follow_all
@@ -124,7 +127,7 @@ module Amoeba
     def process_coercions
       # prepend any extra strings to indicate uniqueness of the new record(s)
       amoeba.coercions.each do |field, coercion|
-        @new_object[field] = "#{coercion}"
+        @new_object[field] = coercion.to_s
       end
     end
 

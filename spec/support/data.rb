@@ -1,3 +1,4 @@
+
 u1 = User.create(name: 'Robert Johnson', email: 'bob@crossroads.com')
 u2 = User.create(name: 'Miles Davis', email: 'miles@kindofblue.com')
 
@@ -12,54 +13,20 @@ f1 = p1.create_post_config(is_visible: true, is_open: false, password: 'abcdefg1
 a1 = p1.create_account(title: 'Foo')
 h1 = p1.account.create_history(some_stuff: 'Bar')
 c1 = p1.comments.create(contents: 'I love it!', nerf: 'ratatat')
-c1.ratings.create(num_stars: 5)
-c1.ratings.create(num_stars: 5)
-c1.ratings.create(num_stars: 4)
-c1.ratings.create(num_stars: 3)
-c1.ratings.create(num_stars: 5)
-c1.ratings.create(num_stars: 5)
+[5, 5, 4, 3, 5, 5].each { |stars| c1.ratings.create(num_stars: stars) }
 
 c2 = p1.comments.create(contents: 'I hate it!', nerf: 'whapaow')
-c2.ratings.create(num_stars: 3)
-c2.ratings.create(num_stars: 1)
-c2.ratings.create(num_stars: 4)
-c2.ratings.create(num_stars: 1)
-c2.ratings.create(num_stars: 1)
-c2.ratings.create(num_stars: 2)
+[3, 1, 4, 1, 1, 2].each { |stars| c2.ratings.create(num_stars: stars) }
 
 c3 = p1.comments.create(contents: 'kthxbbq!!11!!!1!eleven!!', nerf: 'bonk')
-c3.ratings.create(num_stars: 0)
-c3.ratings.create(num_stars: 0)
-c3.ratings.create(num_stars: 1)
-c3.ratings.create(num_stars: 2)
-c3.ratings.create(num_stars: 1)
-c3.ratings.create(num_stars: 0)
+[0, 0, 1, 2, 1, 0].each { |stars| c3.ratings.create(num_stars: stars) }
 
-t1 = Tag.create(value: 'funny')
-t2 = Tag.create(value: 'wtf')
-t3 = Tag.create(value: 'cats')
+%w(funny wtf cats).each { |value| p1.tags << Tag.create(value: value) }
 
-p1.tags << t1
-p1.tags << t2
-p1.tags << t3
-p1.save
+['My Sidebar', 'Photo Gallery', 'Share & Like'].each { |value| p1.widgets << Widget.create(value: value) }
 
-w1 = Widget.create(value: 'My Sidebar')
-w2 = Widget.create(value: 'Photo Gallery')
-w3 = Widget.create(value: 'Share & Like')
+['This is important', "You've been warned", "Don't forget"].each { |value| p1.notes << Note.create(value: value) }
 
-p1.widgets << w1
-p1.widgets << w2
-p1.widgets << w3
-p1.save
-
-n1 = Note.create(value: 'This is important')
-n2 = Note.create(value: "You've been warned")
-n3 = Note.create(value: "Don't forget")
-
-p1.notes << n1
-p1.notes << n2
-p1.notes << n3
 p1.save
 
 c1 = Category.create(title: 'Umbrellas', description: 'Clown fart')
