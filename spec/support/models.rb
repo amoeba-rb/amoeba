@@ -70,24 +70,38 @@ class Post < ActiveRecord::Base
       end
     ])
   end
+
+  def truthy?
+    true
+  end
+
+  def falsey?
+    false
+  end
+
+  class << self
+    def tag_count
+      ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS tag_count FROM posts_tags')['tag_count']
+    end
+
+    def note_count
+      ActiveRecord::Base.connection.select_one('SELECT COUNT(*) AS note_count FROM notes_posts')['note_count']
+    end
+  end
 end
 
 class CustomThing < ActiveRecord::Base
   belongs_to :post
+
   class ArrayPack
     def self.load(str)
-      unless str.present? && str.length > 0
-        return []
-      end
-      if str.is_a?(Array)
-        return str
-      end
+      return [] unless str.present?
+      return str if str.is_a?(Array)
       str.split(',').map(&:to_i)
     end
+
     def self.dump(int_array)
-      unless int_array.present? && int_array.length > 0
-        return ''
-      end
+      return '' unless int_array.present?
       int_array.join(',')
     end
   end
@@ -95,6 +109,7 @@ class CustomThing < ActiveRecord::Base
   serialize :value, ArrayPack
 
   before_create :hydrate_me
+
   def hydrate_me
     self.value = value
   end
@@ -185,9 +200,15 @@ class Product < ActiveRecord::Base
   has_many :images
   has_and_belongs_to_many :sections
 
+  SECTION_COUNT_QUERY = 'SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?'.freeze
+
   amoeba do
     enable
     propagate
+  end
+
+  def section_count
+    ActiveRecord::Base.connection.select_one(SECTION_COUNT_QUERY, id)['section_count']
   end
 end
 
@@ -249,6 +270,7 @@ end
 class Company < ActiveRecord::Base
   has_many :employees
   has_many :customers
+
   amoeba do
     include_association :employees
     include_association :customers
@@ -259,6 +281,7 @@ class Employee < ActiveRecord::Base
   has_many :addresses, as: :addressable
   has_many :photos, as: :imageable
   belongs_to :company
+
   amoeba do
     include_association :addresses
     include_association :photos
@@ -270,6 +293,7 @@ class Customer < ActiveRecord::Base
   has_many :addresses, as: :addressable
   has_many :photos, as: :imageable
   belongs_to :company
+
   amoeba do
     enable
   end
@@ -293,7 +317,7 @@ class ObjectPrototype < MetalObject
     self.dup.becomes RealObject
   end
 
-  def remap_subobjects( relation_name )
+  def remap_subobjects(relation_name)
     :subobjects if relation_name == :subobject_prototypes
   end
 end
@@ -303,7 +327,6 @@ class RealObject < MetalObject
 end
 
 class SubobjectPrototype < MetalObject
-
   amoeba do
     enable
     through :become_subobject
@@ -320,7 +343,6 @@ end
 # Check of changing boolean attributes
 
 class SuperAdmin < ::ActiveRecord::Base
-
   amoeba do
     set active: false
     prepend password: false
@@ -330,25 +352,21 @@ end
 # Proper inheritance
 
 class Box < ActiveRecord::Base
-
   has_many        :products, class_name: 'BoxProduct'
   has_many        :sub_products, class_name: 'BoxSubProduct'
 
   amoeba do
     enable
   end
-
 end
 
 class BoxProduct < ActiveRecord::Base
-
   belongs_to      :box, class_name: 'Box'
 
   amoeba do
     enable
     propagate
   end
-
 end
 
 class BoxSubProduct < BoxProduct

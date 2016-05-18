@@ -200,6 +200,45 @@ This example does the same thing as the inclusive style example, it will copy th
 
 The exclusive style, when used, will automatically disable any other style that was previously selected, so if you selected include fields, and then you choose some exclude fields, the `exclude_association` method will disable the previously slected inclusive style and wipe out any corresponding include fields.
 
+#### Conditions
+
+Also if you need to path extra condition for include or exclude relationship you can path method name to `:if` option.
+
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
+  has_many :tags
+
+  amoeba do
+    include_association :comments, if: :popular?
+  end
+  
+  def popular?
+    likes > 15
+  end
+end
+```
+
+After call `Post.first.amoeba_dup` if `likes` is larger 15 than all comments will be duplicated too, but in another situation - no relations will be cloned. Same behaviur will be for `exclude_association`.
+
+**Be aware**! If you wrote:
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
+  has_many :tags
+
+  amoeba do
+    exclude_association :tags
+    include_association :comments, if: :popular?
+  end
+  
+  def popular?
+    likes > 15
+  end
+end
+```
+inclusion strategy will be chosen regardless of the result of `popular?` method call (the same for reverse situation).
+
 #### Cloning
 
 If you are using a Many-to-Many relationship, you may tell amoeba to actually make duplicates of the original related records rather than merely maintaining association with the original records. Cloning is easy, merely tell amoeba which fields to clone in the same way you tell it which fields to include or exclude.

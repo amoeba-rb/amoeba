@@ -8,8 +8,8 @@ module Amoeba
       raised:         false,
       dup_method:     :dup,
       remap_method:   nil,
-      includes:       [],
-      excludes:       [],
+      includes:       {},
+      excludes:       {},
       clones:         [],
       customizations: [],
       overrides:      [],
@@ -69,15 +69,15 @@ module Amoeba
 
     def propagate(style = :submissive)
       @config[:parenting] ||= style
-      @config[:inherit]  = true
+      @config[:inherit] = true
     end
 
     def push_value_to_array(value, key)
       res = @config[key]
       if value.is_a?(::Array)
         res = value
-      else
-        res << value if value
+      elsif value
+        res << value
       end
       @config[key] = res.uniq
     end
@@ -107,37 +107,37 @@ module Amoeba
       @config[config_key][key] = val if val || (!val.nil? && config_key == :coercions)
     end
 
-    def include_association(value = nil)
-      @config[:enabled]  = true
-      @config[:excludes] = []
-      push_value_to_array(value, :includes)
+    def include_association(value = nil, options = {})
+      enable
+      @config[:excludes] = {}
+      push_value_to_hash({ value => options }, :includes)
     end
 
-    # TODO remove this method in v3.0.0
+    # TODO: remove this method in v3.0.0
     def include_field(value = nil)
-      warn "include_field is deprecated and will be removed in version 3.0.0; please use include_association instead"
+      warn 'include_field is deprecated and will be removed in version 3.0.0; please use include_association instead'
       include_association(value)
     end
 
-    def exclude_association(value = nil)
-      @config[:enabled]  = true
-      @config[:includes] = []
-      push_value_to_array(value, :excludes)
+    def exclude_association(value = nil, options = {})
+      enable
+      @config[:includes] = {}
+      push_value_to_hash({ value => options }, :excludes)
     end
 
-    # TODO remove this method in v3.0.0
+    # TODO: remove this method in v3.0.0
     def exclude_field(value = nil)
-      warn "exclude_field is deprecated and will be removed in version 3.0.0; please use exclude_association instead"
+      warn 'exclude_field is deprecated and will be removed in version 3.0.0; please use exclude_association instead'
       exclude_association(value)
     end
 
     def clone(value = nil)
-      @config[:enabled] = true
+      enable
       push_value_to_array(value, :clones)
     end
 
     def recognize(value = nil)
-      @config[:enabled] = true
+      enable
       push_value_to_array(value, :known_macros)
     end
 
