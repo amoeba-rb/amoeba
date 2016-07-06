@@ -113,6 +113,10 @@ module Amoeba
       push_value_to_hash({ value => options }, :includes)
     end
 
+    def include_associations(*values)
+      values.flatten.each { |v| include_association(v) }
+    end
+
     # TODO: remove this method in v3.0.0
     def include_field(value = nil)
       warn 'include_field is deprecated and will be removed in version 3.0.0; please use include_association instead'
@@ -123,6 +127,10 @@ module Amoeba
       enable
       @config[:includes] = {}
       push_value_to_hash({ value => options }, :excludes)
+    end
+
+    def exclude_associations(*values)
+      values.flatten.each { |v| exclude_association(v) }
     end
 
     # TODO: remove this method in v3.0.0
