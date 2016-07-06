@@ -16,6 +16,11 @@ module Amoeba
       @config
     end
 
+    def reset_amoeba(&block)
+      @config_block = block if block_given?
+      @config = Amoeba::Config.new(self)
+    end
+
     def amoeba_block
       @config_block
     end

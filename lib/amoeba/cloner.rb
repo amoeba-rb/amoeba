@@ -9,7 +9,7 @@ module Amoeba
     def_delegators :old_object, :_parent_amoeba, :_amoeba_settings,
                    :_parent_amoeba_settings
 
-    def_delegators :object_klass, :amoeba, :fresh_amoeba
+    def_delegators :object_klass, :amoeba, :fresh_amoeba, :reset_amoeba
 
     def initialize(object, options = {})
       @old_object = object
@@ -41,12 +41,13 @@ module Amoeba
     end
 
     def inherit_submissive_parent_settings
-      fresh_amoeba(&_parent_amoeba_settings)
+      reset_amoeba(&_amoeba_settings)
+      amoeba(&_parent_amoeba_settings)
       amoeba(&_amoeba_settings)
     end
 
     def inherit_parent_settings
-      return if amoeba.enabled || !_parent_amoeba.inherit
+      return if !_parent_amoeba.inherit
       return unless %w(strict relaxed submissive).include?(parenting_style.to_s)
       __send__("inherit_#{parenting_style}_parent_settings".to_sym)
     end
