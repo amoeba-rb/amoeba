@@ -71,7 +71,7 @@ my_copy.save
 puts Comment.all.count # should be 4
 ```
 
-By default, when enabled, amoeba will copy any and all associated child records automatically and associated them with the new parent record.
+By default, when enabled, amoeba will copy any and all associated child records automatically and associate them with the new parent record.
 
 You can configure the behavior to only include fields that you list or to only include fields that you don't exclude. Of the three, the most performant will be the indiscriminate style, followed by the inclusive style, and the exclusive style will be the slowest because of the need for an extra explicit check on each field. This performance difference is likely negligible enough that you can choose the style to use based on which is easiest to read and write, however, if your data tree is large enough and you need control over what fields get copied, inclusive style is probably a better choice than exclusive style.
 
@@ -198,7 +198,7 @@ end
 
 This example does the same thing as the inclusive style example, it will copy the post's tags and authors but not its comments. As with inclusive style, there is no need to explicitly enable amoeba when specifying fields to exclude.
 
-The exclusive style, when used, will automatically disable any other style that was previously selected, so if you selected include fields, and then you choose some exclude fields, the `exclude_association` method will disable the previously slected inclusive style and wipe out any corresponding include fields.
+The exclusive style, when used, will automatically disable any other style that was previously selected, so if you selected include fields, and then you choose some exclude fields, the `exclude_association` method will disable the previously selected inclusive style and wipe out any corresponding include fields.
 
 #### Conditions
 
@@ -219,7 +219,7 @@ class Post < ActiveRecord::Base
 end
 ```
 
-After call `Post.first.amoeba_dup` if `likes` is larger 15 than all comments will be duplicated too, but in another situation - no relations will be cloned. Same behaviur will be for `exclude_association`.
+After call `Post.first.amoeba_dup` if `likes` is larger 15 than all comments will be duplicated too, but in another situation - no relations will be cloned. Same behavior will be for `exclude_association`.
 
 **Be aware**! If you wrote:
 ```ruby
@@ -338,7 +338,7 @@ Unlike inclusive and exclusive styles, specifying null fields will not automatic
 
 #### Set
 
-If you wish to just set a field to an aribrary value on all duplicated objects you may use the `set` directive. For example, if you wanted to copy an object that has some kind of approval process associated with it, you likely may wish to set the new object's state to be open or "in progress" again.
+If you wish to just set a field to an arbitrary value on all duplicated objects you may use the `set` directive. For example, if you wanted to copy an object that has some kind of approval process associated with it, you likely may wish to set the new object's state to be open or "in progress" again.
 
 ```ruby
 class Post < ActiveRecord::Base
@@ -468,7 +468,7 @@ end
 
 #### Stacking
 
-You may apply multiple preproccessing directives to a single model at once.
+You may apply multiple preprocessing directives to a single model at once.
 
 ```ruby
 class Post < ActiveRecord::Base
@@ -535,7 +535,7 @@ This example will copy all of a post's tags and authors, but not its comments. I
 
 Note that, because of precedence, inclusive style is used and the list of exclude fields is never consulted. Additionally, the `enable` method is redundant because amoeba is automatically enabled when using `include_association`.
 
-The preprocessing directives are run after child records are copied andare run in this order.
+The preprocessing directives are run after child records are copied and are run in this order.
 
  1. Null fields
  2. Prepends
@@ -1135,7 +1135,7 @@ end
 
 #### set
 
-  Set a field to a given value. This sould work for almost any type of field. Accepts a hash of fields and the values you want them set to.. The keys are the field names and the values are the prefix strings. An example would be to add " (copied version)" to your description field. Don't forget to add a leading space if you want it. Passing a hash will add each key value pair to the list of append directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:approval_state => "open_for_editing"}]`.
+  Set a field to a given value. This should work for almost any type of field. Accepts a hash of fields and the values you want them set to.. The keys are the field names and the values are the prefix strings. An example would be to add " (copied version)" to your description field. Don't forget to add a leading space if you want it. Passing a hash will add each key value pair to the list of append directives. If you wish to empty the list of directives, you may pass the hash inside of an array like this `[{:approval_state => "open_for_editing"}]`.
 
 #### regex
 
