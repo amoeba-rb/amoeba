@@ -379,3 +379,38 @@ end
 class BoxAnotherProduct < BoxProduct
   belongs_to :sub_product, class_name: 'BoxSubProduct'
 end
+
+# Inclusion inheritance
+class Stage < ActiveRecord::Base
+  has_many :listeners
+  has_many :specialists
+
+  amoeba do
+    include_association :listeners
+    include_association :specialists
+    nullify :external_id
+    propagate
+  end
+end
+
+class Participant < ActiveRecord::Base
+  belongs_to :stage
+end
+
+class Listener < Participant
+end
+
+class Specialist < Participant
+end
+
+class CustomStage < Stage
+  has_many :custom_rules, foreign_key: :stage_id
+
+  amoeba do
+    include_association :custom_rules
+  end
+end
+
+class CustomRule < ActiveRecord::Base
+  belongs_to :custom_stage
+end

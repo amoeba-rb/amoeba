@@ -213,4 +213,23 @@ ActiveRecord::Schema.define do
     t.timestamps null: true
   end
 
+  create_table :stages, force: true do |t|
+    t.string   :title
+    t.string   :type
+    t.integer  :external_id
+    t.timestamps null: true
+  end
+
+  create_table :participants, force: true do |t|
+    t.string    :name
+    t.string    :type
+    t.integer   :stage_id
+    t.timestamps
+  end
+
+  create_table :custom_rules, force: true do |t|
+    t.string   :description
+    t.integer  :stage_id
+    t.timestamps
+  end
 end

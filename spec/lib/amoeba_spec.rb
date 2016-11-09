@@ -255,8 +255,8 @@ describe 'amoeba' do
   end
 
   context 'strict propagate' do
-    it 'should call #fresh_amoeba' do
-      expect(::SuperBlackBox).to receive(:fresh_amoeba).and_call_original
+    it 'should call #reset_amoeba' do
+      expect(::SuperBlackBox).to receive(:reset_amoeba).and_call_original
       box = ::SuperBlackBox.create(title: 'Super Black Box', price: 9.99, length: 1, metal: '1')
       new_box = box.amoeba_dup
       expect(new_box.save).to be_truthy
@@ -304,6 +304,34 @@ describe 'amoeba' do
       sub_sub_product.update_attributes(box: box, another_product: another_product)
       expect(box.sub_products.first.another_product.title).to eq('Cleaning product')
       expect(box.amoeba_dup.sub_products.first.another_product.title).to eq('Cleaning product')
+    end
+  end
+
+  context 'inheritance extended' do
+    let(:stage) do
+      stage = CustomStage.new(title: 'My Stage', external_id: 213)
+      stage.listeners.build(name: 'John')
+      stage.listeners.build(name: 'Helen')
+      stage.specialists.build(name: 'Jack')
+      stage.custom_rules.build(description: 'Kill all humans')
+      stage.save!
+      stage
+    end
+
+    subject { stage.amoeba_dup }
+
+    it "contains parent association and own associations", :aggregate_failures do
+      subject
+      expect { subject.save! }.to change(Listener, :count).by(2).
+                                  and change(Specialist, :count).by(1).
+                                  and change(CustomRule, :count).by(1)
+
+      expect(subject.title).to eq 'My Stage'
+      expect(subject.external_id).to be_nil
+      expect(subject.listeners.find_by(name: 'John')).to_not be_nil
+      expect(subject.listeners.find_by(name: 'Helen')).to_not be_nil
+      expect(subject.specialists.find_by(name: 'Jack')).to_not be_nil
+      expect(subject.custom_rules.first.description).to eq 'Kill all humans'
     end
   end
 
