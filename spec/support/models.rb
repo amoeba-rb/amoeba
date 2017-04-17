@@ -272,8 +272,8 @@ class Company < ActiveRecord::Base
   has_many :customers
 
   amoeba do
-    include_association :employees
-    include_association :customers
+    include_associations :employees,
+                        :customers
   end
 end
 
@@ -283,8 +283,7 @@ class Employee < ActiveRecord::Base
   belongs_to :company
 
   amoeba do
-    include_association :addresses
-    include_association :photos
+    include_associations [:addresses, :photos]
   end
 
 end
