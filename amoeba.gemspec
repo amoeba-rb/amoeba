@@ -5,11 +5,11 @@ require 'amoeba/version'
 Gem::Specification.new do |s|
   s.name        = 'amoeba'
   s.version     = Amoeba::VERSION
-  s.authors     = ['Vaughn Draughon']
-  s.email       = 'vaughn@rocksolidwebdesign.com'
-  s.homepage    = 'http://github.com/rocksolidwebdesign/amoeba'
+  s.authors     = ['Vaughn Draughon', 'Oleksandr Simonov']
+  s.email       = 'alex@simonov.me'
+  s.homepage    = 'http://github.com/amoeba-rb/amoeba'
   s.license     = 'BSD'
-  s.summary     = 'Easy copying of rails models and their child associations.  '
+  s.summary     = 'Easy copying of rails models and their child associations.'
 
   s.description = <<-EOF
 An extension to ActiveRecord to allow the duplication method to also copy associated children, with recursive support for nested of grandchildren. The behavior is controllable with a simple DSL both on your rails models and on the fly, i.e. per instance. Numerous configuration styles and preprocessing directives are included for power and flexibility. Supports preprocessing of field values to prepend strings such as "Copy of ", to nullify or process field values with regular expressions. Supports most association types including has_one :through and has_many :through.
