@@ -110,7 +110,8 @@ module Amoeba
     def include_association(value = nil, options = {})
       enable
       @config[:excludes] = {}
-      push_value_to_hash({ value => options }, :includes)
+      value = value.is_a?(Array) ? Hash[value.map! { |v| [v, options] }] : { value => options }
+      push_value_to_hash(value, :includes)
     end
 
     def include_associations(*values)
@@ -126,7 +127,8 @@ module Amoeba
     def exclude_association(value = nil, options = {})
       enable
       @config[:includes] = {}
-      push_value_to_hash({ value => options }, :excludes)
+      value = value.is_a?(Array) ? Hash[value.map! { |v| [v, options] }] : { value => options }
+      push_value_to_hash(value, :excludes)
     end
 
     def exclude_associations(*values)

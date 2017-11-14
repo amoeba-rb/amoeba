@@ -176,7 +176,7 @@ describe 'amoeba' do
     end
   end
 
-  context 'use if condition in includes and excludes' do
+  context 'Using a if condition' do
     before(:all) do
       require ::File.dirname(__FILE__) + '/../support/data.rb'
     end
@@ -185,30 +185,58 @@ describe 'amoeba' do
     subject { post.amoeba_dup.save! }
     let(:post) { Post.first }
 
-    it 'includes associations with truthy condition' do
+    it 'includes an association with truthy condition' do
       ::Post.amoeba do
         include_association :comments, if: :truthy?
       end
       expect { subject }.to change { Comment.count }.by(3)
     end
 
-    it 'does not include associations with false condition' do
+    it 'does not include an association with a falsey condition' do
       ::Post.amoeba do
         include_association :comments, if: :falsey?
       end
       expect { subject }.not_to change { Comment.count }
     end
 
-    it 'excludes associations with truthy condition' do
+    it 'excludes an association with a truthy condition' do
       ::Post.amoeba do
         exclude_association :comments, if: :truthy?
       end
       expect { subject }.not_to change { Comment.count }
     end
 
-    it 'does not exclude associations with false condition' do
+    it 'does not exclude an association with a falsey condition' do
       ::Post.amoeba do
         exclude_association :comments, if: :falsey?
+      end
+      expect { subject }.to change { Comment.count }.by(3)
+    end
+
+    it 'includes associations from a given array with a truthy condition' do
+      ::Post.amoeba do
+        include_association [:comments], if: :truthy?
+      end
+      expect { subject }.to change { Comment.count }.by(3)
+    end
+
+    it 'does not include associations from a given array with a falsey condition' do
+      ::Post.amoeba do
+        include_association [:comments], if: :falsey?
+      end
+      expect { subject }.not_to change { Comment.count }
+    end
+
+    it 'does exclude associations from a given array with a truthy condition' do
+      ::Post.amoeba do
+        exclude_association [:comments], if: :truthy?
+      end
+      expect { subject }.not_to change { Comment.count }
+    end
+
+    it 'does not exclude associations from a given array with a falsey condition' do
+      ::Post.amoeba do
+        exclude_association [:comments], if: :falsey?
       end
       expect { subject }.to change { Comment.count }.by(3)
     end
@@ -320,7 +348,7 @@ describe 'amoeba' do
 
     subject { stage.amoeba_dup }
 
-    it "contains parent association and own associations", :aggregate_failures do
+    it 'contains parent association and own associations', :aggregate_failures do
       subject
       expect { subject.save! }.to change(Listener, :count).by(2).
                                   and change(Specialist, :count).by(1).
