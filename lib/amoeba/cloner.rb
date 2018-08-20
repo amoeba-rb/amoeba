@@ -150,7 +150,7 @@ module Amoeba
       # regex any fields that need changing
       amoeba.regexes.each do |field, action|
         if action[:with].respond_to? :call
-          @new_object[field].gsub!(action[:replace], action[:with].call)
+          @new_object[field] = action[:with].call(@new_object[field])
         else
           @new_object[field].gsub!(action[:replace], action[:with])
         end
