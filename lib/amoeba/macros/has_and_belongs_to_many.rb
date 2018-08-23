@@ -10,7 +10,11 @@ module Amoeba
 
       def fill_relation(relation_name, old_obj, clone)
         # associate this new child to the new parent object
-        old_obj = old_obj.amoeba_dup if clone
+        if clone
+            old_obj = reuse_instance(old_obj, -> do
+              old_obj.amoeba_dup
+            end)
+        end
         relation_name = remapped_relation_name(relation_name)
         @new_object.__send__(relation_name) << old_obj
       end

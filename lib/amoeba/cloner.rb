@@ -4,6 +4,8 @@ module Amoeba
   class Cloner
     extend Forwardable
 
+    @@isRunning = false
+
     attr_reader :new_object, :old_object, :object_klass
 
     def_delegators :old_object, :_parent_amoeba, :_amoeba_settings,
@@ -19,10 +21,21 @@ module Amoeba
       @new_object = object.__send__(amoeba.dup_method)
     end
 
+    def self.running?
+      @@isRunning
+    end
+
+    def self.finished
+      @@isRunning = false
+    end
+
     def run
+      @@isRunning = true
+
       process_overrides
       apply if amoeba.enabled
       after_apply if amoeba.do_preproc
+
       @new_object
     end
 
@@ -60,6 +73,10 @@ module Amoeba
 
     def exclude_clone_if_has_many_through(clone_field)
       association = @object_klass.reflect_on_association(clone_field)
+
+      if association.nil?
+        raise "Association doesn't exist: #{@object_klass}::#{clone_field} - check amoeba config for this class"
+      end
 
       # if this is a has many through and we're gonna deep
       # copy the child records, exclude the regular join

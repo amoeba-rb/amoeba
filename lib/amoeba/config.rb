@@ -11,6 +11,7 @@ module Amoeba
       includes:       {},
       excludes:       {},
       clones:         [],
+      reuse_values:   [],
       customizations: [],
       overrides:      [],
       null_fields:    [],
@@ -61,6 +62,10 @@ module Amoeba
 
     def disable
       @config[:enabled] = false
+    end
+
+    def reuse(symbols)
+      @config[:reuse_values] = symbols
     end
 
     def raised(style = :submissive)
