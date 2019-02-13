@@ -1,3 +1,3 @@
 module Amoeba
-  VERSION = '3.1.0'
+  VERSION = '5.2.0'
 end
