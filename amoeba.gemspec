@@ -32,7 +32,7 @@ EOF
     s.add_development_dependency 'activerecord-jdbc-adapter', '~> 1.3.2'
     s.add_development_dependency 'activerecord-jdbcsqlite3-adapter', '~> 1.3.2'
   else
-    s.add_development_dependency 'sqlite3'
+    s.add_development_dependency 'sqlite3', '>= 1.3', '< 1.4'
   end
 
   s.add_dependency 'activerecord', '>= 4.2.0'
