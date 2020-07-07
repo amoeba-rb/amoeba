@@ -1,8 +1,6 @@
 module Amoeba
   module Macros
     class Base
-      @@associationCache = {}
-      
       def initialize(cloner)
         @cloner     = cloner
         @old_object = cloner.old_object
@@ -25,31 +23,17 @@ module Amoeba
       end
       
       def reuse_instance(new_object, lambda)
-        if @@associationCache.nil?
-          @@associationCache = {}
-        end
-
-        if not @@associationCache.has_key? new_object.class.name
-          @@associationCache[new_object.class.name] = {}
-        end
-
-        if not new_object.attributes.has_key? 'name'
-          relationName = Digest::MD5.hexdigest(new_object.attributes.reject{|x| x == 'id'}.values.join(','))
-        else
-          relationName = new_object.name
-        end
-
-        if @@associationCache[new_object.class.name].has_key? relationName
-          return @@associationCache[new_object.class.name][relationName]
-        else
+        existing = Amoeba::AssociationCache.get(new_object)
+        if existing.nil?
           new_instance = lambda.call
           
           if new_instance.nil?
             return nil
           end
 
-          @@associationCache[new_object.class.name][relationName] = new_instance
-          return new_instance
+          new_instance
+        else
+          existing
         end
       end
     end

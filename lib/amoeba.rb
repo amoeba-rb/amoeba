@@ -10,6 +10,7 @@ require 'amoeba/macros/has_and_belongs_to_many'
 require 'amoeba/cloner'
 require 'amoeba/class_methods'
 require 'amoeba/instance_methods'
+require 'amoeba/association_cache'
 
 module Amoeba
 end

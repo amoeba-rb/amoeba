@@ -19,6 +19,12 @@ module Amoeba
       @object_klass = @old_object.class
       inherit_parent_settings
       @new_object = object.__send__(amoeba.dup_method)
+      
+      if !amoeba.cacheables.nil?
+        amoeba.cacheables.each do |is_cacheable|
+          Amoeba::AssociationCache.cache(@new_object) if is_cacheable.call(@new_object)
+        end
+      end
     end
 
     def self.running?

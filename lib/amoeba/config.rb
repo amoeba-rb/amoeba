@@ -19,7 +19,8 @@ module Amoeba
       prefixes:       {},
       suffixes:       {},
       regexes:        {},
-      known_macros:   [:has_one, :has_many, :has_and_belongs_to_many]
+      known_macros:   [:has_one, :has_many, :has_and_belongs_to_many],
+      cacheables:     [],
     }
 
     # ActiveRecord 3.x have different implementation of deep_dup
@@ -58,6 +59,11 @@ module Amoeba
 
     def enable
       @config[:enabled] = true
+    end
+
+    def cacheable(value=nil)
+      push_value_to_array(value, :cacheables)
+
     end
 
     def disable
