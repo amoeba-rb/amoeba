@@ -1,5 +1,9 @@
 module Amoeba
   module AssociationCache
+    def self.flush
+      RequestStore.store[:amoeba_cache] = {}
+    end
+
     def self.cache(instance)
       key = get_key(instance)
 

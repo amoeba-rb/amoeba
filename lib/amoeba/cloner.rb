@@ -22,7 +22,10 @@ module Amoeba
       
       if !amoeba.cacheables.nil?
         amoeba.cacheables.each do |is_cacheable|
-          Amoeba::AssociationCache.cache(@new_object) if is_cacheable.call(@new_object)
+          if is_cacheable.call(@new_object)
+            Amoeba::AssociationCache.cache(@new_object)
+            break
+          end
         end
       end
     end
