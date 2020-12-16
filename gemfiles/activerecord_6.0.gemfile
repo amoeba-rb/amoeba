@@ -2,12 +2,12 @@
 
 source "https://rubygems.org"
 
-gem "activerecord", "~> 5.0.0"
+gem "activerecord", "~> 5.2.0"
 
 group :development, :test do
   gem "rake"
   gem "coveralls", require: false
-  gem "sqlite3", "~> 1.3.0"
+  gem "sqlite3", "~> 1.4.0"
 end
 
 group :local_development do
