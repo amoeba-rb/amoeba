@@ -20,7 +20,6 @@ matrix:
   allow_failures:
     - rvm: ruby-head
     - rvm: jruby
-jobs:
   exclude:
     - rvm: 2.2
       gemfile: gemfiles/activerecord_6.0.gemfile
