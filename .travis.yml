@@ -23,15 +23,17 @@ matrix:
   exclude:
     - rvm: 2.2
       gemfile: gemfiles/activerecord_6.0.gemfile
-    - rvm: 2.3
-      gemfile: gemfiles/activerecord_6.0.gemfile
-    - rvm: 2.4
-      gemfile: gemfiles/activerecord_6.0.gemfile
     - rvm: 2.2
       gemfile: gemfiles/activerecord_6.1.gemfile
     - rvm: 2.3
+      gemfile: gemfiles/activerecord_6.0.gemfile
+    - rvm: 2.3
       gemfile: gemfiles/activerecord_6.1.gemfile
     - rvm: 2.4
+      gemfile: gemfiles/activerecord_6.0.gemfile
+    - rvm: 2.4
       gemfile: gemfiles/activerecord_6.1.gemfile
+    - rvm: 2.7
+      gemfile: gemfiles/activerecord_4.2.gemfile
 bundler_args: --without local_development
 before_install: gem install bundler -v 1.17.3
