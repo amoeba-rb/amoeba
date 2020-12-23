@@ -49,6 +49,10 @@ matrix:
       gemfile: gemfiles/activerecord_6.1.gemfile
     - rvm: 2.4
       gemfile: gemfiles/activerecord_head.gemfile
+    - rvm: 2.4
+      gemfile: gemfiles/jruby-activerecord_6.1.gemfile
+    - rvm: 2.4
+      gemfile: gemfiles/jruby-activerecord_head.gemfile
     - rvm: 2.5
       gemfile: gemfiles/jruby-activerecord_6.1.gemfile
     - rvm: 2.5
