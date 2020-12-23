@@ -29,8 +29,8 @@ EOF
   s.add_development_dependency 'rspec', '>= 3.0.0'
 
   if RUBY_PLATFORM == 'java'
-    s.add_development_dependency 'activerecord-jdbc-adapter', '~> 1.3.2'
-    s.add_development_dependency 'activerecord-jdbcsqlite3-adapter', '~> 1.3.2'
+    s.add_development_dependency 'activerecord-jdbc-adapter', '~> 61.0'
+    s.add_development_dependency 'activerecord-jdbcsqlite3-adapter', '~> 61.0'
   else
     s.add_development_dependency 'sqlite3', '>= 1.3'
   end

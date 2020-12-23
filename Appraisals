@@ -40,6 +40,14 @@ appraise 'activerecord-6.1' do
   end
 end
 
+appraise 'jruby-activerecord-6.1' do
+  gem 'activerecord', '~> 6.1.0'
+  group :development, :test do
+    gem 'activerecord-jdbc-adapter', '~> 61.0'
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 61.0'
+  end
+end
+
 appraise 'activerecord-head' do
   git 'git://github.com/rails/arel.git' do
     gem 'arel'
@@ -49,5 +57,22 @@ appraise 'activerecord-head' do
   end
   group :development, :test do
     gem "sqlite3", "~> 1.4.0"
+  end
+end
+
+appraise 'jruby-activerecord-head' do
+  git 'git://github.com/rails/arel.git' do
+    gem 'arel'
+  end
+  git 'git://github.com/rails/rails.git' do
+    gem 'activerecord'
+  end
+  group :development, :test do
+    git 'git://github.com/jruby/activerecord-jdbc-adapter' do
+      gem 'activerecord-jdbc-adapter'
+    end
+    git 'git://github.com/jruby/activerecord-jdbcsqlite3-adapter' do
+      gem 'activerecord-jdbcsqlite3-adapter'
+    end
   end
 end
