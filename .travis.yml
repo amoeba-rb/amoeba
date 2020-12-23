@@ -30,9 +30,9 @@ matrix:
     - rvm: 2.2
       gemfile: gemfiles/activerecord_head.gemfile
     - rvm: 2.2
-      gemfile: gemfiles/jruby-activerecord_6.1.gemfile
+      gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: 2.2
-      gemfile: gemfiles/jruby-activerecord_head.gemfile
+      gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: 2.3
       gemfile: gemfiles/activerecord_6.0.gemfile
     - rvm: 2.3
@@ -40,9 +40,9 @@ matrix:
     - rvm: 2.3
       gemfile: gemfiles/activerecord_head.gemfile
     - rvm: 2.3
-      gemfile: gemfiles/jruby-activerecord_6.1.gemfile
+      gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: 2.3
-      gemfile: gemfiles/jruby-activerecord_head.gemfile
+      gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: 2.4
       gemfile: gemfiles/activerecord_6.0.gemfile
     - rvm: 2.4
@@ -50,27 +50,27 @@ matrix:
     - rvm: 2.4
       gemfile: gemfiles/activerecord_head.gemfile
     - rvm: 2.4
-      gemfile: gemfiles/jruby-activerecord_6.1.gemfile
+      gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: 2.4
-      gemfile: gemfiles/jruby-activerecord_head.gemfile
+      gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: 2.5
-      gemfile: gemfiles/jruby-activerecord_6.1.gemfile
+      gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: 2.5
-      gemfile: gemfiles/jruby-activerecord_head.gemfile
+      gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: 2.6
-      gemfile: gemfiles/jruby-activerecord_6.1.gemfile
+      gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: 2.6
-      gemfile: gemfiles/jruby-activerecord_head.gemfile
+      gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: 2.7
       gemfile: gemfiles/activerecord_4.2.gemfile
     - rvm: 2.7
-      gemfile: gemfiles/jruby-activerecord_6.1.gemfile
+      gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: 2.7
-      gemfile: gemfiles/jruby-activerecord_head.gemfile
+      gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: ruby-head
-      gemfile: gemfiles/jruby-activerecord_6.1.gemfile
+      gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: ruby-head
-      gemfile: gemfiles/jruby-activerecord_head.gemfile
+      gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: jruby
       gemfile: gemfiles/activerecord_4.2.gemfile
     - rvm: jruby
