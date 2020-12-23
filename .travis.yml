@@ -15,9 +15,9 @@ gemfile:
   - gemfiles/activerecord_5.2.gemfile
   - gemfiles/activerecord_6.0.gemfile
   - gemfiles/activerecord_6.1.gemfile
-  - gemfiles/jruby-activerecord_6.1.gemfile
+  - gemfiles/jruby_activerecord_6.1.gemfile
   - gemfiles/activerecord_head.gemfile
-  - gemfiles/jruby-activerecord_head.gemfile
+  - gemfiles/jruby_activerecord_head.gemfile
 matrix:
   allow_failures:
     - rvm: ruby-head
