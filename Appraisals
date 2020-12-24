@@ -70,9 +70,7 @@ appraise 'jruby-activerecord-head' do
   group :development, :test do
     git 'git://github.com/jruby/activerecord-jdbc-adapter' do
       gem 'activerecord-jdbc-adapter'
-    end
-    git 'git://github.com/jruby/activerecord-jdbcsqlite3-adapter' do
-      gem 'activerecord-jdbcsqlite3-adapter'
+      gem 'activerecord-jdbcsqlite3-adapter', glob: 'activerecord-jdbcsqlite3-adapter/activerecord-jdbcsqlite3-adapter.gemspec'
     end
   end
 end
