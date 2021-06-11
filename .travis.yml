@@ -63,9 +63,13 @@ matrix:
     - rvm: 2.4
       gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: 2.5
+      gemfile: gemfiles/activerecord_head.gemfile
+    - rvm: 2.5
       gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: 2.5
       gemfile: gemfiles/jruby_activerecord_head.gemfile
+    - rvm: 2.6
+      gemfile: gemfiles/activerecord_head.gemfile
     - rvm: 2.6
       gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: 2.6
