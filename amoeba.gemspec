@@ -35,5 +35,5 @@ EOF
     s.add_development_dependency 'sqlite3', '>= 1.3'
   end
 
-  s.add_dependency 'activerecord', '>= 4.2.0', '< 6.2'
+  s.add_dependency 'activerecord', '>= 4.2.0'
 end
