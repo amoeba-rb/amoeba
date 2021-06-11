@@ -52,7 +52,7 @@ appraise 'activerecord-head' do
   git 'git://github.com/rails/arel.git' do
     gem 'arel'
   end
-  git 'git://github.com/rails/rails.git' do
+  git 'git://github.com/rails/rails.git', branch: 'main' do
     gem 'activerecord'
   end
   group :development, :test do
@@ -64,7 +64,7 @@ appraise 'jruby-activerecord-head' do
   git 'git://github.com/rails/arel.git' do
     gem 'arel'
   end
-  git 'git://github.com/rails/rails.git' do
+  git 'git://github.com/rails/rails.git', branch: 'main' do
     gem 'activerecord'
   end
   group :development, :test do
