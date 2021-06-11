@@ -87,6 +87,8 @@ matrix:
     - rvm: 3.0
       gemfile: gemfiles/jruby_activerecord_head.gemfile
     - rvm: ruby-head
+      gemfile: gemfiles/activerecord_4.2.gemfile
+    - rvm: ruby-head
       gemfile: gemfiles/jruby_activerecord_6.1.gemfile
     - rvm: ruby-head
       gemfile: gemfiles/jruby_activerecord_head.gemfile
