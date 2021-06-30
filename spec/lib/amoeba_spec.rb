@@ -329,7 +329,7 @@ describe 'amoeba' do
     it 'does not fail with a deep inheritance' do
       sub_sub_product = BoxSubSubProduct.create(title: 'Awesome shoes')
       another_product = BoxAnotherProduct.create(title: 'Cleaning product')
-      sub_sub_product.update_attributes(box: box, another_product: another_product)
+      sub_sub_product.update(box: box, another_product: another_product)
       expect(box.sub_products.first.another_product.title).to eq('Cleaning product')
       expect(box.amoeba_dup.sub_products.first.another_product.title).to eq('Cleaning product')
     end

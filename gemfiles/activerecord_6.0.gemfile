@@ -2,13 +2,7 @@
 
 source "https://rubygems.org"
 
-git "git://github.com/rails/arel.git" do
-  gem "arel"
-end
-
-git "git://github.com/rails/rails.git", branch: "main" do
-  gem "activerecord"
-end
+gem "activerecord", "~> 6.0.0"
 
 group :development, :test do
   gem "rake"

@@ -11,9 +11,13 @@ git "git://github.com/rails/rails.git", branch: "main" do
 end
 
 group :development, :test do
+  git "git://github.com/jruby/activerecord-jdbc-adapter" do
+    gem "activerecord-jdbc-adapter"
+    gem "activerecord-jdbcsqlite3-adapter", glob: "activerecord-jdbcsqlite3-adapter/activerecord-jdbcsqlite3-adapter.gemspec"
+  end
+
   gem "rake"
   gem "coveralls", require: false
-  gem "sqlite3", "~> 1.4.0"
 end
 
 group :local_development do
