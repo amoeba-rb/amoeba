@@ -6,3 +6,4 @@ spec/test.sqlite3
 coverage
 .idea
 gemfiles/*.lock
+.ruby-version
