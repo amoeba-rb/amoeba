@@ -118,12 +118,6 @@ module Amoeba
       values.flatten.each { |v| include_association(v) }
     end
 
-    # TODO: remove this method in v3.0.0
-    def include_field(value = nil)
-      warn 'include_field is deprecated and will be removed in version 3.0.0; please use include_association instead'
-      include_association(value)
-    end
-
     def exclude_association(value = nil, options = {})
       enable
       @config[:includes] = {}
@@ -133,12 +127,6 @@ module Amoeba
 
     def exclude_associations(*values)
       values.flatten.each { |v| exclude_association(v) }
-    end
-
-    # TODO: remove this method in v3.0.0
-    def exclude_field(value = nil)
-      warn 'exclude_field is deprecated and will be removed in version 3.0.0; please use exclude_association instead'
-      exclude_association(value)
     end
 
     def clone(value = nil)
