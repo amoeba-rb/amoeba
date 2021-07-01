@@ -3,7 +3,8 @@ gemspec
 
 group :development, :test do
   gem 'rake'
-  gem 'coveralls', require: false
+  gem 'simplecov', '~> 0.21.2'
+  gem 'simplecov-lcov', '~> 0.8.0'
 end
 
 group :local_development do
