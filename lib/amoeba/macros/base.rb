@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Amoeba
   module Macros
     class Base
@@ -8,7 +10,7 @@ module Amoeba
       end
 
       def follow(_relation_name, _association)
-        fail "#{self.class.name} doesn't implement `follow`!"
+        raise "#{self.class.name} doesn't implement `follow`!"
       end
 
       class << self
@@ -19,6 +21,7 @@ module Amoeba
 
       def remapped_relation_name(name)
         return name unless @cloner.amoeba.remap_method
+
         @old_object.__send__(@cloner.amoeba.remap_method, name.to_sym) || name
       end
     end

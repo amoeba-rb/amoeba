@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 require 'active_support/all'
 require 'amoeba/version'
@@ -14,5 +16,5 @@ require 'amoeba/instance_methods'
 module Amoeba
 end
 
-ActiveRecord::Base.send :extend, Amoeba::ClassMethods
-ActiveRecord::Base.send :include, Amoeba::InstanceMethods
+ActiveRecord::Base.extend Amoeba::ClassMethods
+ActiveRecord::Base.include Amoeba::InstanceMethods

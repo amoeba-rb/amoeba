@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'amoeba' do
   context 'dup' do
-    before :each do
+    before do
       require ::File.dirname(__FILE__) + '/../support/data.rb'
     end
 
@@ -73,12 +73,17 @@ describe 'amoeba' do
       expect(new_post.supercats.map(&:ramblings)).to include('Copy of zomg')
       expect(new_post.supercats.map(&:other_ramblings).uniq.length).to eq(1)
       expect(new_post.supercats.map(&:other_ramblings).uniq).to include('La la la')
-      expect(new_post.contents).to eq("Here's a copy: #{old_post.contents.gsub(/dog/, 'cat')} (copied version)")
+      expect(new_post.contents).to eq("Here's a copy: #{old_post.contents.gsub(/dog/,
+                                                                               'cat')} (copied version)")
       expect(new_post.comments.length).to eq(5)
-      expect(new_post.comments.select { |c| c.nerf == 'ratatat' && c.contents.nil? }.length).to eq(1)
+      expect(new_post.comments.select do |c|
+               c.nerf == 'ratatat' && c.contents.nil?
+             end.length).to eq(1)
       expect(new_post.comments.select { |c| c.nerf == 'ratatat' }.length).to eq(2)
       expect(new_post.comments.select { |c| c.nerf == 'bonk' }.length).to eq(1)
-      expect(new_post.comments.select { |c| c.nerf == 'bonkers' && c.contents.nil? }.length).to eq(1)
+      expect(new_post.comments.select do |c|
+               c.nerf == 'bonkers' && c.contents.nil?
+             end.length).to eq(1)
 
       new_post.widgets.map(&:id).each do |id|
         expect(old_post.widgets.map(&:id)).not_to include(id)
@@ -96,7 +101,9 @@ describe 'amoeba' do
       expect(new_author.errors.messages).to be_empty
       expect(new_author.posts.first.custom_things.length).to eq(3)
       expect(new_author.posts.first.custom_things.select { |ct| ct.value == [] }.length).to eq(1)
-      expect(new_author.posts.first.custom_things.select { |ct| ct.value == [1, 2] }.length).to eq(1)
+      expect(new_author.posts.first.custom_things.select do |ct|
+               ct.value == [1, 2]
+             end.length).to eq(1)
       expect(new_author.posts.first.custom_things.select { |ct| ct.value == [78] }.length).to eq(1)
       # }}}
       # Products {{{
@@ -177,87 +184,89 @@ describe 'amoeba' do
   end
 
   context 'Using a if condition' do
+    subject { post.amoeba_dup.save! }
+
     before(:all) do
       require ::File.dirname(__FILE__) + '/../support/data.rb'
     end
+
     before { ::Post.fresh_amoeba }
 
-    subject { post.amoeba_dup.save! }
     let(:post) { Post.first }
 
     it 'includes an association with truthy condition' do
       ::Post.amoeba do
         include_association :comments, if: :truthy?
       end
-      expect { subject }.to change { Comment.count }.by(3)
+      expect { subject }.to change(Comment, :count).by(3)
     end
 
     it 'does not include an association with a falsey condition' do
       ::Post.amoeba do
         include_association :comments, if: :falsey?
       end
-      expect { subject }.not_to change { Comment.count }
+      expect { subject }.not_to change(Comment, :count)
     end
 
     it 'excludes an association with a truthy condition' do
       ::Post.amoeba do
         exclude_association :comments, if: :truthy?
       end
-      expect { subject }.not_to change { Comment.count }
+      expect { subject }.not_to change(Comment, :count)
     end
 
     it 'does not exclude an association with a falsey condition' do
       ::Post.amoeba do
         exclude_association :comments, if: :falsey?
       end
-      expect { subject }.to change { Comment.count }.by(3)
+      expect { subject }.to change(Comment, :count).by(3)
     end
 
     it 'includes associations from a given array with a truthy condition' do
       ::Post.amoeba do
         include_association [:comments], if: :truthy?
       end
-      expect { subject }.to change { Comment.count }.by(3)
+      expect { subject }.to change(Comment, :count).by(3)
     end
 
     it 'does not include associations from a given array with a falsey condition' do
       ::Post.amoeba do
         include_association [:comments], if: :falsey?
       end
-      expect { subject }.not_to change { Comment.count }
+      expect { subject }.not_to change(Comment, :count)
     end
 
     it 'does exclude associations from a given array with a truthy condition' do
       ::Post.amoeba do
         exclude_association [:comments], if: :truthy?
       end
-      expect { subject }.not_to change { Comment.count }
+      expect { subject }.not_to change(Comment, :count)
     end
 
     it 'does not exclude associations from a given array with a falsey condition' do
       ::Post.amoeba do
         exclude_association [:comments], if: :falsey?
       end
-      expect { subject }.to change { Comment.count }.by(3)
+      expect { subject }.to change(Comment, :count).by(3)
     end
   end
 
   context 'override' do
-    before :each do
+    before do
       ::Image.fresh_amoeba
       ::Image.amoeba do
         override ->(old, new) { new.product_id = 13 if old.filename == 'test.jpg' }
       end
     end
 
-    it 'should override fields' do
+    it 'overrides fields' do
       image = ::Image.create(filename: 'test.jpg', product_id: 12)
       image_dup = image.amoeba_dup
       expect(image_dup.save).to be_truthy
       expect(image_dup.product_id).to eq(13)
     end
 
-    it 'should not override fields' do
+    it 'does not override fields' do
       image = ::Image.create(filename: 'test2.jpg', product_id: 12)
       image_dup = image.amoeba_dup
       expect(image_dup.save).to be_truthy
@@ -266,7 +275,7 @@ describe 'amoeba' do
   end
 
   context 'nullify' do
-    before :each do
+    before do
       ::Image.fresh_amoeba
       ::Image.amoeba do
         nullify :product_id
@@ -276,14 +285,14 @@ describe 'amoeba' do
     let(:image) { ::Image.create(filename: 'test.jpg', product_id: 12) }
     let(:image_dup) { image.amoeba_dup }
 
-    it 'should nullify fields' do
+    it 'nullifies fields' do
       expect(image_dup.save).to be_truthy
       expect(image_dup.product_id).to be_nil
     end
   end
 
   context 'strict propagate' do
-    it 'should call #reset_amoeba' do
+    it 'calls #reset_amoeba' do
       expect(::SuperBlackBox).to receive(:reset_amoeba).and_call_original
       box = ::SuperBlackBox.create(title: 'Super Black Box', price: 9.99, length: 1, metal: '1')
       new_box = box.amoeba_dup
@@ -312,13 +321,16 @@ describe 'amoeba' do
 
   context 'preprocessing fields' do
     subject { super_admin.amoeba_dup }
-    let(:super_admin) { ::SuperAdmin.create!(email: 'user@example.com', active: true, password: 'password') }
 
-    it 'should accept "set" to set false to attribute' do
+    let(:super_admin) do
+      ::SuperAdmin.create!(email: 'user@example.com', active: true, password: 'password')
+    end
+
+    it 'accepts "set" to set false to attribute' do
       expect(subject.active).to be false
     end
 
-    it 'should skip "prepend" if it equal to false' do
+    it 'skips "prepend" if it equal to false' do
       expect(subject.password).to eq('password')
     end
   end
@@ -336,6 +348,8 @@ describe 'amoeba' do
   end
 
   context 'inheritance extended' do
+    subject { stage.amoeba_dup }
+
     let(:stage) do
       stage = CustomStage.new(title: 'My Stage', external_id: 213)
       stage.listeners.build(name: 'John')
@@ -346,19 +360,19 @@ describe 'amoeba' do
       stage
     end
 
-    subject { stage.amoeba_dup }
-
     it 'contains parent association and own associations', :aggregate_failures do
       subject
-      expect { subject.save! }.to change(Listener, :count).by(2).
-                                  and change(Specialist, :count).by(1).
-                                  and change(CustomRule, :count).by(1)
+      expect { subject.save! }.to change(Listener, :count).by(2)
+                                                          .and change(Specialist, :count).by(1)
+                                                                                         .and change(
+                                                                                           CustomRule, :count
+                                                                                         ).by(1)
 
       expect(subject.title).to eq 'My Stage'
       expect(subject.external_id).to be_nil
-      expect(subject.listeners.find_by(name: 'John')).to_not be_nil
-      expect(subject.listeners.find_by(name: 'Helen')).to_not be_nil
-      expect(subject.specialists.find_by(name: 'Jack')).to_not be_nil
+      expect(subject.listeners.find_by(name: 'John')).not_to be_nil
+      expect(subject.listeners.find_by(name: 'Helen')).not_to be_nil
+      expect(subject.specialists.find_by(name: 'Jack')).not_to be_nil
       expect(subject.custom_rules.first.description).to eq 'Kill all humans'
     end
   end

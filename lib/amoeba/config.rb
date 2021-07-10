@@ -1,25 +1,27 @@
+# frozen_string_literal: true
+
 module Amoeba
   class Config
     DEFAULTS = {
-      enabled:        false,
-      inherit:        false,
-      do_preproc:     false,
-      parenting:      false,
-      raised:         false,
-      dup_method:     :dup,
-      remap_method:   nil,
-      includes:       {},
-      excludes:       {},
-      clones:         [],
+      enabled: false,
+      inherit: false,
+      do_preproc: false,
+      parenting: false,
+      raised: false,
+      dup_method: :dup,
+      remap_method: nil,
+      includes: {},
+      excludes: {},
+      clones: [],
       customizations: [],
-      overrides:      [],
-      null_fields:    [],
-      coercions:      {},
-      prefixes:       {},
-      suffixes:       {},
-      regexes:        {},
-      known_macros:   [:has_one, :has_many, :has_and_belongs_to_many]
-    }
+      overrides: [],
+      null_fields: [],
+      coercions: {},
+      prefixes: {},
+      suffixes: {},
+      regexes: {},
+      known_macros: %i[has_one has_many has_and_belongs_to_many]
+    }.freeze
 
     # ActiveRecord 3.x have different implementation of deep_dup
     if ::ActiveRecord::VERSION::MAJOR == 3
@@ -53,7 +55,7 @@ module Amoeba
       @config = self.class::DEFAULTS.deep_dup
     end
 
-    alias_method :upbringing, :raised
+    alias upbringing raised
 
     def enable
       @config[:enabled] = true
@@ -110,7 +112,7 @@ module Amoeba
     def include_association(value = nil, options = {})
       enable
       @config[:excludes] = {}
-      value = value.is_a?(Array) ? Hash[value.map! { |v| [v, options] }] : { value => options }
+      value = value.is_a?(Array) ? value.map! { |v| [v, options] }.to_h : { value => options }
       push_value_to_hash(value, :includes)
     end
 
@@ -121,7 +123,7 @@ module Amoeba
     def exclude_association(value = nil, options = {})
       enable
       @config[:includes] = {}
-      value = value.is_a?(Array) ? Hash[value.map! { |v| [v, options] }] : { value => options }
+      value = value.is_a?(Array) ? value.map! { |v| [v, options] }.to_h : { value => options }
       push_value_to_hash(value, :excludes)
     end
 
