@@ -34,41 +34,41 @@ class Post < ActiveRecord::Base
 
   amoeba do
     enable
-    clone [:widgets, :notes]
+    clone %i[widgets notes]
     prepend title: 'Copy of '
     append contents: ' (copied version)'
     regex contents: { replace: /dog/, with: 'cat' }
     customize([
-      lambda do |orig_obj, copy_of_obj|
-        orig_obj.comments.each do |oc|
-          if oc.nerf == 'ratatat'
-            hash = oc.attributes
-            hash[:id]       = nil
-            hash[:post_id]  = nil
-            hash[:contents] = nil
+                lambda do |orig_obj, copy_of_obj|
+                  orig_obj.comments.each do |oc|
+                    next unless oc.nerf == 'ratatat'
 
-            cc = Comment.new(hash)
+                    hash = oc.attributes
+                    hash[:id]       = nil
+                    hash[:post_id]  = nil
+                    hash[:contents] = nil
 
-            copy_of_obj.comments << cc
-          end
-        end
-      end,
-      lambda do |orig_obj, copy_of_obj|
-        orig_obj.comments.each do |oc|
-          if oc.nerf == 'bonk'
-            hash = oc.attributes
-            hash[:id]       = nil
-            hash[:post_id]  = nil
-            hash[:contents] = nil
-            hash[:nerf]     = 'bonkers'
+                    cc = Comment.new(hash)
 
-            cc = Comment.new(hash)
+                    copy_of_obj.comments << cc
+                  end
+                end,
+                lambda do |orig_obj, copy_of_obj|
+                  orig_obj.comments.each do |oc|
+                    next unless oc.nerf == 'bonk'
 
-            copy_of_obj.comments << cc
-          end
-        end
-      end
-    ])
+                    hash = oc.attributes
+                    hash[:id]       = nil
+                    hash[:post_id]  = nil
+                    hash[:contents] = nil
+                    hash[:nerf]     = 'bonkers'
+
+                    cc = Comment.new(hash)
+
+                    copy_of_obj.comments << cc
+                  end
+                end
+              ])
   end
 
   def truthy?
@@ -97,11 +97,13 @@ class CustomThing < ActiveRecord::Base
     def self.load(str)
       return [] unless str.present?
       return str if str.is_a?(Array)
+
       str.split(',').map(&:to_i)
     end
 
     def self.dump(int_array)
       return '' unless int_array.present?
+
       int_array.join(',')
     end
   end
@@ -261,7 +263,7 @@ class Photo < ActiveRecord::Base
   belongs_to :imageable, polymorphic: true
 
   amoeba do
-    customize(lambda { |original_photo,new_photo|
+    customize(lambda { |original_photo, new_photo|
       new_photo.name = original_photo.name.to_s + ' Copy'
     })
   end
@@ -273,7 +275,7 @@ class Company < ActiveRecord::Base
 
   amoeba do
     include_associations :employees,
-                        :customers
+                         :customers
   end
 end
 
@@ -283,9 +285,8 @@ class Employee < ActiveRecord::Base
   belongs_to :company
 
   amoeba do
-    include_associations [:addresses, :photos]
+    include_associations %i[addresses photos]
   end
-
 end
 
 class Customer < ActiveRecord::Base
@@ -313,7 +314,7 @@ class ObjectPrototype < MetalObject
   end
 
   def become_real
-    self.dup.becomes RealObject
+    dup.becomes RealObject
   end
 
   def remap_subobjects(relation_name)
@@ -332,7 +333,7 @@ class SubobjectPrototype < MetalObject
   end
 
   def become_subobject
-    self.dup.becomes Subobject
+    dup.becomes Subobject
   end
 end
 
@@ -360,7 +361,7 @@ class Box < ActiveRecord::Base
 end
 
 class BoxProduct < ActiveRecord::Base
-  belongs_to      :box, class_name: 'Box'
+  belongs_to :box, class_name: 'Box'
 
   amoeba do
     enable

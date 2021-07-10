@@ -28,6 +28,8 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   s.add_development_dependency 'rspec', '>= 3.0.0'
   s.add_development_dependency 'rubocop', '~> 1.16'
+  s.add_development_dependency 'rubocop-rake', '~> 0.6'
+  s.add_development_dependency 'rubocop-rspec', '~> 2.4'
 
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'activerecord-jdbc-adapter', '~> 61.0'

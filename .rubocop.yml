@@ -1,18 +1,21 @@
+require:
+  - rubocop-rspec
+  - rubocop-rake
+
 inherit_from: .rubocop_todo.yml
 
 AllCops:
-  Exclude:
-    - 'spec/**/*'
   TargetRubyVersion: 2.5
-Metrics/LineLength:
+  NewCops: enable
+Layout/LineLength:
   Max: 99
-Style/FileName:
+Naming/FileName:
   Enabled: false
 Style/ModuleFunction:
   Enabled: false
 Style/Encoding:
   Enabled: false
-Documentation:
+Style/Documentation:
   Enabled: false
 Metrics/MethodLength:
   Max: 15

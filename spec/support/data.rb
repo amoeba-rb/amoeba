@@ -1,4 +1,3 @@
-
 u1 = User.create(name: 'Robert Johnson', email: 'bob@crossroads.com')
 u2 = User.create(name: 'Miles Davis', email: 'miles@kindofblue.com')
 
@@ -8,7 +7,8 @@ a2 = Author.create(full_name: 'Arthur Sees Clarck', nickname: 'strangewater')
 t = Topic.create(title: 'Ponies', description: 'Lets talk about my ponies.')
 
 # First Post {{{
-p1 = t.posts.create(owner: u1, author: a1, title: 'My little pony', contents: 'Lorum ipsum dolor rainbow bright. I like dogs, dogs are awesome.')
+p1 = t.posts.create(owner: u1, author: a1, title: 'My little pony',
+                    contents: 'Lorum ipsum dolor rainbow bright. I like dogs, dogs are awesome.')
 f1 = p1.create_post_config(is_visible: true, is_open: false, password: 'abcdefg123')
 a1 = p1.create_account(title: 'Foo')
 h1 = p1.account.create_history(some_stuff: 'Bar')
@@ -21,11 +21,15 @@ c2 = p1.comments.create(contents: 'I hate it!', nerf: 'whapaow')
 c3 = p1.comments.create(contents: 'kthxbbq!!11!!!1!eleven!!', nerf: 'bonk')
 [0, 0, 1, 2, 1, 0].each { |stars| c3.ratings.create(num_stars: stars) }
 
-%w(funny wtf cats).each { |value| p1.tags << Tag.create(value: value) }
+%w[funny wtf cats].each { |value| p1.tags << Tag.create(value: value) }
 
-['My Sidebar', 'Photo Gallery', 'Share & Like'].each { |value| p1.widgets << Widget.create(value: value) }
+['My Sidebar', 'Photo Gallery', 'Share & Like'].each do |value|
+  p1.widgets << Widget.create(value: value)
+end
 
-['This is important', "You've been warned", "Don't forget"].each { |value| p1.notes << Note.create(value: value) }
+['This is important', "You've been warned", "Don't forget"].each do |value|
+  p1.notes << Note.create(value: value)
+end
 
 p1.save
 
@@ -85,15 +89,18 @@ necklace1.sections << jewelry
 necklace1.sections << accessories
 necklace1.save
 
-
-company = Company.create(name:'ABC Industries')
-employee = company.employees.create(name:'Joe',ssn:'1111111111',salary:10000.0)
-employee_address = employee.addresses.create(street: '123 My Street',unit:'103',city:'Hollywood',state:'CA',zip:'90210')
-employee_address_2 = employee.addresses.create(street: '124 My Street',unit:'103',city:'Follywood',state:'CA',zip:'90210')
-employee_photo = employee.photos.create(name: 'Portrait', size: 12345)
-customer = company.customers.create(email:'my@email.address',password:'password')
-customer_address = customer.addresses.create(street: '321 My Street',unit:'301',city:'Bollywood',state:'IN',zip:'11111')
-customer_address_2 = customer.addresses.create(street: '321 My Drive',unit:'311',city:'Mollywood',state:'IN',zip:'21111')
-customer_photo = customer.photos.create(name: 'Mug Shot', size: 54321)
+company = Company.create(name: 'ABC Industries')
+employee = company.employees.create(name: 'Joe', ssn: '1111111111', salary: 10_000.0)
+employee_address = employee.addresses.create(street: '123 My Street', unit: '103', city: 'Hollywood',
+                                             state: 'CA', zip: '90210')
+employee_address_2 = employee.addresses.create(street: '124 My Street', unit: '103', city: 'Follywood',
+                                               state: 'CA', zip: '90210')
+employee_photo = employee.photos.create(name: 'Portrait', size: 12_345)
+customer = company.customers.create(email: 'my@email.address', password: 'password')
+customer_address = customer.addresses.create(street: '321 My Street', unit: '301', city: 'Bollywood',
+                                             state: 'IN', zip: '11111')
+customer_address_2 = customer.addresses.create(street: '321 My Drive', unit: '311', city: 'Mollywood',
+                                               state: 'IN', zip: '21111')
+customer_photo = customer.photos.create(name: 'Mug Shot', size: 54_321)
 
 # }}}
