@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 
 module Amoeba
@@ -114,7 +116,7 @@ module Amoeba
       return unless amoeba.known_macros.include?(association.macro.to_sym)
 
       follow_klass = ::Amoeba::Macros.list[association.macro.to_sym]
-      follow_klass.new(self).follow(relation_name, association) if follow_klass
+      follow_klass&.new(self)&.follow(relation_name, association)
     end
 
     def process_overrides

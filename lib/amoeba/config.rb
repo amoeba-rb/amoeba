@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Amoeba
   class Config
     DEFAULTS = {
@@ -19,7 +21,7 @@ module Amoeba
       suffixes: {},
       regexes: {},
       known_macros: %i[has_one has_many has_and_belongs_to_many]
-    }
+    }.freeze
 
     # ActiveRecord 3.x have different implementation of deep_dup
     if ::ActiveRecord::VERSION::MAJOR == 3

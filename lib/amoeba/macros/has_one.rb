@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Amoeba
   module Macros
     class HasOne < ::Amoeba::Macros::Base
