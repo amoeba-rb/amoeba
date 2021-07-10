@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Vaughn Draughon', 'Oleksandr Simonov']
   s.email       = 'alex@simonov.me'
   s.homepage    = 'http://github.com/amoeba-rb/amoeba'
-  s.license     = 'BSD'
+  s.license     = 'BSD-2-Clause'
   s.summary     = 'Easy copying of rails models and their child associations.'
   s.required_ruby_version = '>= 2.5'
 
