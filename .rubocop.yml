@@ -1,6 +1,9 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
   Exclude:
     - 'spec/**/*'
+  TargetRubyVersion: 2.5
 Metrics/LineLength:
   Max: 99
 Style/FileName:
