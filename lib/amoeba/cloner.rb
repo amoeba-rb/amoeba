@@ -29,7 +29,7 @@ module Amoeba
     private
 
     def parenting_style
-      amoeba.upbringing ? amoeba.upbringing : _parent_amoeba.parenting
+      amoeba.upbringing || _parent_amoeba.parenting
     end
 
     def inherit_strict_parent_settings
@@ -47,8 +47,9 @@ module Amoeba
     end
 
     def inherit_parent_settings
-      return if !_parent_amoeba.inherit
-      return unless %w(strict relaxed submissive).include?(parenting_style.to_s)
+      return unless _parent_amoeba.inherit
+      return unless %w[strict relaxed submissive].include?(parenting_style.to_s)
+
       __send__("inherit_#{parenting_style}_parent_settings".to_sym)
     end
 
@@ -67,12 +68,14 @@ module Amoeba
       # and old children on the copy
       return unless association.macro == :has_many ||
                     association.is_a?(::ActiveRecord::Reflection::ThroughReflection)
+
       amoeba.exclude_association(association.options[:through])
     end
 
     def follow_only_includes
       amoeba.includes.each do |include, options|
         next if options[:if] && !@old_object.send(options[:if])
+
         follow_association(include, @object_klass.reflect_on_association(include))
       end
     end
@@ -81,6 +84,7 @@ module Amoeba
       @object_klass.reflections.each do |name, association|
         exclude = amoeba.excludes[name.to_sym]
         next if exclude && (exclude.blank? || @old_object.send(exclude[:if]))
+
         follow_association(name, association)
       end
     end
@@ -108,6 +112,7 @@ module Amoeba
 
     def follow_association(relation_name, association)
       return unless amoeba.known_macros.include?(association.macro.to_sym)
+
       follow_klass = ::Amoeba::Macros.list[association.macro.to_sym]
       follow_klass.new(self).follow(relation_name, association) if follow_klass
     end

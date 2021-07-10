@@ -8,6 +8,6 @@ group :development, :test do
 end
 
 group :local_development do
-  gem 'pry'
   gem 'appraisal'
+  gem 'pry'
 end

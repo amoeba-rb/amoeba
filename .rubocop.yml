@@ -1,6 +1,4 @@
 AllCops:
-  Include:
-    - '**/Rakefile'
   Exclude:
     - 'spec/**/*'
 Metrics/LineLength:

@@ -1,24 +1,24 @@
 module Amoeba
   class Config
     DEFAULTS = {
-      enabled:        false,
-      inherit:        false,
-      do_preproc:     false,
-      parenting:      false,
-      raised:         false,
-      dup_method:     :dup,
-      remap_method:   nil,
-      includes:       {},
-      excludes:       {},
-      clones:         [],
+      enabled: false,
+      inherit: false,
+      do_preproc: false,
+      parenting: false,
+      raised: false,
+      dup_method: :dup,
+      remap_method: nil,
+      includes: {},
+      excludes: {},
+      clones: [],
       customizations: [],
-      overrides:      [],
-      null_fields:    [],
-      coercions:      {},
-      prefixes:       {},
-      suffixes:       {},
-      regexes:        {},
-      known_macros:   [:has_one, :has_many, :has_and_belongs_to_many]
+      overrides: [],
+      null_fields: [],
+      coercions: {},
+      prefixes: {},
+      suffixes: {},
+      regexes: {},
+      known_macros: %i[has_one has_many has_and_belongs_to_many]
     }
 
     # ActiveRecord 3.x have different implementation of deep_dup
@@ -53,7 +53,7 @@ module Amoeba
       @config = self.class::DEFAULTS.deep_dup
     end
 
-    alias_method :upbringing, :raised
+    alias upbringing raised
 
     def enable
       @config[:enabled] = true

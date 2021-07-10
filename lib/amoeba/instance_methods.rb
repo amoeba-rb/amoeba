@@ -10,6 +10,7 @@ module Amoeba
 
     def _first_superclass_with_amoeba
       return @_first_superclass_with_amoeba unless @_first_superclass_with_amoeba.nil?
+
       klass = self.class
       while klass.superclass < ::ActiveRecord::Base
         klass = klass.superclass
