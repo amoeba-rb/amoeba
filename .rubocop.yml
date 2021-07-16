@@ -7,15 +7,9 @@ inherit_from: .rubocop_todo.yml
 AllCops:
   TargetRubyVersion: 2.5
   NewCops: enable
-Layout/LineLength:
-  Max: 99
-Naming/FileName:
-  Enabled: false
 Style/ModuleFunction:
   Enabled: false
 Style/Encoding:
   Enabled: false
 Style/Documentation:
   Enabled: false
-Metrics/MethodLength:
-  Max: 15
