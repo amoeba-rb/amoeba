@@ -23,24 +23,6 @@ module Amoeba
       known_macros: %i[has_one has_many has_and_belongs_to_many]
     }.freeze
 
-    # ActiveRecord 3.x have different implementation of deep_dup
-    if ::ActiveRecord::VERSION::MAJOR == 3
-      DEFAULTS.instance_eval do
-        def deep_dup
-          each_with_object(dup) do |(key, value), hash|
-            hash[key.deep_dup] = value.deep_dup
-          end
-        end
-      end
-      Object.class_eval do
-        def deep_dup
-          duplicable? ? dup : self
-        end
-      end
-    end
-
-    DEFAULTS.freeze
-
     DEFAULTS.each do |key, value|
       value.freeze if value.is_a?(Array) || value.is_a?(Hash)
       class_eval <<-EOS, __FILE__, __LINE__ + 1
