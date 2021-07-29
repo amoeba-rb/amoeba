@@ -30,6 +30,10 @@ adapter = if defined?(JRuby)
 ActiveRecord::Base.establish_connection(adapter: adapter, database: ':memory:')
 
 ::RSpec.configure do |config|
+  config.before do
+    ActiveSupport::Dependencies::Reference.clear! if ActiveSupport::VERSION::MAJOR < 7
+  end
+
   config.order = :default
 end
 
