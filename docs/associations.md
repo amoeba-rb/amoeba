@@ -9,20 +9,20 @@ original instance or duplicated as new instances.
 |---|---|---|---|
 | not enabled            | Yes (association is nil)        | Yes (associations are empty)      | Yes (associations are empty)      |
 | enabled                | Yes (association is duplicated) | Yes (associations are duplicated) | Yes (associations are copied)     |
-| blank assocation       | Yes (assocation is nil)         | Yes (associations are empty)      | No                                |
-| nullify                | Yes (pending, see below)        | Yes (pending, see below)          | No                                |
-| preprocessing          | Yes                             | Yes                               | No                                |
+| blank assocation       | Yes (assocation is nil)         | Yes (associations are empty)      | Yes (associations are empty)      |
+| nullify                | Yes (pending, see below)        | Yes (pending, see below)          | Yes (pending, see below)          |
+| preprocessing          | Yes                             | Yes                               | Yes                               |
 | not recognized         | Yes (association is nil)        | Yes                               | Yes (associations are empty)      |
 | with `clone`           | N/A                             | N/A                               | Yes (associations are duplicated) |
 | STI                    | | | |
-| propagate              | Yes                             | Yes                               | No                                |
-| no propagate           | Yes                             | Yes                               | No                                |
-| set on STI table       | Yes                             | Yes                               | No                                |
+| propagate              | Yes                             | Yes                               | Yes                               |
+| no propagate           | Yes                             | Yes                               | Yes                               |
+| set on STI table       | Yes                             | Yes                               | Yes                               |
 | `through`              | | | |
-| enabled on join table  | Yes (association is duplicated) | Yes (associations are copied)     | No                                |
-| not enabled on join    | Yes (association is nil)        | Yes (associations are blank)      | No                                |
-| not recognized on join | Yes (association is nil)        | Yes (associations are blank)      | No                                |
-| with `clone`           | N/A                             | Yes (associations are duplicated) | No                                |
+| enabled on join table  | Yes (association is duplicated) | Yes (associations are copied)     | N/A                               |
+| not enabled on join    | Yes (association is nil)        | Yes (associations are blank)      | N/A                               |
+| not recognized on join | Yes (association is nil)        | Yes (associations are blank)      | N/A                               |
+| with `clone`           | N/A                             | Yes (associations are duplicated) | N/A                               |
 
 ### Pending tests
 
@@ -34,3 +34,4 @@ assume the following behaviour:
 |---|---|---|
 | `has_one` association with `nullify` | Associated record of duplicate will be nil | `ActiveModel::MissingAttributeError` exception |
 | `has_many` association with `nullify` | Associated records of duplicate will be empty | `ActiveModel::MissingAttributeError` exception |
+| `has_and_belongs_to_many` association with `nullify` | Associated records of duplicate will be empty | `ActiveModel::MissingAttributeError` exception |
