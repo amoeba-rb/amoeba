@@ -53,6 +53,54 @@ RSpec.describe Amoeba::Config, '#has_many' do
       it { expect(duplicate.children.length).to eq 3 }
     end
 
+    context 'without amoeba enabled' do
+      let(:original) { Parent.create(children: [Child.new(name: 'Test name')]) }
+      let(:tables) do
+        super().tap { |t| t[:parents][:model_config] = 'has_many :children, inverse_of: :parent' }
+      end
+
+      it { expect(duplicate.children).to be_empty }
+    end
+
+    context 'without attached records' do
+      let(:original) { Parent.create }
+
+      it { is_expected.to be_valid }
+      it { expect(duplicate.children).to be_empty }
+
+      it do
+        duplicate
+        expect { duplicate.save }.not_to change(Child, :count)
+      end
+    end
+
+    context 'with nullify preprocessing' do
+      let(:original) { Parent.create(children: [Child.new(name: 'Test name')]) }
+      let(:tables) do
+        super().tap do |t|
+          t[:parents][:model_config] = <<~CONFIG
+            has_many :children, inverse_of: :parent
+
+            amoeba do
+              enable
+              nullify :children
+            end
+          CONFIG
+        end
+      end
+
+      before do
+        pending 'TODO: Decide if this is the desired behaviour'
+        # It seems sensible that nullify should work on a has_many association
+        # but at the moment it results in an ActiveModel::MissingAttributeError
+        # exception.
+      end
+
+      it { is_expected.to be_valid }
+
+      it { expect(duplicate.children).to be_empty }
+    end
+
     context 'with preprocessing on the attached record' do
       let(:original) { Parent.create(children: [Child.new(name: 'Test name')]) }
       let(:tables) do
@@ -128,6 +176,100 @@ RSpec.describe Amoeba::Config, '#has_many' do
         duplicate.save
         expect(duplicate.children).to be_empty
       end
+    end
+  end
+
+  context 'with single table inheritance' do
+    let(:original) { SuperParent.create(children: [Child.new, Child.new, Child.new]) }
+
+    let(:tables) do
+      {
+        parents: {
+          database: proc { |t| t.string :type },
+          model: 'Parent',
+          parent_model: 'ActiveRecord::Base',
+          model_config: <<~CONFIG
+            has_many :children
+            amoeba { enable }
+          CONFIG
+        },
+        children: {
+          database: proc do |t|
+            t.string :name
+            t.references :parent
+          end,
+          model: 'Child',
+          parent_model: 'ActiveRecord::Base',
+          model_config: 'belongs_to :parent'
+        },
+        super_parents: {
+          model: 'SuperParent',
+          parent_model: 'Parent',
+          model_config: ''
+        }
+      }
+    end
+
+    context 'with propagate' do
+      let(:tables) do
+        super().tap do |t|
+          t[:parents][:model_config] = <<~CONFIG
+            has_many :children, inverse_of: :parent
+
+            amoeba {
+              enable
+              propagate
+            }
+          CONFIG
+        end
+      end
+
+      it do
+        duplicate
+        expect { duplicate.save }.to change(Child, :count).by 3
+      end
+
+      it { expect(duplicate.children.length).to eq 3 }
+    end
+
+    context 'without propagate' do
+      let(:tables) do
+        super().tap do |t|
+          t[:parents][:model_config] = <<~CONFIG
+            has_many :children, inverse_of: :parent
+
+            amoeba { enable }
+          CONFIG
+        end
+      end
+
+      it do
+        duplicate
+        expect { duplicate.save }.not_to change(Child, :count)
+      end
+
+      it { expect(duplicate.children).to be_empty }
+    end
+
+    context 'with child associated to inherited table' do
+      let(:tables) do
+        super().tap do |t|
+          t[:parents][:model_config] = <<~CONFIG
+            amoeba {
+              enable
+              propagate
+            }
+          CONFIG
+          t[:super_parents][:model_config] = 'has_many :children, foreign_key: :parent_id'
+        end
+      end
+
+      it do
+        duplicate
+        expect { duplicate.save }.to change(Child, :count).by 3
+      end
+
+      it { expect(duplicate.children.length).to eq 3 }
     end
   end
 

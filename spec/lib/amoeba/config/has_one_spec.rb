@@ -57,7 +57,6 @@ RSpec.describe Amoeba::Config, '#has_one' do
 
     context 'without amoeba enabled' do
       let(:original) { Parent.create(child: Child.new(name: 'Fred')) }
-      let(:parent_config) { 'has_one :child' }
       let(:tables) { super().tap { |t| t[:parents][:model_config] = 'has_one :child' } }
 
       it { expect(duplicate.child).to be_nil }
