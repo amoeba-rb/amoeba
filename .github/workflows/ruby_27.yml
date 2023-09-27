@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gemfile: [  activerecord_5.2, activerecord_6.0, activerecord_6.1, activerecord_head ]
+        gemfile: [ activerecord_5.2, activerecord_6.0, activerecord_6.1, activerecord_7.0, activerecord_head ]
     env:
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
