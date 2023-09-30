@@ -16,5 +16,7 @@ require 'amoeba/instance_methods'
 module Amoeba
 end
 
-ActiveRecord::Base.extend Amoeba::ClassMethods
-ActiveRecord::Base.include Amoeba::InstanceMethods
+ActiveSupport.on_load :active_record do
+  extend Amoeba::ClassMethods
+  include Amoeba::InstanceMethods
+end
