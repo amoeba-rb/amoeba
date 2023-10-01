@@ -1,3 +1,8 @@
+### Unreleased
+
+* Drop support for Rails 5.2.
+* Drop support for Ruby 2.5 and 2.6.
+
 ### 3.3.0
 
 * Move test pipelines from Travis to Github Actions.
