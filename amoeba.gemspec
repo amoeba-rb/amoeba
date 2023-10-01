@@ -35,8 +35,8 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'activerecord-jdbc-adapter', '~> 70.0'
     s.add_development_dependency 'activerecord-jdbcsqlite3-adapter', '~> 70.0'
   else
-    s.add_development_dependency 'sqlite3', '>= 1.3'
+    s.add_development_dependency 'sqlite3', '~> 1.6'
   end
 
-  s.add_dependency 'activerecord', '>= 5.2.0'
+  s.add_dependency 'activerecord', '>= 6.0.0'
 end

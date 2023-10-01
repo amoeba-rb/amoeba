@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-appraise 'activerecord-5.2' do
-  gem 'activerecord', '~> 5.2.0'
-  group :development, :test do
-    gem 'sqlite3', '~> 1.3.0'
-  end
-end
-
 appraise 'activerecord-6.0' do
   gem 'activerecord', '~> 6.0.0'
   group :development, :test do
