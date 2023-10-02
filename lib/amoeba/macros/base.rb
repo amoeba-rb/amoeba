@@ -7,6 +7,7 @@ module Amoeba
         @cloner     = cloner
         @old_object = cloner.old_object
         @new_object = cloner.new_object
+        @options    = cloner.options
       end
 
       def follow(_relation_name, _association)
