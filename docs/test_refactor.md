@@ -19,6 +19,14 @@ created to mimic the modules so, for example;
 * `spec/lib/amoeba/macros/has_many_spec.rb` to test the
   `Amoeba::Macros::HasMany` module.
 
+The `amoeba_dup` method, which is how users will normally interact with Amoeba,
+is in the `Amoeba::InstanceMethods` module so this is where these tests are to
+be found. As there will be many such tests for various configuration options
+they are broken up into separate files with names based on `instance_methods`
+and with a double underscore preceeding the test grouping. So, for example,
+tests of the indiscriminate, inclusive and exclusive styles are in
+`spec/lib/amoeba/instance_methods__style_spec.rb`.
+
 ## Test setup
 
 Most tests require a test Active Record model linked to a database table. In
@@ -78,3 +86,6 @@ Preprocessing operations on fields that still need to be tested;
         return <new value based on original and duplicate>
       end)
     ```
+
+Tests for various styles (indiscriminate, inclusive and exclusive) are found in
+`spec/lib/amoeba/instance_methods__style_spec.rb`.
