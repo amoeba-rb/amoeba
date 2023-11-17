@@ -2,39 +2,23 @@
 
 appraise 'activerecord-6.0' do
   gem 'activerecord', '~> 6.0.0'
-  group :development, :test do
-    gem 'sqlite3', '~> 1.6.0'
-  end
 end
 
 appraise 'activerecord-6.1' do
   gem 'activerecord', '~> 6.1.0'
-  group :development, :test do
-    gem 'sqlite3', '~> 1.6.0'
-  end
 end
 
 appraise 'activerecord-7.0' do
   gem 'activerecord', '~> 7.0.0'
-  group :development, :test do
-    gem 'sqlite3', '~> 1.6.0'
-  end
 end
 
 appraise 'jruby-activerecord-7.0' do
   gem 'activerecord', '~> 7.0.0'
-  group :development, :test do
-    gem 'activerecord-jdbc-adapter', '~> 70.1'
-    gem 'activerecord-jdbcsqlite3-adapter', '~> 70.1'
-  end
 end
 
 appraise 'activerecord-head' do
   git 'https://github.com/rails/rails.git', branch: 'main' do
     gem 'activerecord'
-  end
-  group :development, :test do
-    gem 'sqlite3', '~> 1.6.0'
   end
 end
 
