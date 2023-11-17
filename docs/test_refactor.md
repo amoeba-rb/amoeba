@@ -66,12 +66,12 @@ Tests exist for duplicating in the following situations;
 * No modification.
 * With a 'nullified' field; `nullify test_field`
 * With a field to set to a default value; `set test_field: 'new value'`
-
-Preprocessing operations on fields that still need to be tested;
-
 * With a field to prepend; `prepend test_field: 'prefix'`
 * With a field to append; `append test_field: 'suffix'`
 * With a field modified by a regex; `regex test_field: { replace: /old/, with: 'new' }`
+
+Preprocessing operations on fields that still need to be tested;
+
 * With a field with customized preprocessing;
   * ```
       customize(lambda do |original, duplicate|
