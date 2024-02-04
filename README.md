@@ -984,7 +984,7 @@ After cloning we will get instance of `Child` instead of `ChildPrototype`
 
 ## Remapping associations
 
-If you will need to do complex cloning with remapping associations name you can user `remapper`:
+If you will need to do complex cloning with remapping associations name you can use `remapper`:
 
 ```ruby
 class ObjectPrototype < ActiveRecord::Base
