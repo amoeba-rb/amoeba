@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 u1 = User.create(name: 'Robert Johnson', email: 'bob@crossroads.com')
 u2 = User.create(name: 'Miles Davis', email: 'miles@kindofblue.com')
 

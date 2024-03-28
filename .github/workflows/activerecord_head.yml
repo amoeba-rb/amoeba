@@ -1,4 +1,4 @@
-name: JRuby
+name: Active Record head
 
 on:
   push:
@@ -8,19 +8,19 @@ on:
 
 jobs:
   test:
+
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gemfile: [ jruby_activerecord_7.0 ]
+        ruby_version: [ 3.0, 3.1, 3.2, 3.3, head ]
     env:
-      BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
-      JRUBY_OPTS: --debug
+      BUNDLE_GEMFILE: gemfiles/activerecord_head.gemfile
     steps:
     - uses: actions/checkout@v4
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: jruby
+        ruby-version: ${{ matrix.ruby_version }}
         bundler-cache: true
     - name: Run tests
       run: bundle exec rspec
