@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Topic < ActiveRecord::Base
   has_many :posts
 end
@@ -202,7 +204,7 @@ class Product < ActiveRecord::Base
   has_many :images
   has_and_belongs_to_many :sections
 
-  SECTION_COUNT_QUERY = 'SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?'.freeze
+  SECTION_COUNT_QUERY = 'SELECT COUNT(*) AS section_count FROM products_sections WHERE product_id = ?'
 
   amoeba do
     enable
