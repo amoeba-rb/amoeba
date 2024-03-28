@@ -52,7 +52,7 @@ module Amoeba
       return unless _parent_amoeba.inherit
       return unless %w[strict relaxed submissive].include?(parenting_style.to_s)
 
-      __send__("inherit_#{parenting_style}_parent_settings".to_sym)
+      __send__(:"inherit_#{parenting_style}_parent_settings")
     end
 
     def apply_clones

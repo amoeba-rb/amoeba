@@ -26,10 +26,10 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   # specify any dependencies here; for example:
-  s.add_development_dependency 'rspec', '~> 3.12'
-  s.add_development_dependency 'rubocop', '~> 1.56'
-  s.add_development_dependency 'rubocop-rake', '~> 0.6'
-  s.add_development_dependency 'rubocop-rspec', '~> 2.24'
+  s.add_development_dependency 'rspec', '~> 3.13.0'
+  s.add_development_dependency 'rubocop', '= 1.62.1'
+  s.add_development_dependency 'rubocop-rake', '~> 0.6.0'
+  s.add_development_dependency 'rubocop-rspec', '~> 2.27.1'
 
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'activerecord-jdbc-adapter', '~> 70.0'
