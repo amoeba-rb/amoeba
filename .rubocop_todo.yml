@@ -125,24 +125,6 @@ RSpec/PredicateMatcher:
   Exclude:
     - 'spec/lib/amoeba_spec.rb'
 
-# Offense count: 11
-# This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, always_true, never
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'gemfiles/activerecord_6.0.gemfile'
-    - 'gemfiles/activerecord_6.1.gemfile'
-    - 'gemfiles/activerecord_7.0.gemfile'
-    - 'gemfiles/activerecord_head.gemfile'
-    - 'gemfiles/jruby_activerecord_7.0.gemfile'
-    - 'gemfiles/jruby_activerecord_head.gemfile'
-    - 'spec/lib/amoeba_spec.rb'
-    - 'spec/spec_helper.rb'
-    - 'spec/support/data.rb'
-    - 'spec/support/models.rb'
-    - 'spec/support/schema.rb'
-
 # Offense count: 25
 # This cop supports safe autocorrection (--autocorrect).
 Style/RedundantConstantBase:
