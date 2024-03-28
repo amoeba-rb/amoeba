@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'simplecov'
 
 SimpleCov.start do
@@ -29,9 +31,21 @@ adapter = if defined?(JRuby)
 
 ActiveRecord::Base.establish_connection(adapter: adapter, database: ':memory:')
 
-::RSpec.configure do |config|
+RSpec.configure do |config|
   config.order = :default
+
+  # Existing tests in spec/lib/amoeba_spec.rb fail when run in transaction.
+  # These lines can be uncommented to execute new tests locally.
+  # When spec/lib/amoeba_spec.rb is removed this can be added permanently.
+  #
+  # config.around do |example|
+  #   ActiveRecord::Base.transaction do
+  #     example.run
+  #   ensure
+  #     raise ActiveRecord::Rollback
+  #   end
+  # end
 end
 
-load File.dirname(__FILE__) + '/support/schema.rb'
-load File.dirname(__FILE__) + '/support/models.rb'
+load "#{File.dirname(__FILE__)}/support/schema.rb"
+load "#{File.dirname(__FILE__)}/support/models.rb"
