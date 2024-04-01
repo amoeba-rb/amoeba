@@ -6,6 +6,10 @@ Easy cloning of active_record objects including associations and several operati
 [![Gem Version](https://badge.fury.io/rb/amoeba.svg)](http://badge.fury.io/rb/amoeba)
 [![Build Status](https://travis-ci.org/amoeba-rb/amoeba.svg?branch=master)](https://travis-ci.org/amoeba-rb/amoeba)
 
+## Interested in contributing?
+
+See [here.](docs/contributing.md)
+
 ## What?
 
 The goal was to be able to easily and quickly reproduce ActiveRecord objects including their children, for example copying a blog post maintaining its associated tags or categories.
