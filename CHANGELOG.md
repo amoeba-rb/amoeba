@@ -2,6 +2,7 @@
 
 * Drop support for Rails 5.2, Ruby 2.5 and 2.6. [https://github.com/amoeba-rb/amoeba/pull/120]
 * Notes on contributing. Github Actions for automate tests. [https://github.com/amoeba-rb/amoeba/pull/124]
+* Fix tests for Active Record after 7.1. [https://github.com/amoeba-rb/amoeba/pull/127]
 
 ### 3.3.0
 
