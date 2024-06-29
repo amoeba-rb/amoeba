@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'simplecov'
 
 SimpleCov.start do
@@ -30,7 +32,7 @@ adapter = if defined?(JRuby)
 ActiveRecord::Base.establish_connection(adapter: adapter, database: ':memory:')
 
 ::RSpec.configure do |config|
-  config.order = :default
+  config.order = :defined
 end
 
 load File.dirname(__FILE__) + '/support/schema.rb'
