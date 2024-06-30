@@ -13,9 +13,9 @@ module Amoeba
 
     def_delegators :object_klass, :amoeba, :fresh_amoeba, :reset_amoeba
 
-    def initialize(object, options = {})
+    def initialize(object, **kwargs)
       @old_object = object
-      @options    = options
+      @params = kwargs
       @object_klass = @old_object.class
       inherit_parent_settings
       @new_object = object.__send__(amoeba.dup_method)
@@ -135,7 +135,12 @@ module Amoeba
     def process_coercions
       # prepend any extra strings to indicate uniqueness of the new record(s)
       amoeba.coercions.each do |field, coercion|
-        @new_object[field] = coercion.to_s
+        if coercion.is_a?(Proc)
+          keys = coercion.parameters.select { |pair| %i[key keyreq].include?(pair.first) }.map(&:second)
+          @new_object[field] = coercion.call(**@params.slice(*keys))
+        else
+          @new_object[field] = coercion.to_s
+        end
       end
     end
 
