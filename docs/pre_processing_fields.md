@@ -33,6 +33,22 @@ current time:
   end
 ```
 
+Keyword parameters passed to the `amoeba_dup` command can also be used:
+
+```ruby
+  amoeba do
+    set string_field: ->(str_arg:) { str_arg }
+    set integer_field: ->(int_arg:) { int_arg }
+    set combined_field: ->(str_arg:, int_arg: 33, other_arg: 'default') { "#{str_arg} - #{int_arg} - #{other_arg}" }
+  end
+
+new_item = item.amoeba_dup(str_arg: 'new string', int_arg: 45)
+# => new_item.string_field = 'new_string'
+# => new_item.integer_field = 99
+# => new_item.combined_field = 'new_string - 99 - default'
+```
+
+
 ## regex
 
 To do

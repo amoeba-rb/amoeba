@@ -4,8 +4,9 @@ require 'spec_helper'
 
 RSpec.describe Amoeba::ClassMethods do
   describe '#amoeba' do
-    let(:dup) { test.amoeba_dup }
-    let(:test) { TestModel.new(**params) }
+    let(:dup) { original.amoeba_dup(**dup_params) }
+    # let(:test) { TestModel.new(**params) }
+    let(:dup_params) { {} }
 
     before do
       stub_const 'TestModel', Class.new(ActiveRecord::Base)
@@ -22,7 +23,7 @@ RSpec.describe Amoeba::ClassMethods do
 
     describe 'set' do
       context 'with a static string value' do
-        let(:params) { { test_field: 'original string' } }
+        let(:original) { TestModel.new(test_field: 'original string') }
         let(:field_type) { :string }
         let(:config) do
           <<~CONFIG
@@ -36,7 +37,7 @@ RSpec.describe Amoeba::ClassMethods do
       end
 
       context 'with a static integer value' do
-        let(:params) { { test_field: 33 } }
+        let(:original) { TestModel.new(test_field: 33) }
         let(:field_type) { :integer }
         let(:config) do
           <<~CONFIG
@@ -50,7 +51,7 @@ RSpec.describe Amoeba::ClassMethods do
       end
 
       context 'with a static boolean value' do
-        let(:params) { { test_field: true } }
+        let(:original) { TestModel.new(test_field: true) }
         let(:field_type) { :boolean }
         let(:config) do
           <<~CONFIG
@@ -64,7 +65,7 @@ RSpec.describe Amoeba::ClassMethods do
       end
 
       context 'with a datetime field set by a lambda' do
-        let(:params) { { test_field: DateTime.parse('30 Jun 2024 18:19') } }
+        let(:original) { TestModel.new(test_field: DateTime.parse('30 Jun 2024 18:19')) }
         let(:field_type) { :datetime }
         let(:config) do
           <<~CONFIG
@@ -78,6 +79,45 @@ RSpec.describe Amoeba::ClassMethods do
         after { travel_back }
 
         it { expect(dup.test_field).to eq(DateTime.parse('1 Jul 2024 09:35')) }
+      end
+
+      context 'with a field set by a parameter' do
+        let(:original) { TestModel.new(test_field: 'original string') }
+        let(:dup_params) { { str_arg: 'new string arg' } }
+        let(:field_type) { :string }
+        let(:config) do
+          <<~CONFIG
+            amoeba do
+              set test_field: ->(str_arg:) { ">> \#{str_arg} <<" }
+            end
+          CONFIG
+        end
+
+        it { expect(dup.test_field).to eq('>> new string arg <<') }
+      end
+
+      context 'with fields set by different parameters' do
+        let(:original) { TestModel.new(test_field: 'original string', second_test_field: 33, third_test_field: '') }
+        let(:dup_params) { { str_arg: 'new string arg', int_arg: 99 } }
+        let(:field_type) { :string }
+        let(:config) do
+          <<~CONFIG
+            amoeba do
+              set test_field: ->(str_arg:) { ">> \#{str_arg} <<" }
+              set second_test_field: ->(int_arg:) { int_arg * 2 }
+              set third_test_field: ->(str_arg:, int_arg: 33, other_arg: 'default') { "\#{str_arg} - \#{int_arg} - default" }
+            end
+          CONFIG
+        end
+
+        before do
+          ActiveRecord::Base.connection.add_column :test_models, :second_test_field, :integer
+          ActiveRecord::Base.connection.add_column :test_models, :third_test_field, :string
+        end
+
+        it { expect(dup.test_field).to eq('>> new string arg <<') }
+        it { expect(dup.second_test_field).to eq(198) }
+        it { expect(dup.third_test_field).to eq('new string arg - 99 - default') }
       end
     end
   end
