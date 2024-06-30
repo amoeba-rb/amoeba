@@ -135,7 +135,7 @@ module Amoeba
     def process_coercions
       # prepend any extra strings to indicate uniqueness of the new record(s)
       amoeba.coercions.each do |field, coercion|
-        @new_object[field] = coercion.to_s
+        @new_object[field] = coercion.is_a?(Proc) ? coercion.call : coercion.to_s
       end
     end
 

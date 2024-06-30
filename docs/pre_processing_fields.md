@@ -24,6 +24,15 @@ Set a field to a given value.
   end
 ```
 
+The field may be set to the return value of a lambda, so to set a field to the
+current time:
+
+```ruby
+  amoeba do
+    set datetime_field: ->() { Time.now }
+  end
+```
+
 ## regex
 
 To do

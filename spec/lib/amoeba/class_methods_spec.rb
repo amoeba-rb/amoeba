@@ -62,6 +62,23 @@ RSpec.describe Amoeba::ClassMethods do
 
         it { expect(dup.test_field).to be(false) }
       end
+
+      context 'with a datetime field set by a lambda' do
+        let(:params) { { test_field: DateTime.parse('30 Jun 2024 18:19') } }
+        let(:field_type) { :datetime }
+        let(:config) do
+          <<~CONFIG
+            amoeba do
+              set test_field: ->() { Time.now }
+            end
+          CONFIG
+        end
+
+        before { travel_to DateTime.parse('1 Jul 2024 09:35') }
+        after { travel_back }
+
+        it { expect(dup.test_field).to eq(DateTime.parse('1 Jul 2024 09:35')) }
+      end
     end
   end
 end
