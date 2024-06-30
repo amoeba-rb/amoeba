@@ -110,7 +110,7 @@ class CustomThing < ActiveRecord::Base
     end
   end
 
-  serialize :value, ArrayPack
+  serialize :value, coder: ArrayPack
 
   before_create :hydrate_me
 
