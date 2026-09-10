@@ -10,6 +10,17 @@ gem 'amoeba'
 
 The gem depends on Active Record. Confirm supported Ruby and Active Record versions from the gemspec and CI matrix for the version being installed.
 
+## Runnable example
+
+The [`example/`](../example/) directory is a small, self-contained Active Record + SQLite3 app demonstrating recursive copying and the `prepend`/`nullify` directives:
+
+```sh
+cd example
+bundle install
+bundle exec ruby setup.rb    # creates the database and seeds sample data
+bundle exec ruby example.rb  # duplicates a record and prints the result
+```
+
 ## First duplication
 
 Given a post with comments, enable Amoeba on every model whose child associations should be copied recursively.

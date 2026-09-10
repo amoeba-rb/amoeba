@@ -5,6 +5,7 @@ Amoeba extends Active Record models with `amoeba_dup`, a configurable deep-dupli
 ## Guides
 
 - [Getting started](getting-started.md): installation, the duplication lifecycle, and a first model.
+- [Runnable example](../example/): a small Active Record + SQLite3 app you can run to see Amoeba in action.
 - [Configuration reference](configuration.md): every public method available inside an `amoeba` block.
 - [Common recipes](examples.md): typical application configurations.
 - [Advanced usage](advanced.md): recursion, `has_many :through`, STI, custom duplicate methods, and remapping.
