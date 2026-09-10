@@ -341,15 +341,96 @@ describe 'amoeba' do
 
     let(:image) { ::Image.create(filename: 'test.jpg', product_id: 12) }
 
-    before do
-      Image.fresh_amoeba
-      Image.amoeba do
-        nullify :product_id
+    before { ::Image.fresh_amoeba }
+
+    context 'without a condition' do
+      before do
+        ::Image.amoeba do
+          nullify :product_id
+        end
+      end
+
+      it { is_expected.to be_truthy }
+      it { expect(image_dup.product_id).to be_nil }
+
+      it 'exposes the field names through null_fields' do
+        expect(::Image.amoeba.null_fields).to eq([:product_id])
+      end
+
+      it 'registers no condition' do
+        expect(::Image.amoeba.null_field_conditions).to be_empty
       end
     end
 
-    it { is_expected.to be_truthy }
-    it { expect(image_dup.product_id).to be_nil }
+    context 'with a truthy if condition' do
+      before do
+        ::Image.amoeba do
+          nullify :product_id, if: :truthy?
+        end
+      end
+
+      it { expect(image_dup.product_id).to be_nil }
+    end
+
+    context 'with a falsey if condition' do
+      before do
+        ::Image.amoeba do
+          nullify :product_id, if: :falsey?
+        end
+      end
+
+      it { expect(image_dup.product_id).to eq(12) }
+
+      it 'keeps the condition out of null_fields' do
+        expect(::Image.amoeba.null_fields).to eq([:product_id])
+      end
+
+      it 'records the condition against the field' do
+        expect(::Image.amoeba.null_field_conditions).to eq(product_id: :falsey?)
+      end
+    end
+
+    context 'with an array of fields and a falsey if condition' do
+      before do
+        ::Image.amoeba do
+          nullify %i[filename product_id], if: :falsey?
+        end
+      end
+
+      it { expect(image_dup.filename).to eq('test.jpg') }
+      it { expect(image_dup.product_id).to eq(12) }
+    end
+
+    context 'when an array of fields replaces the previously configured ones' do
+      before do
+        ::Image.amoeba do
+          nullify :filename
+          nullify [:product_id]
+        end
+      end
+
+      it { expect(image_dup.filename).to eq('test.jpg') }
+      it { expect(image_dup.product_id).to be_nil }
+
+      it 'drops the replaced field from null_fields' do
+        expect(::Image.amoeba.null_fields).to eq([:product_id])
+      end
+    end
+
+    context 'when an array of fields replaces a previously conditional one' do
+      before do
+        ::Image.amoeba do
+          nullify :product_id, if: :falsey?
+          nullify [:product_id]
+        end
+      end
+
+      it { expect(image_dup.product_id).to be_nil }
+
+      it 'drops the condition along with the previous list' do
+        expect(::Image.amoeba.null_field_conditions).to be_empty
+      end
+    end
   end
 
   context 'strict propagate' do

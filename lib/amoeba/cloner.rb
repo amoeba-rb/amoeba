@@ -128,6 +128,9 @@ module Amoeba
     def process_null_fields
       # nullify any fields the user has configured
       amoeba.null_fields.each do |field_key|
+        condition = amoeba.null_field_conditions[field_key]
+        next if condition && !@old_object.send(condition)
+
         @new_object[field_key] = nil
       end
     end

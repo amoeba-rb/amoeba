@@ -220,6 +220,13 @@ class Section < ActiveRecord::Base
 end
 
 class Image < ActiveRecord::Base
+  def truthy?
+    true
+  end
+
+  def falsey?
+    false
+  end
 end
 
 class Shirt < Product

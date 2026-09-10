@@ -340,6 +340,25 @@ This example will copy all of a post's comments. It will also nullify the publis
 
 Unlike inclusive and exclusive styles, specifying null fields will not automatically enable amoeba to copy all child records. As with any active record object, the default field value will be used instead of `nil` if a default value exists on the migration.
 
+A field may also be nullified only under a given condition, by passing the name of a method on the source record to the `:if` option, just like the [conditions](#conditions) available for `include_association` and `exclude_association`:
+
+```ruby
+class Post < ActiveRecord::Base
+  belongs_to :topic
+
+  amoeba do
+    nullify :date_published
+    nullify :topic_id, if: :popular?
+  end
+
+  def popular?
+    likes > 15
+  end
+end
+```
+
+Here `date_published` is always nullified, while `topic_id` is only nullified when `popular?` returns a truthy value on the post being copied. The `:if` option accepts a method name only.
+
 #### Set
 
 If you wish to just set a field to an arbitrary value on all duplicated objects you may use the `set` directive. For example, if you wanted to copy an object that has some kind of approval process associated with it, you likely may wish to set the new object's state to be open or "in progress" again.
@@ -1128,6 +1147,8 @@ end
 #### nullify
 
   Adds a field to the list of non-association based fields which should be set to nil during copy. All fields in this list will be set to `nil` - note that any nullified field will be given its default value if a default value exists on this model's migration. This method may be called multiple times, once per desired field, or you may pass an array of field names. Passing a single symbol will add to the list of null fields. Passing an array will empty the list and replace it with the array you pass.
+
+  Accepts an `:if` option, taking the name of a method that is called on the record being copied. The field is only nullified when that method returns a truthy value, e.g. `nullify :topic_id, if: :popular?`. When an array of field names is given, the condition applies to every field in the array. As with the list of null fields itself, passing an array empties the list of conditions and replaces it, which is how a condition already set on a field is removed.
 
 #### prepend
 
