@@ -15,7 +15,7 @@ module Amoeba
       clones: [],
       customizations: [],
       overrides: [],
-      null_fields: [],
+      null_fields: {},
       coercions: {},
       prefixes: {},
       suffixes: {},
@@ -123,14 +123,19 @@ module Amoeba
       push_value_to_array(value, :known_macros)
     end
 
-    { override: 'overrides', customize: 'customizations',
-      nullify: 'null_fields' }.each do |method, key|
+    { override: 'overrides', customize: 'customizations' }.each do |method, key|
       class_eval <<-EOS, __FILE__, __LINE__ + 1
         def #{method}(value = nil)             # def override(value = nil)
           @config[:do_preproc] = true          #   @config[:do_preproc] = true
           push_value_to_array(value, :#{key})  #   push_value_to_array(value, :overrides)
         end                                    # end
       EOS
+    end
+
+    def nullify(value = nil, options = {})
+      @config[:do_preproc] = true
+      @config[:null_fields] = {} if value.is_a?(::Array)
+      push_value_to_hash(Array(value).to_h { |field| [field, options] }, :null_fields)
     end
 
     { set: 'coercions', prepend: 'prefixes',

@@ -4,6 +4,7 @@
 * Notes on contributing. Github Actions for automate tests. [https://github.com/amoeba-rb/amoeba/pull/124]
 * Fix tests for Active Record after 7.1. [https://github.com/amoeba-rb/amoeba/pull/127]
 * Refactor tests. [https://github.com/amoeba-rb/amoeba/pull/130]
+* Allow `nullify` to accept an `:if` condition. `Config#null_fields` is now a Hash of field names to options rather than an Array of field names, for consistency with `includes` and `excludes`; code reading it directly should use `null_fields.keys`. [https://github.com/amoeba-rb/amoeba/pull/134]
 
 ### 3.3.0
 
