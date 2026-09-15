@@ -19,6 +19,7 @@ SimpleCov.start do
 end
 
 require 'active_record'
+require 'active_support/testing/time_helpers'
 require 'amoeba'
 
 adapter = if defined?(JRuby)
@@ -32,6 +33,7 @@ adapter = if defined?(JRuby)
 ActiveRecord::Base.establish_connection(adapter: adapter, database: ':memory:')
 
 ::RSpec.configure do |config|
+  config.include ActiveSupport::Testing::TimeHelpers
   config.order = :defined
 end
 
