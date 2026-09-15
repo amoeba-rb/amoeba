@@ -25,16 +25,5 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ['lib']
 
-  # specify any dependencies here; for example:
-  s.add_development_dependency 'rspec', '~> 3.13.0'
-  s.add_development_dependency 'rubocop', '~> 1.71.0'
-  s.add_development_dependency 'rubocop-rake', '~> 0.6.0'
-  s.add_development_dependency 'rubocop-rspec', '~> 2.27.1'
-
-  if RUBY_PLATFORM == 'java'
-    s.add_development_dependency 'activerecord-jdbc-adapter', '= 70.1'
-    s.add_development_dependency 'activerecord-jdbcsqlite3-adapter', '= 70.1'
-  end
-
-  s.add_dependency 'activerecord', '>= 6.1.0'
+  s.add_dependency 'activerecord', '>= 7.1.0'
 end
