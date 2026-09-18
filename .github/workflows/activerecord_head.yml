@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  test_cruby:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,6 +20,21 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby_version }}
+        bundler-cache: true
+    - name: Run tests
+      # Allow tests to run on Active Record head without failing the pipeline
+      run: bundle exec rspec || true
+  test_jruby:
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_GEMFILE: gemfiles/jruby_activerecord_head.gemfile
+      JRUBY_OPTS: --debug
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: jruby
         bundler-cache: true
     - name: Run tests
       # Allow tests to run on Active Record head without failing the pipeline

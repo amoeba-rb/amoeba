@@ -361,8 +361,8 @@ end
 # Proper inheritance
 
 class Box < ActiveRecord::Base
-  has_many        :products, class_name: 'BoxProduct'
-  has_many        :sub_products, class_name: 'BoxSubProduct'
+  has_many :products, class_name: 'BoxProduct'
+  has_many :sub_products, class_name: 'BoxSubProduct'
 
   amoeba do
     enable

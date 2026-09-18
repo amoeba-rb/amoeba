@@ -29,7 +29,14 @@ adapter = if defined?(JRuby)
             'sqlite3'
           end
 
-ActiveRecord::Base.establish_connection(adapter: adapter, database: ':memory:')
+begin
+  ActiveRecord::Base.establish_connection(adapter: adapter, database: ':memory:')
+rescue ActiveRecord::AdapterNotFound
+  # activerecord-jdbc-adapter >= 80.0 registers itself under the standard 'sqlite3' name
+  raise unless adapter == 'jdbcsqlite3'
+
+  ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+end
 
 ::RSpec.configure do |config|
   config.order = :defined

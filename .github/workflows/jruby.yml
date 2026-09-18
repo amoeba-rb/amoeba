@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gemfile: [ jruby_activerecord_7.0 ]
+        gemfile: [ jruby_activerecord_7.1, jruby_activerecord_7.2, jruby_activerecord_8.0 ]
     env:
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
       JRUBY_OPTS: --debug

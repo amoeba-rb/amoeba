@@ -3,6 +3,7 @@
 module Amoeba
   module Macros
     extend self
+
     def list
       @list ||= {}
     end
