@@ -1,3 +1,9 @@
+### Unreleased
+
+* Update minimum supported Ruby version to 3.2
+* Update minimum supported Rails version to 7.1
+* Tidy up Gemspec file
+
 ### 3.4.0
 
 * Update test matrix for current version for Ruby and Rails. Drop support for Rails versions 5.2 and 6.0, and Ruby 2.5, 2.6 and 2.7. [https://github.com/amoeba-rb/amoeba/pull/120 and https://github.com/amoeba-rb/amoeba/pull/124]
