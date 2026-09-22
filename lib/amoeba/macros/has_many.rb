@@ -32,7 +32,7 @@ module Amoeba
         return if association.is_a?(ActiveRecord::Reflection::ThroughReflection)
 
         @old_object.__send__(relation_name).each do |old_obj|
-          copy_of_obj = old_obj.amoeba_dup(@options)
+          copy_of_obj = old_obj.amoeba_dup
           copy_of_obj[:"#{association.foreign_key}"] = nil
           relation_name = remapped_relation_name(relation_name)
           # associate this new child to the new parent object

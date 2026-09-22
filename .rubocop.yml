@@ -19,3 +19,5 @@ Style/Documentation:
   Enabled: false
 Metrics/MethodLength:
   Max: 15
+RSpec/NestedGroups:
+  Max: 4

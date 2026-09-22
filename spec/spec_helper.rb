@@ -19,6 +19,7 @@ SimpleCov.start do
 end
 
 require 'active_record'
+require 'active_support/testing/time_helpers'
 require 'amoeba'
 
 adapter = if defined?(JRuby)
@@ -39,6 +40,7 @@ rescue ActiveRecord::AdapterNotFound
 end
 
 ::RSpec.configure do |config|
+  config.include ActiveSupport::Testing::TimeHelpers
   config.order = :defined
 end
 
