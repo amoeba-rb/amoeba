@@ -21,30 +21,85 @@ bundle exec ruby setup.rb    # creates the database and seeds sample data
 bundle exec ruby example.rb  # duplicates a record and prints the result
 ```
 
-## First duplication
+## In detail
 
-Given a post with comments, enable Amoeba on every model whose child associations should be copied recursively.
+The definition of the `Survey` class in the above example is;
 
 ```ruby
-class Post < ApplicationRecord
-  has_many :comments, inverse_of: :post
+class Survey < ActiveRecord::Base
+  has_many :sections, inverse_of: :survey
 
   amoeba do
     enable
     prepend title: 'Copy of '
   end
 end
+```
 
-class Comment < ApplicationRecord
-  belongs_to :post, inverse_of: :comments
+When an instance of `Survey` is duplicated the Amoeba configuration does two things;
+* `enable` causes child associations to be copied recursively
+* `prepend` adds text to the string attribute
+
+`Section` is defined as;
+
+```ruby
+class Section < ActiveRecord::Base
+  belongs_to :survey, inverse_of: :sections
+  has_many :questions, inverse_of: :section
+
+  amoeba do
+    enable
+  end
 end
+```
 
-original = Post.find(params[:id])
+As in `Survey`, `enable` causes child associations to be copied.
+
+`Question` is defined as;
+
+```ruby
+class Question < ActiveRecord::Base
+  belongs_to :section, inverse_of: :questions
+
+  amoeba do
+    nullify :response_count
+  end
+end
+```
+
+This class does not have child associations and so `enable` is not necessary. `nullify` results in the value to be set to nil in the copied instance.
+
+## First duplication
+
+With the classes set up as above;
+
+```ruby
+original = Survey.find(id)
 copy = original.amoeba_dup
 copy.save!
 ```
 
-`copy` is a new, unsaved `Post`. With this configuration it has a copied title and new, unsaved comment records attached to it. Persisting `copy` saves the graph through Active Record's normal association behavior.
+`copy` is a new `Survey` based on `original`. The title of `copy` is the same as the title of `original` with `Copy of ` prepended so, for example;
+
+```ruby
+original.title
+=> "My first survey"
+copy.title
+=> "Copy of My first survey"
+```
+
+Any sections that `original` has are duplicated in `copy` as new instances of `Section`. The questions attached to each section are also duplicated and the values of `response_count` are set to `nil`. So, for example;
+
+```ruby
+original.sections.first.questions.first.question
+=> "What is your favourite colour?"
+original.sections.first.questions.first.response_count
+=> 42
+copy.sections.first.questions.first.question
+=> "What is your favourite colour?"
+copy.sections.first.questions.first.response_count
+=> nil
+```
 
 ## What Amoeba copies
 

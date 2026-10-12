@@ -4,7 +4,7 @@ require_relative 'config/environment'
 
 load File.expand_path('db/schema.rb', __dir__)
 
-survey = Survey.create!(title: 'Customer Satisfaction Q3')
+survey = Survey.create!(title: 'Customer Satisfaction')
 
 SECTION_QUESTIONS = {
   'Demographics' => [
