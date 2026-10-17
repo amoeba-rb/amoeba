@@ -158,6 +158,8 @@ module Amoeba
     def process_regexes
       # regex any fields that need changing
       amoeba.regexes.each do |field, action|
+        next if @new_object[field].nil?
+
         @new_object[field].gsub!(action[:replace], action[:with])
       end
     end
