@@ -3,6 +3,7 @@
 * Update minimum supported Ruby version to 3.2
 * Update minimum supported Rails version to 7.1
 * Tidy up Gemspec file
+* Fix `regex` raising `NoMethodError` when the field is nil. [https://github.com/amoeba-rb/amoeba/issues/107]
 
 ### 3.4.0
 
