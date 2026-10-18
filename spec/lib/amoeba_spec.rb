@@ -425,6 +425,32 @@ describe 'amoeba' do
     end
   end
 
+  context 'with a field configured with regex' do
+    subject(:image_dup) { image.amoeba_dup }
+
+    before do
+      ::Image.fresh_amoeba
+      ::Image.amoeba do
+        enable
+        regex filename: { replace: /jpg/, with: 'png' }
+      end
+    end
+
+    context 'when the field has a value' do
+      let(:image) { ::Image.create(filename: 'test.jpg') }
+
+      it { expect(image_dup.filename).to eq('test.png') }
+      it { expect { image_dup }.not_to change(image, :filename).from('test.jpg') }
+    end
+
+    context 'when the field is nil' do
+      let(:image) { ::Image.create(filename: nil) }
+
+      it { expect { image_dup }.not_to raise_error }
+      it { expect(image_dup.filename).to be_nil }
+    end
+  end
+
   context 'strict propagate' do
     it 'calls #reset_amoeba' do
       allow(SuperBlackBox).to receive(:reset_amoeba).and_call_original
