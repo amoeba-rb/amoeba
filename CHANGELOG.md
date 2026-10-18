@@ -1,9 +1,9 @@
-### Unreleased
+### 3.4.1
 
 * Update minimum supported Ruby version to 3.2
 * Update minimum supported Rails version to 7.1
-* Tidy up Gemspec file
-* Fix `regex` raising `NoMethodError` when the field is nil. [https://github.com/amoeba-rb/amoeba/issues/107]
+* Tidy up Gemspec file. Various files, such as test files, are no longer bundled with the gem. The gem file is now 21K (unpacked to 128K) compared with 34K (unpacked to 292K) previously. [https://github.com/amoeba-rb/amoeba/pull/136]
+* Fix `regex` raising `NoMethodError` when the field is nil.[https://github.com/amoeba-rb/amoeba/pull/138] Thanks @suryakant-source
 
 ### 3.4.0
 
