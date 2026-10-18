@@ -440,7 +440,7 @@ describe 'amoeba' do
       let(:image) { ::Image.create(filename: 'test.jpg') }
 
       it { expect(image_dup.filename).to eq('test.png') }
-      it { expect(image.filename).to eq('test.jpg') }
+      it { expect { image_dup }.not_to change(image, :filename).from('test.jpg') }
     end
 
     context 'when the field is nil' do
