@@ -3,7 +3,7 @@
 require 'simplecov'
 
 SimpleCov.start do
-  add_filter 'spec'
+  skip 'spec'
   minimum_coverage(76)
 
   if ENV['CI']
