@@ -3,7 +3,7 @@
 require 'forwardable'
 
 module Amoeba
-  class Cloner # rubocop:disable Metrics/ClassLength
+  class Cloner
     extend Forwardable
 
     attr_reader :new_object, :old_object, :object_klass
@@ -78,10 +78,14 @@ module Amoeba
       amoeba.includes.each do |include, options|
         next if options[:if] && !@old_object.send(options[:if])
 
-        # `has_rich_text :body` defines the association as `rich_text_body`
-        name = [include, :"rich_text_#{include}"].find { |n| @object_klass.reflect_on_association(n) }
+        name = association_name_for(include)
         follow_association(name, @object_klass.reflect_on_association(name))
       end
+    end
+
+    # `has_rich_text :body` defines the association as `rich_text_body`
+    def association_name_for(include)
+      [include, :"rich_text_#{include}"].find { |n| @object_klass.reflect_on_association(n) } || include
     end
 
     def follow_all_except_excludes
