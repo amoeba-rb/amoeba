@@ -130,8 +130,17 @@ module Amoeba
       amoeba.null_fields.each do |field_key, options|
         next if options[:if] && !@old_object.send(options[:if])
 
-        @new_object[field_key] = nil
+        @new_object[field_key] = nullified_value(field_key)
       end
+    end
+
+    # A NOT NULL column cannot hold nil, so fall back to its default.
+    # column_for_attribute returns a NullColumn (null == true) when the
+    # attribute is not a column, and column_defaults holds the type-cast value.
+    def nullified_value(field_key)
+      return if @object_klass.column_for_attribute(field_key).null
+
+      @object_klass.column_defaults[field_key.to_s]
     end
 
     def process_coercions
