@@ -127,10 +127,10 @@ module Amoeba
 
     def process_null_fields
       # nullify any fields the user has configured
-      amoeba.null_fields.each do |field_key, options|
+      amoeba.null_fields.each do |key, options|
         next if options[:if] && !@old_object.send(options[:if])
 
-        @new_object[field_key] = nil
+        @new_object[key] = @object_klass.column_for_attribute(key).null ? nil : @object_klass.column_defaults[key.to_s]
       end
     end
 
