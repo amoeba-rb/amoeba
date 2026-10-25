@@ -1,3 +1,9 @@
+### Unreleased
+
+#### Bugfix
+
+* Use column default when nullify targets a NOT NULL column [https://github.com/amoeba-rb/amoeba/pull/141] Thanks @suryakant-source
+
 ### 3.4.1
 
 * Update minimum supported Ruby version to 3.2
