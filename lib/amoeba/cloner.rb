@@ -78,8 +78,14 @@ module Amoeba
       amoeba.includes.each do |include, options|
         next if options[:if] && !@old_object.send(options[:if])
 
-        follow_association(include, @object_klass.reflect_on_association(include))
+        name = association_name_for(include)
+        follow_association(name, @object_klass.reflect_on_association(name))
       end
+    end
+
+    # `has_rich_text :body` defines the association as `rich_text_body`
+    def association_name_for(include)
+      [include, :"rich_text_#{include}"].find { |n| @object_klass.reflect_on_association(n) } || include
     end
 
     def follow_all_except_excludes

@@ -7,6 +7,8 @@ source 'https://rubygems.org'
 gem 'activerecord', '~> 7.2'
 
 group :development, :test do
+  gem 'actiontext', '>= 7.1.0'
+  gem 'railties', '>= 7.1.0'
   gem 'rake'
   gem 'rspec', '~> 3.13.0'
   gem 'rubocop', '~> 1.91.0'
