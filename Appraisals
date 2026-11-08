@@ -36,6 +36,14 @@ appraise 'jruby-activerecord-8.0' do
   end
 end
 
+appraise 'jruby-activerecord-8.1' do
+  gem 'activerecord', '~> 8.1.0'
+  group :development, :test do
+    gem 'activerecord-jdbc-adapter', '~> 81.0.pre1'
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 81.0.pre1'
+  end
+end
+
 appraise 'activerecord-head' do
   git 'https://github.com/rails/rails.git', branch: 'main' do
     gem 'activerecord'
