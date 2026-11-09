@@ -10,6 +10,7 @@ jobs:
   test_cruby:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         ruby_version: [ 3.3, 3.4, '4.0', head ]
     env:
@@ -17,13 +18,27 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Ruby
+      id: setup_ruby
+      continue-on-error: true
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby_version }}
         bundler-cache: true
     - name: Run tests
-      # Allow tests to run on Active Record head without failing the pipeline
-      run: bundle exec rspec || true
+      if: steps.setup_ruby.outcome == 'success'
+      id: run_tests
+      continue-on-error: true
+      run: bundle exec rspec
+    - name: Report setup failure
+      if: steps.setup_ruby.outcome == 'failure'
+      run: |
+        echo "::warning title=Tests skipped::Ruby setup or dependency installation failed for Active Record head."
+        exit 1
+    - name: Report test failure
+      if: steps.setup_ruby.outcome == 'success' && steps.run_tests.outcome == 'failure'
+      run: |
+        echo "::warning title=Tests failed::Tests failed for Active Record head."
+        exit 1
   test_jruby:
     runs-on: ubuntu-latest
     env:
@@ -39,9 +54,17 @@ jobs:
         ruby-version: jruby
         bundler-cache: true
     - name: Run tests
+      id: run_tests
       if: steps.setup_ruby.outcome == 'success'
-      # Allow tests to run on Active Record head without failing the pipeline
-      run: bundle exec rspec || true
-    - name: Report JRuby setup failure
+      continue-on-error: true
+      run: bundle exec rspec
+    - name: Report setup failure
       if: steps.setup_ruby.outcome == 'failure'
-      run: echo "::warning title=JRuby tests skipped::Ruby setup or dependency installation failed for Active Record head."
+      run: |
+        echo "::warning title=Tests skipped::Ruby setup or dependency installation failed for Active Record head."
+        exit 1
+    - name: Report test failure
+      if: steps.setup_ruby.outcome == 'success' && steps.run_tests.outcome == 'failure'
+      run: |
+        echo "::warning title=Tests failed::Tests failed for Active Record head."
+        exit 1
