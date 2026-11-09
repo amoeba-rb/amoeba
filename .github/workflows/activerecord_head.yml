@@ -32,10 +32,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Ruby
+      id: setup_ruby
+      continue-on-error: true
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: jruby
         bundler-cache: true
     - name: Run tests
+      if: steps.setup_ruby.outcome == 'success'
       # Allow tests to run on Active Record head without failing the pipeline
       run: bundle exec rspec || true
+    - name: Report JRuby setup failure
+      if: steps.setup_ruby.outcome == 'failure'
+      run: echo "::warning title=JRuby tests skipped::Ruby setup or dependency installation failed for Active Record head."
