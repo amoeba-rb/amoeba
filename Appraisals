@@ -45,6 +45,7 @@ end
 appraise 'jruby-activerecord-head' do
   git 'https://github.com/rails/rails.git', branch: 'main' do
     gem 'activerecord'
+    gem 'actiontext'
   end
   group :development, :test do
     git 'https://github.com/jruby/activerecord-jdbc-adapter' do

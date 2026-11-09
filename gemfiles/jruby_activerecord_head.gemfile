@@ -5,6 +5,7 @@
 source 'https://rubygems.org'
 
 git 'https://github.com/rails/rails.git', branch: 'main' do
+  gem 'actiontext'
   gem 'activerecord'
 end
 
