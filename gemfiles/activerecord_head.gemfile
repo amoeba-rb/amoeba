@@ -6,6 +6,7 @@ source 'https://rubygems.org'
 
 git 'https://github.com/rails/rails.git', branch: 'main' do
   gem 'activerecord'
+  gem 'unknown'
 end
 
 group :development, :test do

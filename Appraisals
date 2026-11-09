@@ -39,6 +39,7 @@ end
 appraise 'activerecord-head' do
   git 'https://github.com/rails/rails.git', branch: 'main' do
     gem 'activerecord'
+    gem 'unknown'
   end
 end
 
