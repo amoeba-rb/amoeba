@@ -6,7 +6,7 @@ module Amoeba
   class Cloner
     extend Forwardable
 
-    attr_reader :new_object, :old_object, :object_klass
+    attr_reader :new_object, :old_object, :object_klass, :options
 
     def_delegators :old_object, :_parent_amoeba, :_amoeba_settings,
                    :_parent_amoeba_settings
