@@ -1,3 +1,7 @@
+### Unreleased
+
+* Pass the options given to `amoeba_dup` to `override` and `customize` blocks that take a third parameter, and to the associated records that are duplicated with it. [https://github.com/amoeba-rb/amoeba/issues/112] Builds on https://github.com/amoeba-rb/amoeba/pull/111, thanks @thinhbui311.
+
 ### 3.4.1
 
 * Update minimum supported Ruby version to 3.2
