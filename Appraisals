@@ -37,14 +37,28 @@ appraise 'jruby-activerecord-8.0' do
 end
 
 appraise 'activerecord-head' do
+  group :development, :test do
+    remove_gem 'actiontext'
+    remove_gem 'railties'
+  end
+
   git 'https://github.com/rails/rails.git', branch: 'main' do
+    gem 'actiontext'
     gem 'activerecord'
+    gem 'railties'
   end
 end
 
 appraise 'jruby-activerecord-head' do
+  group :development, :test do
+    remove_gem 'actiontext'
+    remove_gem 'railties'
+  end
+
   git 'https://github.com/rails/rails.git', branch: 'main' do
+    gem 'actiontext'
     gem 'activerecord'
+    gem 'railties'
   end
   group :development, :test do
     git 'https://github.com/jruby/activerecord-jdbc-adapter' do

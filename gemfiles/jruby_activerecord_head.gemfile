@@ -5,7 +5,9 @@
 source 'https://rubygems.org'
 
 git 'https://github.com/rails/rails.git', branch: 'main' do
+  gem 'actiontext'
   gem 'activerecord'
+  gem 'railties'
 end
 
 group :development, :test do

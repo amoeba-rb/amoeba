@@ -33,7 +33,7 @@ Lint/UselessAssignment:
 # Offense count: 2
 # Configuration parameters: CountComments, CountAsOne.
 Metrics/ClassLength:
-  Max: 130
+  Max: 140
 
 # Offense count: 3
 # Configuration parameters: ForbiddenDelimiters.
