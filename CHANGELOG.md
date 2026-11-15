@@ -1,3 +1,13 @@
+### Unreleased
+
+#### New features
+
+* Support for [Rich Text](https://guides.rubyonrails.org/action_text_overview.html) fields [https://github.com/amoeba-rb/amoeba/pull/142] Thank you to @goulvench for reporting and @suryakant-source for implementing.
+
+#### Bugfix
+
+* Use column default when nullify targets a NOT NULL column [https://github.com/amoeba-rb/amoeba/pull/141] Thanks @suryakant-source
+
 ### 3.4.1
 
 * Update minimum supported Ruby version to 3.2
