@@ -33,8 +33,8 @@ module Amoeba
       end
     end
 
-    def amoeba_dup(options = {})
-      ::Amoeba::Cloner.new(self, options).run
+    def amoeba_dup(**kwargs)
+      ::Amoeba::Cloner.new(self, **kwargs).run
     end
   end
 end
