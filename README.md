@@ -416,7 +416,7 @@ end
 
 ##### Customize
 
-You may run a custom method or methods to do basically anything you like, simply pass a lambda block, or an array of lambda blocks to the `customize` directive. Each block must have the same form, meaning that each block must accept two parameters, the original object and the newly copied object. You may then do whatever you wish, like this:
+You may run a custom method or methods to do basically anything you like, simply pass a lambda block, or an array of lambda blocks to the `customize` directive. Each block must have the same form, meaning that each block must accept two parameters, the original object and the newly copied object (and, optionally, a third: see [Passing Options](#passing-options)). You may then do whatever you wish, like this:
 
 ```ruby
 class Post < ActiveRecord::Base
@@ -474,6 +474,36 @@ class Post < ActiveRecord::Base
     append :comments => "... know what I'm sayin?"
   end
 end
+```
+
+##### Passing Options
+
+Any options passed to `amoeba_dup` are given to the `override` and `customize` blocks that take a third parameter. Blocks that take only two parameters are called with two arguments, as before. The options are also passed down to every associated record that is duplicated along with the original, so the blocks of the child models receive them too. If `amoeba_dup` is called without options, the third argument is an empty hash, unless the block gives it a default value: then the default is used.
+
+```ruby
+class Course < ActiveRecord::Base
+  has_many :lessons
+
+  amoeba do
+    enable
+    customize(lambda { |original_course, new_course, options|
+      new_course.starts_on = options[:starts_on]
+    })
+  end
+end
+
+class Lesson < ActiveRecord::Base
+  belongs_to :course
+
+  amoeba do
+    customize(lambda { |original_lesson, new_lesson, options|
+      offset = original_lesson.scheduled_on - original_lesson.course.starts_on
+      new_lesson.scheduled_on = options[:starts_on] + offset
+    })
+  end
+end
+
+next_term = course.amoeba_dup(starts_on: Date.new(2027, 1, 11))
 ```
 
 #### Chaining
@@ -1168,13 +1198,13 @@ end
 
 #### override
 
-  Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy. These blocks will run before any other duplication or field processing.
+  Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy. A block that takes a third parameter also receives the options passed to `amoeba_dup`. These blocks will run before any other duplication or field processing.
 
   This method may be called multiple times, once per desired customizer block, or you may pass an array of lambdas. Passing a single lambda will add to the list of processing directives. Passing an array will empty the list and replace it with the array you pass.
 
 #### customize
 
-  Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy. These blocks will run after all copying and field processing.
+  Runs a custom method so you can do basically whatever you want. All you need to do is pass a lambda block or an array of lambda blocks that take two parameters, the original object and the new object copy. A block that takes a third parameter also receives the options passed to `amoeba_dup`. These blocks will run after all copying and field processing.
 
   This method may be called multiple times, once per desired customizer block, or you may pass an array of lambdas. Passing a single lambda will add to the list of processing directives. Passing an array will empty the list and replace it with the array you pass.
 
