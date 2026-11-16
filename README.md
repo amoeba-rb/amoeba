@@ -478,7 +478,7 @@ end
 
 ##### Passing Options
 
-Any options passed to `amoeba_dup` are given to the `override` and `customize` blocks that take a third parameter. Blocks that take only two parameters are called with two arguments, as before. The options are also passed down to every associated record that is duplicated along with the original, so the blocks of the child models receive them too. If `amoeba_dup` is called without options, the third argument is an empty hash.
+Any options passed to `amoeba_dup` are given to the `override` and `customize` blocks that take a third parameter. Blocks that take only two parameters are called with two arguments, as before. The options are also passed down to every associated record that is duplicated along with the original, so the blocks of the child models receive them too. If `amoeba_dup` is called without options, the third argument is an empty hash, unless the block gives it a default value: then the default is used.
 
 ```ruby
 class Course < ActiveRecord::Base

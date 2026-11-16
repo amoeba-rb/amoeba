@@ -123,10 +123,16 @@ module Amoeba
       amoeba.overrides.each { |block| call_block(block) }
     end
 
-    # Blocks that take a third parameter also receive the options passed to amoeba_dup
     def call_block(block)
-      takes_options = block.parameters.count { |type, _| %i[req opt rest].include?(type) } > 2
-      block.call(@old_object, @new_object, *(takes_options ? [@options] : []))
+      args = [@old_object, @new_object]
+      args << @options if takes_options?(block)
+      block.call(*args)
+    end
+
+    # A lambda's optional third parameter keeps its default unless options are given
+    def takes_options?(block)
+      type = block.parameters[2]&.first
+      type == :req || (type == :opt && (!block.lambda? || @options.present?))
     end
 
     def process_null_fields
