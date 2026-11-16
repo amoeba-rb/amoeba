@@ -1,6 +1,13 @@
 ### Unreleased
 
+#### New features
+
+* Support for [Rich Text](https://guides.rubyonrails.org/action_text_overview.html) fields [https://github.com/amoeba-rb/amoeba/pull/142] Thank you to @goulvench for reporting and @suryakant-source for implementing.
 * Pass the options given to `amoeba_dup` to `override` and `customize` blocks that take a third parameter, and to the associated records that are duplicated with it. [https://github.com/amoeba-rb/amoeba/issues/112] Builds on https://github.com/amoeba-rb/amoeba/pull/111, thanks @thinhbui311.
+
+#### Bugfix
+
+* Use column default when nullify targets a NOT NULL column [https://github.com/amoeba-rb/amoeba/pull/141] Thanks @suryakant-source
 
 ### 3.4.1
 

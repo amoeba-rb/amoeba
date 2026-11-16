@@ -29,6 +29,8 @@ adapter = if defined?(JRuby)
             'sqlite3'
           end
 
+require 'support/action_text'
+
 begin
   ActiveRecord::Base.establish_connection(adapter: adapter, database: ':memory:')
 rescue ActiveRecord::AdapterNotFound
